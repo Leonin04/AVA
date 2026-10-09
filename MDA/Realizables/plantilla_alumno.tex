@@ -1,0 +1,352 @@
+% ==============================================================================
+% PLANTILLA_ALUMNO.TEX — MACRO Y DEFINICIÓN DE FICHA PARA ALUMNADO (NEAE)
+% Asignatura: Metodologías de Desarrollo Ágil (MDA) — Universidad de Granada
+% Proyecto AUTOVIDA (26-175) | Reto CeRA — Agenda Accesible PTVAL
+% ==============================================================================
+% Campos canónicos: 9 (Sin Occupation, Education ni Company Information)
+% Uso: \input{plantilla_alumno.tex} y luego invocar \fichaAlumno[...] o \fichaAlumnoBlanco
+% ==============================================================================
+
+\ifdefined\isSubFile
+    % Si se incluye desde otro documento, los paquetes ya están cargados
+\else
+    \documentclass[10pt]{article}
+    \usepackage[utf8]{inputenc}
+    \usepackage[spanish,es-tabla]{babel}
+    \usepackage[margin=0.8cm,top=0.6cm,bottom=0.6cm]{geometry}
+    \usepackage{helvet}
+    \renewcommand{\familydefault}{\sfdefault}
+    \usepackage{microtype}
+    \usepackage{graphicx}
+    \usepackage{xcolor}
+    \usepackage{tikz}
+    \usepackage{enumitem}
+    \usepackage{fontawesome5}
+    \usepackage{tcolorbox}
+    \tcbuselibrary{skins}
+    \pagestyle{empty}
+\fi
+
+% Colores del sistema
+\providecolor{primaryColor}{RGB}{20, 65, 105}     % Azul corporativo
+\providecolor{secondaryColor}{RGB}{35, 115, 170}  % Azul medio accesible
+\providecolor{tealColor}{RGB}{20, 130, 140}       % Verde azulado
+\providecolor{greenColor}{RGB}{30, 135, 75}       % Verde bosque
+\providecolor{accentColor}{RGB}{215, 105, 25}     % Naranja cálido
+\providecolor{purpleColor}{RGB}{120, 60, 150}     % Púrpura suave
+\providecolor{dangerColor}{RGB}{185, 45, 35}      % Rojo criticidad
+\providecolor{bgCard}{RGB}{252, 253, 255}         % Fondo limpio
+\providecolor{borderCard}{RGB}{215, 225, 235}     % Borde sutil
+\providecolor{textDark}{RGB}{30, 40, 50}          % Texto principal oscuro
+\providecolor{textMuted}{RGB}{95, 110, 125}       % Texto secundario
+
+% Configuración de listas
+\setlist[itemize]{leftmargin=3.0mm, itemsep=0.4pt, parsep=0pt, topsep=0.4pt, partopsep=0pt}
+
+% Estilos de caja fija para Alumno
+\tcbset{
+    cardAlumnoBox/.style={
+        enhanced,
+        boxrule=0.65pt,
+        arc=1.8mm,
+        height=32.0mm,
+        left=5.0pt, right=5.0pt, top=1.8pt, bottom=1.8pt,
+        boxsep=0pt,
+        colback=bgCard,
+        colframe=borderCard,
+        fonttitle=\bfseries\small,
+        fontupper=\fontsize{8.5pt}{10.0pt}\selectfont,
+    },
+    cardAlumnoWideBox/.style={
+        enhanced,
+        boxrule=0.65pt,
+        arc=1.8mm,
+        height=22.5mm,
+        left=6.0pt, right=6.0pt, top=2.0pt, bottom=2.0pt,
+        boxsep=0pt,
+        colback=bgCard,
+        colframe=borderCard,
+        fonttitle=\bfseries\small,
+    }
+}
+
+% Macro para badges visuales (si no existe)
+\providecommand{\badge}[2]{%
+    \tikz[baseline=(b.base)] \node[fill=#1!12, text=#1!90!black, draw=#1!35, line width=0.4pt, rounded corners=1.2mm, inner sep=2.0pt, font=\bfseries\scriptsize] (b) {#2};%
+}
+
+% Definición de claves con pgfkeys para \fichaAlumno
+\pgfkeys{
+    /fichaAlumno/.is family, /fichaAlumno,
+    default/.style = {
+        bannerTitulo = {\faUserGraduate\ FICHA DE PERSONA: ALUMNADO (METODOLOGÍA DCU)},
+        subtitulo = {Proyecto AUTOVIDA (26-175) \textbar\ Reto CeRA — Agenda Accesible PTVAL \textbar\ Asignatura MDA (UGR)},
+        equipo = {\textbf{Equipo CeRA-MDA} (5 integrantes)\\\ Course 2026/2027 \textbar\ \textbf{Práctica 1}},
+        nombre = {[Nombre y Apellidos del Alumno]},
+        nombreCorto = {[ALUMNO]},
+        edad = {[Edad]},
+        icono = {\faUserGraduate},
+        foto = {},
+        badgeRol = {[Perfil NEAE / Aula]},
+        badgeTarea = {Tareas Rotativas},
+        centro = {CEE Purísima Concepción},
+        cita = {[Cita textual representativa que exprese cómo vive su rutina, qué le ayuda a anticipar y qué le genera ansiedad o rechazo].},
+        demographic = {
+            \item \textbf{Edad y Género (Age / Gender):} [[Edad] años, [Género]].
+            \item \textbf{Ubicación (Location):} [[Granada capital / Municipio]].
+            \item \textbf{Perfil diagnóstico:} [[Diagnóstico cognitivo, motor o sensorial]].
+        },
+        computerExp = {
+            \item \textbf{Habilidades informáticas:} [[Nivel táctil: autónomo, asistido]].
+            \item \textbf{Años de experiencia:} [[Años de contacto con tablets]].
+            \item \textbf{Hábitos de uso:} [[Apps frecuentes: vídeos, pictogramas, juegos]].
+            \item \textbf{Autonomía digital:} [[Baja / Media / Asistida]].
+        },
+        productExp = {
+            \item \textbf{Productos similares:} [[PECS en papel, velcro, apps previas]].
+            \item \textbf{Limitaciones actuales:} [[Pérdida de material, rigidez, frustración]].
+            \item \textbf{Tendencias de uso:} [[Receptividad a imágenes reales vs pictogramas]].
+        },
+        tasks = {
+            \item \textbf{Tareas Primarias:} 1) [[Login accesible]] $\rightarrow$ 2) [[Ver tarea actual]] $\rightarrow$ 3) [[Ejecutar pasos guiados]] $\rightarrow$ 4) [[Confirmar finalización]].
+            \item \textbf{Tareas Secundarias:} [[Ver siguiente tarea / pedir ayuda]].
+        },
+        domainKnowledge = {
+            \item \textbf{Comprensión del área:} [[Orientación en el colegio, aulas y profesores]].
+            \item \textbf{Comprensión temporal:} [[Visual (disco/reloj de arena), no numérica]].
+            \item \textbf{Destreza procedimental:} [[Grado de autonomía en la tarea asignada]].
+        },
+        technology = {
+            \item \textbf{Hardware:} [[Tablet Android / pulsador externo]].
+            \item \textbf{Software:} [[Android / síntesis de voz]].
+            \item \textbf{Herramientas habituales:} [[Conexión Wi-Fi / atril]].
+        },
+        attitudes = {
+            \item \textbf{Preferencias:} [[Refuerzos sensoriales favoritos, limpieza visual]].
+            \item \textbf{Miedo a la tecnología:} [[Reacción a errores, sonidos o bloqueos]].
+            \item \textbf{Valores:} [[Sentimiento de logro, orgullo por autonomía]].
+        },
+        learningStyle = {
+            \item \textbf{Perfil de aprendizaje:} [[\textbf{Visual} / \textbf{Auditivo} / \textbf{Kinestésico}]].
+            \item \textbf{Canales óptimos:} [[Fotos reales / Pictogramas ARASAAC / Vídeos]].
+            \item \textbf{Metodología:} [[Modelado guiado, repetición, ensayo y éxito]].
+        },
+        criticality = {
+            \item \textbf{Consecuencias de un error:} \textit{Emocional:} [[¿Bloqueo, crisis de frustración, rechazo?]] \textit{Operativo:} [[¿Desorientación, interrupción de la tarea?]]
+            \item \textbf{Tolerancia del software:} [[Acciones no destructivas, confirmación siempre asistida, botón SOS visible]].
+        },
+        escenario = {[[Narrar en 3-4 líneas una situación real: a qué hora usa la agenda, cómo anticipa su rutina con apoyos visuales y cómo supera el momento crítico logrando autonomía sin estrés.]]},
+        badgesAjustes = {
+            \badge{primaryColor}{\faKey\ Login: [[Método]]} \hspace{2mm}
+            \badge{secondaryColor}{\faIcons\ [[ARASAAC / Fotos]]} \hspace{2mm}
+            \badge{accentColor}{\faClock\ [[Temporizador]]} \hspace{2mm}
+            \badge{purpleColor}{\faVolumeUp\ [[Voz TTS]]}%
+        }
+    },
+    bannerTitulo/.store in = \fAlBannerTitulo,
+    subtitulo/.store in = \fAlSubtitulo,
+    equipo/.store in = \fAlEquipo,
+    nombre/.store in = \fAlNombre,
+    nombreCorto/.store in = \fAlNombreCorto,
+    edad/.store in = \fAlEdad,
+    icono/.store in = \fAlIcono,
+    foto/.store in = \fAlFoto,
+    badgeRol/.store in = \fAlBadgeRol,
+    badgeTarea/.store in = \fAlBadgeTarea,
+    centro/.store in = \fAlCentro,
+    cita/.store in = \fAlCita,
+    demographic/.store in = \fAlDemographic,
+    computerExp/.store in = \fAlComputerExp,
+    productExp/.store in = \fAlProductExp,
+    tasks/.store in = \fAlTasks,
+    domainKnowledge/.store in = \fAlDomainKnowledge,
+    technology/.store in = \fAlTechnology,
+    attitudes/.store in = \fAlAttitudes,
+    learningStyle/.store in = \fAlLearningStyle,
+    criticality/.store in = \fAlCriticality,
+    escenario/.store in = \fAlEscenario,
+    badgesAjustes/.store in = \fAlBadgesAjustes,
+}
+
+% COMANDO PRINCIPAL \fichaAlumno
+\newcommand{\fichaAlumno}[1][]{%
+    \begingroup
+    \pgfkeys{/fichaAlumno, default, #1}%
+    % 1. BANNER SUPERIOR
+    \begin{tcolorbox}[
+        enhanced,
+        colback=primaryColor,
+        colframe=primaryColor,
+        arc=1.6mm,
+        left=7pt, right=7pt, top=2.5pt, bottom=2.5pt,
+        boxsep=0pt, coltext=white
+    ]
+        \begin{minipage}[c]{0.70\textwidth}
+            {\normalsize\textbf{\fAlBannerTitulo}}\\[0.2mm]
+            {\tiny \fAlSubtitulo}
+        \end{minipage}\hfill
+        \begin{minipage}[c]{0.29\textwidth}
+            \raggedleft\tiny
+            \fAlEquipo
+        \end{minipage}
+    \end{tcolorbox}
+    \vspace{0.8mm}
+    % 2. TARJETA DE IDENTIDAD DEL ALUMNO
+    \begin{tcolorbox}[
+        enhanced,
+        colback=white,
+        colframe=primaryColor!65,
+        arc=2.0mm,
+        boxrule=0.8pt,
+        left=6pt, right=6pt, top=3.0pt, bottom=3.0pt,
+        boxsep=0pt,
+        drop shadow=black!5
+    ]
+        \begin{minipage}[c]{0.10\textwidth}
+            \centering
+            \begin{tikzpicture}
+                \ifx\fAlFoto\empty
+                    \draw[fill=primaryColor!8, draw=primaryColor!30, line width=0.5pt, rounded corners=2mm] (0,0) rectangle (1.4, 1.55);
+                    \node at (0.7, 0.95) {\color{primaryColor}\scalebox{1.5}{\fAlIcono}};
+                    \node[align=center] at (0.7, 0.28) {\tiny\textbf{\color{primaryColor}\fAlNombreCorto}\\\fontsize{4pt}{5pt}\selectfont\color{textMuted}\fAlEdad};
+                \else
+                    \begin{scope}
+                        \clip[rounded corners=2mm] (0,0) rectangle (1.45, 1.55);
+                        \node[inner sep=0pt] at (0.725, 0.775) {\includegraphics[width=1.45cm,height=1.55cm,keepaspectratio=false]{\fAlFoto}};
+                    \end{scope}
+                    \draw[draw=primaryColor!50, line width=0.8pt, rounded corners=2mm] (0,0) rectangle (1.45, 1.55);
+                \fi
+            \end{tikzpicture}
+        \end{minipage}\hfill
+        \begin{minipage}[c]{0.88\textwidth}
+            \begin{minipage}[b]{0.68\textwidth}\raggedright
+                {\large\textbf{\color{primaryColor}\fAlNombre}} \hspace{2mm}
+                \badge{secondaryColor}{\fAlBadgeRol} \badge{accentColor}{\fAlBadgeTarea}
+            \end{minipage}\hfill
+            \begin{minipage}[b]{0.31\textwidth}
+                \raggedleft\small\textbf{\color{primaryColor}\faSchool\ \fAlCentro}
+            \end{minipage}\\[0.6mm]
+            \tikz[baseline] \node[fill=primaryColor!5, draw=primaryColor!25, rounded corners=1.2mm, inner sep=2.5pt, text width=0.98\linewidth] {
+                \small\itshape\color{primaryColor}
+                \faQuoteLeft\ ``\fAlCita''\ \faQuoteRight
+            };
+        \end{minipage}
+    \end{tcolorbox}
+    \vspace{0.8mm}
+    % 3. LAS 9 CAJAS DE ALUMNOS (4 FILAS X 2 COLS + 1 FILA COMPLETA)
+    \noindent\begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=primaryColor!50, coltitle=primaryColor, title={\faIdCard\ 1. Demographic characteristics}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlDemographic
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=secondaryColor!60, coltitle=secondaryColor!90!black, title={\faLaptop\ 2. Computer experience}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlComputerExp
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}
+    \vspace{0.8mm}
+    \noindent\begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=secondaryColor!60, coltitle=secondaryColor!90!black, title={\faSearchPlus\ 3. Specific product experience}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlProductExp
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=greenColor!65, coltitle=greenColor!90!black, title={\faTasks\ 4. Tasks (Primary and secondary)}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlTasks
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}
+    \vspace{0.8mm}
+    \noindent\begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=accentColor!65, coltitle=accentColor!90!black, title={\faBrain\ 5. Domain knowledge}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlDomainKnowledge
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=tealColor!60, coltitle=tealColor!90!black, title={\faTools\ 6. Technology available}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlTechnology
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}
+    \vspace{0.8mm}
+    \noindent\begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=purpleColor!60, coltitle=purpleColor!90!black, title={\faHeart\ 7. Attitudes and values}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlAttitudes
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}\hfill
+    \begin{minipage}[t]{0.485\textwidth}
+        \begin{tcolorbox}[cardAlumnoBox, colframe=purpleColor!60, coltitle=purpleColor!90!black, title={\faEye\ 8. Learning style}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlLearningStyle
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}
+    \vspace{0.8mm}
+    % FILA 5: Punto 9 (ANCHO COMPLETO — CRITICALITY OF ERRORS)
+    \noindent\begin{minipage}[t]{\textwidth}
+        \begin{tcolorbox}[cardAlumnoWideBox, colframe=dangerColor!65, coltitle=dangerColor!90!black, title={\faExclamationTriangle\ 9. Criticality of errors (Consecuencias de un error y tolerancia del software)}]
+            \fontsize{8.2pt}{9.8pt}\selectfont
+            \begin{itemize}
+                \fAlCriticality
+            \end{itemize}
+        \end{tcolorbox}
+    \end{minipage}
+    \vspace{0.8mm}
+    % 4. BARRA INFERIOR DE INTEGRACIÓN CeRA
+    \begin{tcolorbox}[
+        enhanced,
+        colback=primaryColor!4,
+        colframe=primaryColor!45,
+        arc=1.6mm,
+        left=6pt, right=6pt, top=2.5pt, bottom=2.5pt,
+        boxsep=0pt
+    ]
+        \scriptsize
+        \textbf{\color{primaryColor}\faMapSigns\ Escenario de Uso Contextual (Día típico):} \fAlEscenario\\
+        \vspace{0.3mm}
+        \hrule height 0.35pt \relax
+        \vspace{0.5mm}
+        \centerline{%
+            \textbf{\color{primaryColor}\faSlidersH\ Ajustes UI Accesible (CeRA):} \hspace{2mm}
+            \fAlBadgesAjustes%
+        }
+    \end{tcolorbox}
+    \newpage
+    \endgroup
+}
+
+% COMANDO PARA PLANTILLA EN BLANCO DE ALUMNADO
+\newcommand{\fichaAlumnoBlanco}{%
+    \fichaAlumno[%
+        bannerTitulo={\faUserEdit\ FICHA DE PERSONA: ALUMNADO \textbar\ PLANTILLA DE TRABAJO},
+        cita={[Cita textual que exprese cómo vive su rutina, qué le ayuda a anticipar y qué le genera ansiedad o rechazo].}%
+    ]%
+}
+
+\ifdefined\isSubFile
+    \expandafter\endinput
+\fi
+
+\begin{document}
+\fichaAlumnoBlanco
+\end{document}

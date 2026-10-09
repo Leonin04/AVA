@@ -1,0 +1,307 @@
+\documentclass[10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage[margin=0.8cm,top=0.6cm,bottom=0.6cm]{geometry}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage{fontawesome5}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+
+\pagestyle{empty}
+
+% Indicamos que las plantillas se cargan como módulos
+\def\isSubFile{1}
+\input{plantilla_alumno.tex}
+\input{plantilla_adulto.tex}
+
+\begin{document}
+
+% ==============================================================================
+% PERSONA 1: ALUMNO CON DISCAPACIDAD ÚNICAMENTE MOTRIZ
+% ==============================================================================
+\fichaAlumno[%
+    nombre={Carlos Martínez Ruiz},
+    nombreCorto={CARLOS M.},
+    edad={18 años},
+    icono={\faWheelchair},
+    foto={img/carlos_martinez.jpg},
+    badgeRol={Alumno PTVAL},
+    badgeTarea={Tareas Rotativas},
+    centro={CEE Purísima Concepción},
+    cita={Comprendo todo lo que hay que hacer y quiero ser independiente, pero mis manos no me obedecen con pantallas táctiles pequeñas; necesito botones grandes o un pulsador externo.},
+    demographic={%
+        \item \textbf{Edad y Género (Age / Gender):} 18 años, Varón.
+        \item \textbf{Ubicación (Location):} Granada capital (domicilio familiar).
+        \item \textbf{Perfil diagnóstico:} Parálisis cerebral con tetraparesia espástica. Usuario de silla de ruedas. Capacidad cognitiva, razonamiento y lenguaje normotípicos (sin discapacidad intelectual).
+    },
+    computerExp={%
+        \item \textbf{Habilidades informáticas:} Manejo táctil asistido y uso de joystick en su silla. No realiza pinza fina ni tecleo rápido.
+        \item \textbf{Años de experiencia:} 6 años manejando tablets y ordenadores adaptados.
+        \item \textbf{Hábitos de uso:} Navegación web, dictado por voz, consumo de vídeos y mensajería adaptada.
+        \item \textbf{Autonomía digital:} Muy alta si la app ofrece botones grandes o pulsador.
+    },
+    productExp={%
+        \item \textbf{Productos similares:} Ha probado agendas digitales estándar en móvil.
+        \item \textbf{Limitaciones actuales:} Los botones pequeños y los gestos táctiles le provocan toques involuntarios por espasmos.
+        \item \textbf{Tendencias de uso:} Prefiere interfaces limpias con opción de pulsador adaptado.
+    },
+    tasks={%
+        \item \textbf{Tareas Primarias:} 
+        1) Login con botón grande $\rightarrow$ 2) Consultar la tarea rotativa del día (visitas, comedor, material) $\rightarrow$ 3) Ejecutar los pasos guiados con la tablet $\rightarrow$ 4) Confirmar tarea con pulsador.
+        \item \textbf{Tareas Secundarias:} Avisar al tutor si un ascensor o puerta están bloqueados.
+    },
+    domainKnowledge={%
+        \item \textbf{Comprensión del área:} Conoce al detalle todas las aulas, talleres y personal del centro.
+        \item \textbf{Comprensión temporal:} Completa; entiende horas y minutos estándar, pero agradece un temporizador gráfico.
+        \item \textbf{Destreza procedimental:} Gran capacidad para realizar tareas del centro con apoyo técnico accesible.
+    },
+    technology={%
+        \item \textbf{Hardware:} Tablet Android y pulsador externo.
+        \item \textbf{Software:} Sistema Android y lector de códigos QR.
+        \item \textbf{Herramientas habituales:} Conexión Wi-Fi.
+    },
+    attitudes={%
+        \item \textbf{Preferencias:} Interfaz clara, adulta y no infantilizada, con respuesta rápida.
+        \item \textbf{Miedo a la tecnología:} Ninguno; siente frustración si la interfaz es pequeña y le obliga a pedir ayuda física.
+        \item \textbf{Valores:} Orgullo por su autonomía y por participar en las tareas rotativas del centro.
+    },
+    learningStyle={%
+        \item \textbf{Perfil de aprendizaje:} Cognitivo estándar (\textbf{Visual y Auditivo}).
+        \item \textbf{Canales óptimos:} Iconos claros, texto legible, vídeos explicativos y sonido de confirmación.
+        \item \textbf{Metodología:} Asimilación directa; requiere únicamente adaptación física de entrada.
+    },
+    criticality={%
+        \item \textbf{Consecuencias de un error:} \textit{Emocional:} Frustración e impotencia al no poder pulsar el control deseado. \textit{Operativo:} Pulsación involuntaria por espasmo que marque una tarea sin terminar.
+        \item \textbf{Tolerancia del software:} Filtro antitemblor (retardo de pulsación), botones grandes y confirmación antes de desmarcar tareas.
+    },
+    escenario={A las 11:00h, Carlos recibe un aviso en su tablet. La app le indica su tarea rotativa de hoy: acompañar al grupo de visitas escolares. Conduce su silla a la entrada, escanea el código QR de cada aula con la tablet para reproducir la información y presiona su pulsador para marcar cada hito como completado.},
+    badgesAjustes={%
+        \badge{primaryColor}{\faHandPointer\ Pulsador Externo} \hspace{2mm}
+        \badge{secondaryColor}{\faExpand\ Botones Grandes} \hspace{2mm}
+        \badge{accentColor}{\faSync\ Tareas Rotativas} \hspace{2mm}
+        \badge{purpleColor}{\faLock\ Filtro Antitemblor}%
+    }%
+]
+
+% ==============================================================================
+% PERSONA 2: ALUMNO CON DISCAPACIDAD INTELECTUAL
+% ==============================================================================
+\fichaAlumno[%
+    nombre={Alejandro ``Álex'' García},
+    nombreCorto={ÁLEX G.},
+    edad={19 años},
+    icono={\faUserGraduate},
+    foto={img/alex_garcia.jpg},
+    badgeRol={Alumno PTVAL},
+    badgeTarea={Tareas Rotativas},
+    centro={CEE Purísima Concepción},
+    cita={Necesito saber con imágenes qué tengo que hacer después y cuánto tiempo me queda para no ponerme nervioso ni perderme en los pasillos.},
+    demographic={%
+        \item \textbf{Edad y Género (Age / Gender):} 19 años, Varón.
+        \item \textbf{Ubicación (Location):} Granada capital (domicilio familiar).
+        \item \textbf{Perfil diagnóstico:} Discapacidad intelectual moderada (DI) con rasgos de TEA. Lenguaje funcional telegráfico. Motricidad física preservada.
+    },
+    computerExp={%
+        \item \textbf{Habilidades informáticas:} Nivel básico táctil asistido. No usa ratón ni teclado.
+        \item \textbf{Años de experiencia:} 5 años usando tablets en el aula.
+        \item \textbf{Hábitos de uso:} Navegación por fotos de contactos, vídeos y juegos de emparejamiento.
+        \item \textbf{Autonomía digital:} Buena en pantallas con pocas opciones claras.
+    },
+    productExp={%
+        \item \textbf{Productos similares:} Paneles físicos de velcro (PECS) y app \textit{DictaPicto}.
+        \item \textbf{Limitaciones actuales:} Las tarjetas físicas de papel se pierden; las apps habituales tienen mucho texto o menús complejos.
+        \item \textbf{Tendencias de uso:} Gran adherencia a apoyos con imágenes y sonidos.
+    },
+    tasks={%
+        \item \textbf{Tareas Primarias:} 
+        1) Login tocando su foto $\rightarrow$ 2) Consultar la tarea rotativa asignada (reprografía, comedor, orden) $\rightarrow$ 3) Seguir los pasos guiados con imágenes $\rightarrow$ 4) Confirmar paso verde.
+        \item \textbf{Tareas Secundarias:} Mirar cuánto falta para el recreo; pedir ayuda al tutor.
+    },
+    domainKnowledge={%
+        \item \textbf{Comprensión del área:} Conoce las rutinas del colegio, las aulas y a los maestros.
+        \item \textbf{Comprensión temporal:} Relativa visual (``ahora'', ``después''). No interpreta números de reloj convencional.
+        \item \textbf{Destreza procedimental:} Ejecuta tareas escolares paso a paso de forma autónoma con apoyo de imágenes.
+    },
+    technology={%
+        \item \textbf{Hardware:} Tablet Android.
+        \item \textbf{Software:} Síntesis de voz.
+        \item \textbf{Herramientas habituales:} Conexión Wi-Fi.
+    },
+    attitudes={%
+        \item \textbf{Preferencias:} Refuerzos sonoros alegres (aplausos) y pantallas con una sola idea.
+        \item \textbf{Miedo a la tecnología:} Nulo temor a tocar; ansiedad ante pitidos de error o bloqueos de la aplicación.
+        \item \textbf{Valores:} Gran satisfacción por sentirse útil participando en las tareas del colegio.
+    },
+    learningStyle={%
+        \item \textbf{Perfil de aprendizaje:} \textbf{Visual estricto} reforzado por canal \textbf{Auditivo (TTS)}.
+        \item \textbf{Canales óptimos:} Pictogramas ARASAAC y fotos reales de profesores y aulas.
+        \item \textbf{Metodología:} Modelado, ensayo guiado (\textit{learning by doing}) y refuerzo inmediato.
+    },
+    criticality={%
+        \item \textbf{Consecuencias de un error:} \textit{Emocional:} Desorientación, ansiedad y bloqueo con llanto o rechazo. \textit{Operativo:} Confusión de aulas o retraso en las entregas.
+        \item \textbf{Tolerancia del software:} Extrema. Sin acciones destructivas, confirmación asistida y botón de ayuda permanente.
+    },
+    escenario={A las 10:15h, la tablet emite una melodía suave. Álex toca su foto y descubre su tarea rotativa de la semana: reprografía. Sigue los pasos guiados con fotos de profesores, recoge los folios y pulsa el botón verde. Tras repartir las copias, la pantalla celebra su éxito con un aplauso sonoro y suma una estrella a su casillero.},
+    badgesAjustes={%
+        \badge{primaryColor}{\faKey\ Login Foto/Color} \hspace{2mm}
+        \badge{secondaryColor}{\faIcons\ ARASAAC + Fotos Reales} \hspace{2mm}
+        \badge{accentColor}{\faSync\ Tareas Rotativas} \hspace{2mm}
+        \badge{purpleColor}{\faVolumeUp\ Síntesis de Voz TTS}%
+    }%
+]
+
+% ==============================================================================
+% PERSONA 3: MADRE DE UN NIÑO
+% ==============================================================================
+\fichaAdulto[%
+    nombre={Carmen Fernández Delgado},
+    nombreCorto={CARMEN F.},
+    edad={46 años},
+    icono={\faUserNurse},
+    foto={img/carmen_fernandez.jpg},
+    badgeRol={Madre de Alumno PTVAL},
+    badgeTarea={Coordinación del Hogar},
+    centro={Entorno Familiar \textbar\ Granada},
+    cita={Quiero que la autonomía que Carlos gana en el colegio continúe en casa; necesito una agenda donde podamos programar sus rutinas de la tarde sin que suponga otra carga técnica inasumible tras mi jornada laboral.},
+    demographic={%
+        \item \textbf{Edad y Género:} 46 años, Mujer.
+        \item \textbf{Ubicación:} Granada capital (barrio Zaidín).
+        \item \textbf{Situación familiar:} Madre de Carlos (alumno con discapacidad motriz). Cuidadora principal.
+    },
+    occupation={%
+        \item \textbf{Puesto actual:} Administrativa contable en empresa local (jornada continua).
+        \item \textbf{Antigüedad:} 15 años en la empresa \textbar\ 18 años como madre y cuidadora.
+        \item \textbf{Responsabilidades:} Conciliación laboral y familiar, coordinación de fisioterapia semanal y apoyo en el hogar.
+    },
+    education={%
+        \item \textbf{Titulación (Degree):} Diplomatura en Ciencias Empresariales.
+        \item \textbf{Especialidad (Major):} Gestión contable y financiera.
+        \item \textbf{Cursos realizados:} Talleres de escuela de familias sobre productos de apoyo y autonomía en el hogar.
+    },
+    computerExp={%
+        \item \textbf{Habilidades informáticas:} Nivel usuario medio en smartphone y ordenador.
+        \item \textbf{Años de experiencia:} +16 años utilizando dispositivos digitales.
+        \item \textbf{Hábitos de uso:} Uso diario de apps de mensajería, trámites online y banca móvil.
+    },
+    productExp={%
+        \item \textbf{Productos similares:} Agendas de papel escolar, notas en la nevera y calendario del móvil.
+        \item \textbf{Limitaciones actuales:} Los calendarios convencionales no están adaptados a su hijo y las notas en papel se pierden.
+    },
+    tasks={%
+        \item \textbf{Tareas Primarias:} 
+        1) Comprobar en el móvil las tareas escolares de Carlos $\rightarrow$ 2) Programar las rutinas de la tarde en casa $\rightarrow$ 3) Añadir fotos cotidianas a los pasos $\rightarrow$ 4) Supervisar el progreso.
+        \item \textbf{Tareas Secundarias:} Enviar notas rápidas al tutor sobre estado de ánimo o incidencias.
+    },
+    domainKnowledge={%
+        \item \textbf{Comprensión del área:} Conoce los tiempos de fatiga de su hijo y la importancia de fomentar su autonomía sin sobreprotegerlo.
+        \item \textbf{Enfoque educativo:} Muy alineada con la transición a la vida adulta del centro escolar.
+    },
+    technology={%
+        \item \textbf{Hardware:} Móvil Android y ordenador.
+        \item \textbf{Software:} App móvil.
+        \item \textbf{Herramientas:} Conexión a internet.
+    },
+    attitudes={%
+        \item \textbf{Preferencias:} Interfaz rápida, directa, sin configuraciones farragosas y con sincronización en tiempo real.
+        \item \textbf{Miedo a la tecnología:} Preocupación por caídas de conexión que desorienten a su hijo al llegar a casa.
+        \item \textbf{Valores:} Bienestar emocional de su hijo e impulso a su independencia personal.
+    },
+    learningStyle={%
+        \item \textbf{Perfil de aprendizaje:} Práctico y funcional; resolución directa de tareas cotidianas.
+        \item \textbf{Canales óptimos:} Interfaz clara e intuitiva sin necesidad de manuales extensos.
+        \item \textbf{Curva de adopción:} Inmediata si comprueba que su hijo usa la agenda en casa sin frustración.
+    },
+    criticality={%
+        \item \textbf{Consecuencias de un error:} \textit{Logístico/Familiar:} Olvido de una rutina de fisioterapia o merienda. \textit{Emocional:} Estrés y sobrecarga tras la jornada laboral.
+        \item \textbf{Tolerancia del software:} Guardado local ante fallos de cobertura y sincronización en la nube.
+    },
+    escenario={A las 16:30h al salir de la oficina, Carmen consulta la app en su móvil y comprueba que Carlos completó con éxito su tarea rotativa de la mañana. Con 3 toques rápidos programa la rutina de la tarde: ``17:30h - Merienda'' y ``18:15h - Preparar mochila de fisioterapia'' con fotos de la mochila azul. Carlos recibe las tareas en su tablet y Carmen se siente tranquila al ver cómo su hijo las completa.},
+    badgesAjustes={%
+        \badge{tealColor}{\faMobile*\ App Móvil Familiar} \hspace{2mm}
+        \badge{primaryColor}{\faHome\ Rutinas del Hogar} \hspace{2mm}
+        \badge{accentColor}{\faSync\ Sincronización Centro-Casa} \hspace{2mm}
+        \badge{greenColor}{\faComments\ Chat Directo Tutor}%
+    }%
+]
+
+% ==============================================================================
+% PERSONA 4: PROFESOR (TUTOR ESCOLAR)
+% ==============================================================================
+\fichaAdulto[%
+    nombre={Javier Morales Benítez},
+    nombreCorto={JAVIER M.},
+    edad={39 años},
+    icono={\faChalkboardTeacher},
+    foto={img/javier_morales.jpg},
+    badgeRol={Tutor Docente PTVAL},
+    badgeTarea={Coordinación de Aula},
+    centro={CEE Purísima Concepción},
+    cita={Gestiono un aula heterogénea con diferentes niveles de autonomía. Necesito organizar el día de cada alumno en minutos antes de las 9:00, asignar las tareas rotativas de reprografía o comedor, y tener la certeza de que el sistema avisa a cocina sin errores.},
+    demographic={%
+        \item \textbf{Edad y Género:} 39 años, Varón.
+        \item \textbf{Ubicación:} Granada capital.
+        \item \textbf{Perfil profesional:} Maestro especialista en Pedagogía Terapéutica (PT) con 12 años de experiencia docente, 5 en el CEE Purísima Concepción.
+    },
+    occupation={%
+        \item \textbf{Puesto actual:} Tutor de Aula del Programa de Transición a la Vida Adulta (PTVAL).
+        \item \textbf{Antigüedad:} 12 años en educación especial \textbar\ 5 años en el centro actual.
+        \item \textbf{Responsabilidades:} Planificar itinerarios de autonomía, asignar roles de centro (reprografía, comedor), coordinar con familias y velar por la seguridad del aula.
+    },
+    education={%
+        \item \textbf{Titulación (Degree):} Grado en Educación Primaria (Mención Pedagogía Terapéutica).
+        \item \textbf{Especialidad (Major):} Pedagogía Terapéutica y Audición y Lenguaje (AL).
+        \item \textbf{Cursos realizados:} Formación continua en TIC accesibles, sistemas SAAC y metodologías de inclusión laboral.
+    },
+    computerExp={%
+        \item \textbf{Habilidades informáticas:} Nivel avanzado en herramientas educativas digitales y pictogramas ARASAAC.
+        \item \textbf{Años de experiencia:} +15 años gestionando plataformas digitales y pizarras interactivas.
+        \item \textbf{Hábitos de uso:} Uso continuo de ordenador portátil, tablet y smartphone.
+    },
+    productExp={%
+        \item \textbf{Productos similares:} Portales de pictogramas, hojas de cálculo para el comedor y paneles físicos de aula.
+        \item \textbf{Limitaciones actuales:} Pérdida de tiempo recortando velcros y falta de seguimiento en tiempo real fuera del aula.
+    },
+    tasks={%
+        \item \textbf{Tareas Primarias:} 
+        1) Configurar tareas diarias antes de la asamblea $\rightarrow$ 2) Asignar encargos rotativos del día a los alumnos $\rightarrow$ 3) Supervisar el estado del circuito $\rightarrow$ 4) Validar listado de comedor para cocina.
+        \item \textbf{Tareas Secundarias:} Enviar mensajes de refuerzo y atender dudas por chat accesible.
+    },
+    domainKnowledge={%
+        \item \textbf{Comprensión del área:} Experto en didáctica adaptada, diversidad cognitiva y motriz, sistemas SAAC y anticipación temporal.
+        \item \textbf{Conocimiento del grupo:} Conoce el umbral de tolerancia a la frustración y ritmos de cada uno de sus alumnos.
+    },
+    technology={%
+        \item \textbf{Hardware:} Ordenador portátil y tablet.
+        \item \textbf{Software:} Navegador web.
+        \item \textbf{Herramientas:} Red Wi-Fi.
+    },
+    attitudes={%
+        \item \textbf{Preferencias:} Software ágil, paneles limpios tipo dashboard sin pasos redundantes y visión del aula en un vistazo.
+        \item \textbf{Miedo a la tecnología:} Preocupación por caídas de red que dejen a los alumnos sin soporte visual durante la jornada.
+        \item \textbf{Valores:} Compromiso con la inclusión y la capacitación laboral de sus alumnos.
+    },
+    learningStyle={%
+        \item \textbf{Perfil de aprendizaje:} Analítico, estructurado y visual.
+        \item \textbf{Canales óptimos:} Paneles de control con tarjetas de estado y tablas dinámicas.
+        \item \textbf{Adopción:} Rápida si ahorra tiempo administrativo en la gestión del aula.
+    },
+    criticality={%
+        \item \textbf{Consecuencias de un error:} \textit{Logístico y de Salud:} Notificar erróneamente dietas de comedor (alergias o celiaquía). \textit{Conductual:} Desajuste horario que provoque crisis de ansiedad en el alumno.
+        \item \textbf{Tolerancia del software:} Confirmación obligatoria para dietas de comedor y registro histórico de cambios.
+    },
+    escenario={A las 8:40h antes de que lleguen los alumnos, Javier abre el panel web de CeRA desde su portátil. En dos minutos distribuye los encargos rotativos del día (reprografía a Álex, visitas a Carlos) con las fotos y apoyos asignados. A las 10:20h el tablero le muestra que las tareas avanzan y valida con un clic el listado de comensales para cocina.},
+    badgesAjustes={%
+        \badge{tealColor}{\faDesktop\ Panel Web Docente} \hspace{2mm}
+        \badge{primaryColor}{\faTasks\ Asignación de Rutinas} \hspace{2mm}
+        \badge{accentColor}{\faUtensils\ Control Dietas Comedor} \hspace{2mm}
+        \badge{greenColor}{\faChartLine\ Monitorización Directo}%
+    }%
+]
+
+\end{document}
