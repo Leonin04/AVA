@@ -3,18 +3,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const AplicacionAda());
+  runApp(const AplicacionAva());
 }
 
-/// Aplicación principal ADA (Agenda Digital Accesible)
+/// Aplicación principal AVA (Agenda Virtual Accesible)
 /// Proyecto AUTOVIDA (26-175) - CEE Purísima Concepción de Granada
-class AplicacionAda extends StatelessWidget {
-  const AplicacionAda({super.key});
+class AplicacionAva extends StatelessWidget {
+  const AplicacionAva({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'ADA - Agenda Accesible',
+      title: 'AVA - Agenda Virtual Accesible',
       debugShowCheckedModeBanner: false,
       locale: const Locale('es', 'ES'),
       supportedLocales: const [
@@ -44,7 +44,7 @@ class PantallaInicio extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ADA - Agenda Accesible'),
+        title: const Text('AVA - Agenda Virtual Accesible'),
         centerTitle: true,
       ),
       body: Center(
@@ -66,7 +66,7 @@ class PantallaInicio extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Text(
-                'Agenda Digital Accesible para el CEE Purísima Concepción',
+                'Agenda Virtual Accesible para el CEE Purísima Concepción',
                 style: TextStyle(fontSize: 18),
                 textAlign: TextAlign.center,
               ),

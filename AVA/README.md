@@ -1,4 +1,4 @@
-# ADA — Agenda Digital Accesible (Proyecto AUTOVIDA 26-175)
+# AVA — Agenda Virtual Accesible (Proyecto AUTOVIDA 26-175)
 
 Estructura base del proyecto Flutter desarrollada para el **Colegio de Educación Especial (CEE) Fundación Purísima Concepción** de Granada, dentro del marco de las asignaturas **Dirección y Gestión de Proyectos (DGP)** y **Metodologías de Desarrollo Ágil (MDA)** (Curso 2026–2027, UGR).
 
@@ -11,7 +11,7 @@ Estructura base del proyecto Flutter desarrollada para el **Colegio de Educació
 El proyecto sigue una arquitectura **Feature-First (modular)** en español, conforme a las directrices de codificación del **Manual de Coordinación (DGP0, apartado 1.7)**. Cada módulo funcional de la Iteración 1 agrupa sus pantallas, su lógica de negocio y sus modelos de datos de forma desacoplada.
 
 ```text
-ADA/
+AVA/
 ├── assets/                       # Recursos multimedia y de accesibilidad
 │   ├── fuentes/                  # Tipografías legibles y lectura fácil
 │   ├── iconos/                   # Iconografía de alta visibilidad
@@ -106,7 +106,7 @@ Gracias al patrón **Feature-First**, el código de cada funcionalidad está com
    ```bash
    git checkout develop
    git pull origin develop
-   git checkout -b feature/ADA-09-agenda-diaria
+   git checkout -b feature/AVA-09-agenda-diaria
    ```
 3. **Desarrollar en el módulo correspondiente:**
    - `dominio/`: define el modelo de datos.

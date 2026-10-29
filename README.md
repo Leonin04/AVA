@@ -1,14 +1,14 @@
-# AUTOVIDA — Agenda Digital Accesible (ADA)
+# AUTOVIDA — Agenda Virtual Accesible (AVA)
 
 [![Asignatura](https://img.shields.io/badge/Asignaturas-DGP%20%7C%20MDA-blue.svg)](file:///home/david/5º/PrimerCuatri/DGP_MDA/DocumentosTeoria)
 [![Universidad](https://img.shields.io/badge/Universidad-Granada%20(UGR)-red.svg)](https://www.ugr.es)
 [![Curso](https://img.shields.io/badge/Curso-2026--2027-green.svg)](#)
-[![Framework](https://img.shields.io/badge/Framework-Flutter-02569B?logo=flutter&logoColor=white)](file:///home/david/5º/PrimerCuatri/DGP_MDA/ADA)
+[![Framework](https://img.shields.io/badge/Framework-Flutter-02569B?logo=flutter&logoColor=white)](file:///home/david/5º/PrimerCuatri/DGP_MDA/AVA)
 [![Backend](https://img.shields.io/badge/Backend-Firebase-FFCA28?logo=firebase&logoColor=black)](#)
 
 Repositorio central del proyecto **AUTOVIDA (código 26-175)**, desarrollado de forma coordinada para las asignaturas **Dirección y Gestión de Proyectos (DGP)** y **Metodologías de Desarrollo Ágil (MDA)** del Grado en Ingeniería Informática de la **Universidad de Granada**.
 
-El proyecto consiste en el diseño, especificación y desarrollo de **ADA (Agenda Digital Accesible)**, una aplicación para tabletas Android e iOS destinada al **Colegio de Educación Especial (CEE) Fundación Purísima Concepción** de Granada, enfocada en fomentar la autonomía y organización del alumnado del **Programa de Transición a la Vida Adulta (PTVAL)**.
+El proyecto consiste en el diseño, especificación y desarrollo de **AVA (Agenda Virtual Accesible)**, una aplicación para tabletas Android e iOS destinada al **Colegio de Educación Especial (CEE) Fundación Purísima Concepción** de Granada, enfocada en fomentar la autonomía y organización del alumnado del **Programa de Transición a la Vida Adulta (PTVAL)**.
 
 ---
 
@@ -38,7 +38,7 @@ DGP_MDA/
 │   ├── MDA0.pdf                  # PDF original de MDA
 │   └── img/                      # Figuras, avatares de personas y capturas extraídas
 │
-├── ADA/                          # 📱 Código fuente de la aplicación Flutter
+├── AVA/                          # 📱 Código fuente de la aplicación Flutter
 │   ├── assets/                   # Pictogramas ARASAAC, sonidos de refuerzo, iconos y fuentes
 │   ├── lib/
 │   │   ├── main.dart             # Punto de entrada de la aplicación
@@ -56,7 +56,7 @@ DGP_MDA/
 
 ## 🎯 Estado Actual: Iteración 1 (Mockup e Incremento 1)
 
-Actualmente el equipo se encuentra construyendo el **mockup y la base funcional de la Iteración 1** (planificada en **37 puntos de historia** según MDA0). Para mantener el código limpio y sin elementos distractores, la carpeta de desarrollo (`ADA/lib/features/`) contiene únicamente las **5 funcionalidades correspondientes al alcance de esta primera entrega**:
+Actualmente el equipo se encuentra construyendo el **mockup y la base funcional de la Iteración 1** (planificada en **37 puntos de historia** según MDA0). Para mantener el código limpio y sin elementos distractores, la carpeta de desarrollo (`AVA/lib/features/`) contiene únicamente las **5 funcionalidades correspondientes al alcance de esta primera entrega**:
 
 1. 🔐 **`autenticacion`:** Creación de cuentas, roles de usuario y login accesible adaptado para estudiantes (PIN, foto o color) y tutores (**HU-01, HU-02, HU-08, HU-17**).
 2. 👤 **`perfil`:** Configuración de apoyos de accesibilidad del alumno (pictogramas ARASAAC, imágenes reales, colores y tipografía) (**HU-14, HU-18**).
@@ -91,7 +91,7 @@ Para ejecutar la aplicación localmente en un emulador de tableta o dispositivo 
 
 ```bash
 # 1. Acceder a la carpeta de la aplicación
-cd ADA
+cd AVA
 
 # 2. Descargar las dependencias
 flutter pub get
@@ -103,4 +103,4 @@ flutter analyze
 flutter run
 ```
 
-Para más detalles sobre cómo estructurar el código de una tarea o qué modelo crear, consulta la [Guía Técnica de ADA](file:///home/david/5º/PrimerCuatri/DGP_MDA/ADA/README.md).
+Para más detalles sobre cómo estructurar el código de una tarea o qué modelo crear, consulta la [Guía Técnica de AVA](file:///home/david/5º/PrimerCuatri/DGP_MDA/AVA/README.md).
