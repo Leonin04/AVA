@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -56,7 +53,6 @@ class DefaultFirebaseOptions {
     projectId: 'proyecto-ava-54b58',
     storageBucket: 'proyecto-ava-54b58.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDLSzutCavHYaG5PmUq0N1zzO_75f6Ep04',
     appId: '1:1087325866675:ios:9d5d3ba88ed5ce85973ec6',
@@ -64,5 +60,13 @@ class DefaultFirebaseOptions {
     projectId: 'proyecto-ava-54b58',
     storageBucket: 'proyecto-ava-54b58.firebasestorage.app',
     iosBundleId: 'com.ava.ava',
+  );
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDGB18q0WE5-TaqNUl5YLw0EWQ8x5pRFic',
+    appId: '1:1087325866675:web:f03badd0c187a20c973ec6',
+    messagingSenderId: '1087325866675',
+    projectId: 'proyecto-ava-54b58',
+    authDomain: 'proyecto-ava-54b58.firebaseapp.com',
+    storageBucket: 'proyecto-ava-54b58.firebasestorage.app',
   );
 }
