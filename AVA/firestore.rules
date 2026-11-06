@@ -1,0 +1,81 @@
+rules_version = '2';
+
+// Reglas de seguridad de la Agenda accesible (iteración 1)
+// Roles: admin y tutor tienen documento en /usuarios/{uid};
+//        el estudiante tiene documento en /estudiantes/{uid}.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Funciones auxiliares ----------
+    function sesionIniciada() {
+      return request.auth != null;
+    }
+    function rutaUsuario() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+    function esPersonal() {            // admin o tutor
+      return sesionIniciada() && exists(rutaUsuario());
+    }
+    function rol() {
+      return get(rutaUsuario()).data.rol;
+    }
+    function esAdmin() {
+      return esPersonal() && rol() == 'admin';
+    }
+    function esTutor() {
+      return esPersonal() && rol() == 'tutor';
+    }
+
+    // ---------- usuarios (RF-01, RF-02) ----------
+    match /usuarios/{uid} {
+      allow read: if esAdmin() || (sesionIniciada() && request.auth.uid == uid);
+      allow write: if esAdmin();
+    }
+
+    // ---------- aulas (RF-05) ----------
+    match /aulas/{aulaId} {
+      allow read: if esPersonal();
+      allow write: if esAdmin();
+    }
+
+    // ---------- estudiantes (RF-01, RF-03, RF-04, RF-06 a RF-09) ----------
+    match /estudiantes/{estId} {
+      // RF-06: un tutor solo lee los estudiantes en los que aparece.
+      // Las consultas del tutor deben filtrar con
+      // where('tutores', arrayContains: uid) o Firestore las rechaza.
+      allow read: if esAdmin()
+                  || (esTutor() && request.auth.uid in resource.data.tutores)
+                  || (sesionIniciada() && request.auth.uid == estId);
+
+      // Solo el administrador da de alta, borra y cambia tutores o aula (RF-01, RF-04, RF-05)
+      allow create, delete: if esAdmin();
+
+      // El tutor puede editar perfil y preferencias de sus estudiantes (RF-07 a RF-09),
+      // pero no los tutores asignados ni el aula.
+      allow update: if esAdmin()
+                    || (esTutor()
+                        && request.auth.uid in resource.data.tutores
+                        && !request.resource.data.diff(resource.data).affectedKeys()
+                              .hasAny(['tutores', 'aulaId']));
+    }
+
+    // ---------- tareas y pasos (RF-15, RF-22) ----------
+    match /tareas/{tareaId} {
+      allow read: if esPersonal()
+                  || (sesionIniciada() && request.auth.uid in resource.data.estudiantes);
+      allow create: if esPersonal() && request.resource.data.creadaPor == request.auth.uid;
+      allow update, delete: if esAdmin()
+                            || (esTutor() && resource.data.creadaPor == request.auth.uid);
+
+      match /pasos/{pasoId} {
+        function tarea() {
+          return get(/databases/$(database)/documents/tareas/$(tareaId)).data;
+        }
+        allow read: if esPersonal()
+                    || (sesionIniciada() && request.auth.uid in tarea().estudiantes);
+        allow write: if esAdmin()
+                     || (esTutor() && tarea().creadaPor == request.auth.uid);
+      }
+    }
+  }
+}

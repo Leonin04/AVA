@@ -1,6 +1,11 @@
 # Reglas de análisis estático y calidad de código
 # Conforme a la sección 1.10 del Manual de Coordinación (DGP0) y directrices Effective Dart
 
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
 include: package:flutter_lints/flutter.yaml
 
 linter:
