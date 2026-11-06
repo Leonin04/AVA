@@ -94,7 +94,7 @@ flutter run
 
 Nada más: la conexión con Firebase ya va en el repositorio.
 Para **ver los datos** en la consola web (console.firebase.google.com) hay que estar invitado
-al proyecto: pasad vuestro Gmail a Daniel.
+al proyecto.
 
 ### Reglas importantes al programar
 
