@@ -25,7 +25,7 @@ dependencies:
   firebase_messaging: ^17.0.1
 
   # Conexión HTTP para API de ARASAAC (RF-13)
-  http: ^1.2.0
+  http: ^1.6.0
 
   # Accesibilidad, multimedia y refuerzos sonoros (Persona Álex / Carlos)
   audioplayers: ^5.2.1

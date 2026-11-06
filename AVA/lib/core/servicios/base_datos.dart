@@ -159,6 +159,13 @@ class BaseDatos {
   // Tareas y pasos (RF-15, RF-22)
   // ===================================================================
 
+  /// T-65: todas las tareas de un estudiante, ordenadas por hora de inicio.
+  Stream<List<Tarea>> tareasDeEstudiante(String estudianteUid) => _tareas
+      .where('estudiantes', arrayContains: estudianteUid)
+      .orderBy('horaInicio')
+      .snapshots()
+      .map((s) => s.docs.map(Tarea.fromDoc).toList());
+
   /// RF-22: tareas de hoy de un estudiante, ordenadas por hora.
   /// Firestore no permite dos filtros array-contains en la misma consulta,
   /// así que el día de la semana se filtra en la app.
@@ -180,6 +187,12 @@ class BaseDatos {
       .orderBy('nombre')
       .snapshots()
       .map((s) => s.docs.map(Tarea.fromDoc).toList());
+
+  /// Una tarea concreta (para el detalle, T-85).
+  Stream<Tarea?> tarea(String tareaId) => _tareas
+      .doc(tareaId)
+      .snapshots()
+      .map((d) => d.exists ? Tarea.fromDoc(d) : null);
 
   /// Pasos de una tarea, en orden.
   Future<List<Paso>> pasosDe(String tareaId) async {

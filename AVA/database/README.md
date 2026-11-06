@@ -19,6 +19,17 @@ Requisitos que cubre: RF-01 a RF-09, RF-15 y RF-22.
 | Cuenta de administrador (colección `usuarios`) | ✅ Creada |
 | Colecciones `estudiantes`, `aulas`, `tareas` | ⏳ Se crean solas cuando la app guarde el primer dato |
 
+### Cuenta de administrador para pruebas
+
+| Correo | Contraseña |
+|---|---|
+| `admin.ava@gmail.com` | Mensaje fijado del grupo de WhatsApp |
+
+Con esta cuenta se entra como administrador y se pueden crear tutores, estudiantes y aulas.
+La contraseña **no se escribe en el repositorio**: cualquiera con acceso al código podría
+entrar a la base de datos real.
+
+
 > **Firestore no tiene tablas como SQL.** No se crean columnas antes: cada colección aparece
 > la primera vez que se guarda un documento en ella. El "esquema" lo marcan nuestros
 > **modelos en Dart**: la app siempre guarda los datos con esos campos.
@@ -67,7 +78,7 @@ consultas cumplen las reglas de seguridad.
 | Asignar / quitar tutor (RF-04) | `asignarTutor`, `desasignarTutor` |
 | Aulas (RF-05) | `aulas`, `crearAula`, `actualizarAula`, `cambiarAula`, `eliminarAula` |
 | Perfil y preferencias (RF-07 a RF-09) | `actualizarPerfil`, `actualizarPreferencias` |
-| Tareas (RF-15) | `crearTarea`, `actualizarTarea`, `eliminarTarea`, `pasosDe` |
+| Tareas (RF-15) | `tareasDeEstudiante`, `tarea`, `crearTarea`, `actualizarTarea`, `eliminarTarea`, `pasosDe` |
 | Tareas de hoy del estudiante (RF-22) | `tareasDelDia(uid)` |
 
 Los métodos que devuelven `Stream` se actualizan solos: si se usan con un `StreamBuilder`,
@@ -94,7 +105,7 @@ flutter run
 
 Nada más: la conexión con Firebase ya va en el repositorio.
 Para **ver los datos** en la consola web (console.firebase.google.com) hay que estar invitado
-al proyecto.
+al proyecto: pasad vuestro Gmail a Daniel.
 
 ### Reglas importantes al programar
 
@@ -167,6 +178,7 @@ Los estudiantes de un aula se consultan con `where('aulaId', isEqualTo: id)`.
 | tipo | string | `colegio` \| `personal` |
 | horaInicio / horaFin | string "HH:mm" | "10:00" |
 | diasSemana | array de int | [1, 3] (1 = lunes … 7 = domingo) |
+| fecha | string "yyyy-MM-dd" \| null | día concreto, solo si la tarea **no** se repite (`diasSemana` vacío) |
 | creadaPor | uid | |
 | estudiantes | array de uid | a quién va la tarea |
 | creadoEn | timestamp | |
