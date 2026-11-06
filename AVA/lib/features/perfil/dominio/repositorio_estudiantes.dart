@@ -1,14 +1,14 @@
 import 'estudiante.dart';
-import 'preferencias_accesibilidad.dart';
 
-/// Acceso a los datos de los estudiantes.
+/// Acceso a los perfiles de los estudiantes.
 ///
 /// Al conectar Firebase se implementará con Cloud Firestore.
 abstract interface class RepositorioEstudiantes {
-  Future<List<Estudiante>> obtenerEstudiantesDeAula(String idAula);
+  Future<Estudiante?> obtener(String id);
 
-  Future<void> guardarPreferencias(
-    String idEstudiante,
-    PreferenciasAccesibilidad preferencias,
-  );
+  /// Todos los estudiantes, o solo los de [idAula] si se indica.
+  Future<List<Estudiante>> listar({String? idAula});
+
+  /// Crea o actualiza el perfil.
+  Future<void> guardar(Estudiante estudiante);
 }

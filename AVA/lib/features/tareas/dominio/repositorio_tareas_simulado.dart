@@ -1,14 +1,21 @@
+import '../../../core/constantes/pictogramas.dart';
+import '../../../core/modelos/recurso_visual.dart';
+import '../../../core/servicios/almacen_simulado.dart';
 import 'repositorio_tareas.dart';
 import 'tarea.dart';
 
-/// Genera una rutina de prueba para cualquier estudiante mientras no se
-/// conecta la base de datos.
+/// Tareas guardadas en el [AlmacenSimulado].
 ///
-/// Las tareas se crean la primera vez que se pide un día y se guardan en
-/// memoria, de modo que los cambios de estado se mantienen durante la sesión.
+/// La primera vez que se consulta un día de un estudiante se le crea una
+/// rutina de ejemplo. Después, las tareas se pueden modificar o borrar
+/// como cualquier otra.
 class RepositorioTareasSimulado implements RepositorioTareas {
-  final Map<String, Tarea> _tareas = {};
-  final Set<String> _diasGenerados = {};
+  RepositorioTareasSimulado(this._almacen);
+
+  static const coleccion = 'tareas';
+  static const _coleccionDias = 'dias_con_rutina';
+
+  final AlmacenSimulado _almacen;
 
   @override
   Future<List<Tarea>> obtenerTareas({
@@ -16,37 +23,52 @@ class RepositorioTareasSimulado implements RepositorioTareas {
     required DateTime desde,
     required DateTime hasta,
   }) async {
-    for (var dia = DateTime(desde.year, desde.month, desde.day);
-        dia.isBefore(hasta);
-        dia = DateTime(dia.year, dia.month, dia.day + 1)) {
-      _generarDiaSiFalta(idEstudiante, dia);
+    for (
+      var dia = DateTime(desde.year, desde.month, desde.day);
+      dia.isBefore(hasta);
+      dia = DateTime(dia.year, dia.month, dia.day + 1)
+    ) {
+      _crearRutinaSiFalta(idEstudiante, dia);
     }
 
-    final resultado = _tareas.values
-        .where(
-          (tarea) =>
-              tarea.idEstudiante == idEstudiante &&
-              !tarea.inicio.isBefore(desde) &&
-              tarea.inicio.isBefore(hasta),
-        )
-        .toList()
-      ..sort((a, b) => a.inicio.compareTo(b.inicio));
-    return resultado;
+    final tareas = [
+      for (final (id, datos) in _almacen.listar(
+        coleccion,
+        donde: (d) => d['idEstudiante'] == idEstudiante,
+      ))
+        Tarea.fromMap(id, datos),
+    ].where((t) => !t.inicio.isBefore(desde) && t.inicio.isBefore(hasta));
+
+    return tareas.toList()..sort((a, b) => a.inicio.compareTo(b.inicio));
+  }
+
+  @override
+  Future<void> guardar(Tarea tarea) async {
+    _almacen.guardar(coleccion, tarea.id, tarea.toMap());
+  }
+
+  @override
+  Future<void> eliminar(String idTarea) async {
+    _almacen.eliminar(coleccion, idTarea);
   }
 
   @override
   Future<Tarea> actualizarEstado(String idTarea, EstadoTarea estado) async {
-    final tarea = _tareas[idTarea];
-    if (tarea == null) throw StateError('No existe la tarea $idTarea');
+    final datos = _almacen.obtener(coleccion, idTarea);
+    if (datos == null) throw StateError('No existe la tarea $idTarea');
 
-    final actualizada = tarea.copyWith(estado: estado);
-    _tareas[idTarea] = actualizada;
+    final actualizada = Tarea.fromMap(idTarea, datos).copyWith(estado: estado);
+    _almacen.guardar(coleccion, idTarea, actualizada.toMap());
     return actualizada;
   }
 
-  void _generarDiaSiFalta(String idEstudiante, DateTime dia) {
+  @override
+  String nuevoId(String prefijo) => _almacen.nuevoId(prefijo);
+
+  void _crearRutinaSiFalta(String idEstudiante, DateTime dia) {
     final clave = '$idEstudiante-${dia.year}-${dia.month}-${dia.day}';
-    if (!_diasGenerados.add(clave)) return;
+    if (_almacen.existe(_coleccionDias, clave)) return;
+    _almacen.guardar(_coleccionDias, clave, const {});
 
     final plantillas = _plantillasDelDia(dia.weekday);
     for (var i = 0; i < plantillas.length; i++) {
@@ -55,7 +77,7 @@ class RepositorioTareasSimulado implements RepositorioTareas {
         idEstudiante: idEstudiante,
         dia: dia,
       );
-      _tareas[tarea.id] = tarea;
+      _almacen.guardar(coleccion, tarea.id, tarea.toMap());
     }
   }
 
@@ -74,144 +96,187 @@ class RepositorioTareasSimulado implements RepositorioTareas {
 
   static const _asamblea = _PlantillaTarea(
     titulo: 'Asamblea',
+    pictograma: Pictogramas.asamblea,
     inicio: (9, 0),
     fin: (9, 30),
-    descripcion: 'Saludamos a los compañeros y repasamos el día.',
-    pasos: ['Entra en clase', 'Siéntate en tu sitio', 'Escucha al tutor'],
+    descripcion: 'Saludamos a los compañeros y vemos qué hacemos hoy.',
+    pasos: ['Entra en clase.', 'Siéntate en tu sitio.', 'Escucha al profesor.'],
   );
 
   static const _recreo = _PlantillaTarea(
     titulo: 'Recreo',
+    pictograma: Pictogramas.recreo,
+    tipo: TipoTarea.ocio,
     inicio: (11, 0),
     fin: (11, 30),
-    descripcion: 'Descanso en el patio.',
+    descripcion: 'Descansamos en el patio.',
     pasos: [
-      'Coge tu almuerzo',
-      'Sal al patio',
-      'Vuelve a clase cuando suene el timbre',
+      'Coge tu almuerzo.',
+      'Sal al patio.',
+      'Vuelve a clase cuando suene el timbre.',
     ],
   );
 
   static const _comida = _PlantillaTarea(
     titulo: 'Comida',
+    pictograma: Pictogramas.comer,
     inicio: (13, 30),
     fin: (14, 30),
     descripcion: 'Comemos en el comedor.',
-    pasos: ['Lávate las manos', 'Ve al comedor', 'Recoge tu bandeja al terminar'],
+    pasos: [
+      'Lávate las manos.',
+      'Ve al comedor.',
+      'Recoge tu bandeja al terminar.',
+    ],
   );
 
   static const _talleres = {
     DateTime.monday: _PlantillaTarea(
       titulo: 'Taller de cocina',
+      pictograma: Pictogramas.cocinar,
       inicio: (9, 30),
       fin: (11, 0),
-      descripcion: 'Preparamos una receta sencilla.',
-      pasos: ['Ponte el delantal', 'Lávate las manos', 'Sigue la receta'],
+      descripcion: 'Hacemos una receta fácil.',
+      pasos: ['Ponte el delantal.', 'Lávate las manos.', 'Sigue la receta.'],
     ),
     DateTime.tuesday: _PlantillaTarea(
       titulo: 'Huerto',
+      pictograma: Pictogramas.huerto,
       inicio: (9, 30),
       fin: (11, 0),
       descripcion: 'Cuidamos las plantas del huerto.',
-      pasos: ['Coge los guantes', 'Riega las plantas', 'Guarda las herramientas'],
+      pasos: [
+        'Coge los guantes.',
+        'Riega las plantas.',
+        'Guarda las herramientas.',
+      ],
     ),
     DateTime.wednesday: _PlantillaTarea(
       titulo: 'Informática',
+      pictograma: Pictogramas.ordenador,
       inicio: (9, 30),
       fin: (11, 0),
       descripcion: 'Practicamos con el ordenador.',
-      pasos: ['Enciende el ordenador', 'Abre el programa', 'Apaga al terminar'],
+      pasos: [
+        'Enciende el ordenador.',
+        'Abre el programa.',
+        'Apaga el ordenador al terminar.',
+      ],
     ),
     DateTime.thursday: _PlantillaTarea(
       titulo: 'Lavandería',
+      pictograma: Pictogramas.lavadora,
       inicio: (9, 30),
       fin: (11, 0),
-      descripcion: 'Aprendemos a doblar y guardar la ropa.',
-      pasos: ['Saca la ropa', 'Dóblala', 'Guárdala en su sitio'],
+      descripcion: 'Doblamos y guardamos la ropa.',
+      pasos: ['Saca la ropa.', 'Dobla la ropa.', 'Guarda la ropa en su sitio.'],
     ),
     DateTime.friday: _PlantillaTarea(
       titulo: 'Manualidades',
+      pictograma: Pictogramas.manualidades,
       inicio: (9, 30),
       fin: (11, 0),
-      descripcion: 'Hacemos un trabajo manual.',
-      pasos: ['Coge los materiales', 'Sigue el modelo', 'Recoge la mesa'],
+      descripcion: 'Hacemos un trabajo con las manos.',
+      pasos: ['Coge los materiales.', 'Mira el modelo.', 'Recoge la mesa.'],
     ),
   };
 
   static const _encargos = {
     DateTime.monday: _PlantillaTarea(
-      titulo: 'Llevar fotocopias a reprografía',
+      titulo: 'Llevar fotocopias',
+      pictograma: Pictogramas.fotocopiadora,
       inicio: (11, 30),
       fin: (12, 0),
       tipo: TipoTarea.encargoCentro,
-      descripcion: 'Encargo del centro: llevar las hojas a reprografía.',
-      pasos: ['Coge las hojas del tutor', 'Ve a reprografía', 'Entrégalas'],
+      descripcion: 'Llevamos las hojas a reprografía.',
+      pasos: [
+        'Coge las hojas del profesor.',
+        'Ve a reprografía.',
+        'Entrega las hojas.',
+      ],
     ),
     DateTime.tuesday: _PlantillaTarea(
       titulo: 'Repartir el correo',
+      pictograma: Pictogramas.correo,
       inicio: (11, 30),
       fin: (12, 0),
       tipo: TipoTarea.encargoCentro,
-      descripcion: 'Encargo del centro: repartir las cartas por las aulas.',
-      pasos: ['Recoge el correo en secretaría', 'Entrega cada carta en su aula'],
+      descripcion: 'Llevamos las cartas a cada clase.',
+      pasos: [
+        'Recoge el correo en secretaría.',
+        'Entrega cada carta en su clase.',
+      ],
     ),
     DateTime.wednesday: _PlantillaTarea(
-      titulo: 'Regar las plantas del pasillo',
+      titulo: 'Regar las plantas',
+      pictograma: Pictogramas.regar,
       inicio: (11, 30),
       fin: (12, 0),
       tipo: TipoTarea.encargoCentro,
-      descripcion: 'Encargo del centro: regar las macetas del pasillo.',
-      pasos: ['Llena la regadera', 'Riega cada maceta', 'Guarda la regadera'],
+      descripcion: 'Regamos las macetas del pasillo.',
+      pasos: [
+        'Llena la regadera.',
+        'Riega cada maceta.',
+        'Guarda la regadera.',
+      ],
     ),
     DateTime.thursday: _PlantillaTarea(
-      titulo: 'Poner las mesas del comedor',
+      titulo: 'Poner la mesa',
+      pictograma: Pictogramas.ponerLaMesa,
       inicio: (11, 30),
       fin: (12, 0),
       tipo: TipoTarea.encargoCentro,
-      descripcion: 'Encargo del centro: preparar el comedor.',
-      pasos: ['Coloca los manteles', 'Pon los cubiertos', 'Pon los vasos'],
+      descripcion: 'Preparamos las mesas del comedor.',
+      pasos: ['Pon los manteles.', 'Pon los cubiertos.', 'Pon los vasos.'],
     ),
     DateTime.friday: _PlantillaTarea(
-      titulo: 'Ordenar el aula',
+      titulo: 'Ordenar la clase',
+      pictograma: Pictogramas.ordenar,
       inicio: (11, 30),
       fin: (12, 0),
       tipo: TipoTarea.encargoCentro,
-      descripcion: 'Encargo del centro: dejar el aula ordenada.',
-      pasos: ['Recoge el material', 'Coloca las sillas', 'Tira los papeles'],
+      descripcion: 'Dejamos la clase ordenada.',
+      pasos: ['Recoge el material.', 'Coloca las sillas.', 'Tira los papeles.'],
     ),
   };
 
   static const _rutinaFinDeSemana = [
     _PlantillaTarea(
       titulo: 'Hacer la cama',
+      pictograma: Pictogramas.hacerLaCama,
+      tipo: TipoTarea.domestica,
       inicio: (10, 0),
       fin: (10, 15),
       descripcion: 'Dejamos la habitación ordenada.',
-      pasos: ['Estira las sábanas', 'Coloca la almohada', 'Pon la colcha'],
+      pasos: ['Estira las sábanas.', 'Coloca la almohada.', 'Pon la colcha.'],
     ),
     _PlantillaTarea(
-      titulo: 'Paseo con la familia',
+      titulo: 'Pasear con la familia',
+      pictograma: Pictogramas.pasear,
+      tipo: TipoTarea.ocio,
       inicio: (18, 0),
       fin: (19, 0),
       descripcion: 'Salimos a pasear.',
-      pasos: ['Ponte los zapatos', 'Coge las llaves', 'Sal con tu familia'],
+      pasos: ['Ponte los zapatos.', 'Coge las llaves.', 'Sal con tu familia.'],
     ),
   ];
 }
 
-/// Modelo de tarea que se repite y a partir del cual se crean las tareas
+/// Modelo de tarea que se repite, a partir del cual se crean las tareas
 /// concretas de cada día.
 class _PlantillaTarea {
   const _PlantillaTarea({
     required this.titulo,
+    required this.pictograma,
     required this.inicio,
     required this.fin,
     this.descripcion = '',
     this.pasos = const [],
-    this.tipo = TipoTarea.personal,
+    this.tipo = TipoTarea.escolar,
   });
 
   final String titulo;
+  final PictogramaArasaac pictograma;
   final (int hora, int minuto) inicio;
   final (int hora, int minuto) fin;
   final String descripcion;
@@ -230,6 +295,8 @@ class _PlantillaTarea {
       descripcion: descripcion,
       pasos: pasos,
       tipo: tipo,
+      pictograma: pictograma,
+      creadaPor: 'rutina',
       inicio: DateTime(dia.year, dia.month, dia.day, inicio.$1, inicio.$2),
       fin: DateTime(dia.year, dia.month, dia.day, fin.$1, fin.$2),
     );

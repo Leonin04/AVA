@@ -1,58 +1,157 @@
-/// Colores principales que puede elegir el estudiante.
-///
-/// Se guarda el valor ARGB para que el dominio no dependa de Flutter.
-enum ColorTema {
-  azul('Azul', 0xFF0D47A1),
-  verde('Verde', 0xFF1B5E20),
-  naranja('Naranja', 0xFFE65100);
+import '../../../core/constantes/paleta.dart';
+import '../../agenda/dominio/vista_agenda.dart';
 
-  const ColorTema(this.nombre, this.valorArgb);
+/// Tamaño de la letra (RNF-05).
+enum TamanoTexto {
+  normal('Letra normal', 1.0),
+  grande('Letra grande', 1.25),
+  muyGrande('Letra muy grande', 1.5);
+
+  const TamanoTexto(this.nombre, this.escala);
 
   final String nombre;
-  final int valorArgb;
+  final double escala;
 }
 
-/// Ajustes visuales del estudiante que cambian el aspecto de toda la app
-/// (HU-14).
+/// Preferencias visuales y de comunicación del estudiante (HU-14, RF-08,
+/// RNF-05). Cambian el aspecto de toda la aplicación.
 class PreferenciasAccesibilidad {
   const PreferenciasAccesibilidad({
-    this.textoGrande = false,
+    this.tamanoTexto = TamanoTexto.normal,
+    this.letraClara = true,
+    this.color = ColorPastel.cielo,
     this.altoContraste = false,
     this.modoOscuro = false,
-    this.color = ColorTema.azul,
+    this.menuArriba = false,
+    this.mostrarPictogramas = true,
+    this.mostrarTexto = true,
+    this.leerEnVoz = false,
+    this.filtroAntitemblor = false,
+    this.vistasAgenda = const {
+      VistaAgenda.semanal,
+      VistaAgenda.diaria,
+      VistaAgenda.siguienteTarea,
+    },
   });
 
-  static const double escalaTextoGrande = 1.3;
+  final TamanoTexto tamanoTexto;
 
-  final bool textoGrande;
+  /// Tipografía Atkinson Hyperlegible, diseñada para baja visión.
+  final bool letraClara;
+  final ColorPastel color;
   final bool altoContraste;
   final bool modoOscuro;
-  final ColorTema color;
 
-  double get escalaTexto => textoGrande ? escalaTextoGrande : 1.0;
+  /// Barra de navegación arriba (posición de los menús).
+  final bool menuArriba;
+
+  // Apoyos de comunicación.
+  final bool mostrarPictogramas;
+  final bool mostrarTexto;
+  final bool leerEnVoz;
+
+  /// Ignora pulsaciones repetidas (temblores o espasmos).
+  final bool filtroAntitemblor;
+
+  /// Vistas de la agenda habilitadas para el estudiante (HU-09).
+  final Set<VistaAgenda> vistasAgenda;
 
   PreferenciasAccesibilidad copyWith({
-    bool? textoGrande,
+    TamanoTexto? tamanoTexto,
+    bool? letraClara,
+    ColorPastel? color,
     bool? altoContraste,
     bool? modoOscuro,
-    ColorTema? color,
+    bool? menuArriba,
+    bool? mostrarPictogramas,
+    bool? mostrarTexto,
+    bool? leerEnVoz,
+    bool? filtroAntitemblor,
+    Set<VistaAgenda>? vistasAgenda,
   }) {
     return PreferenciasAccesibilidad(
-      textoGrande: textoGrande ?? this.textoGrande,
+      tamanoTexto: tamanoTexto ?? this.tamanoTexto,
+      letraClara: letraClara ?? this.letraClara,
+      color: color ?? this.color,
       altoContraste: altoContraste ?? this.altoContraste,
       modoOscuro: modoOscuro ?? this.modoOscuro,
-      color: color ?? this.color,
+      menuArriba: menuArriba ?? this.menuArriba,
+      mostrarPictogramas: mostrarPictogramas ?? this.mostrarPictogramas,
+      mostrarTexto: mostrarTexto ?? this.mostrarTexto,
+      leerEnVoz: leerEnVoz ?? this.leerEnVoz,
+      filtroAntitemblor: filtroAntitemblor ?? this.filtroAntitemblor,
+      vistasAgenda: vistasAgenda ?? this.vistasAgenda,
+    );
+  }
+
+  Map<String, Object?> toMap() => {
+    'tamanoTexto': tamanoTexto.name,
+    'letraClara': letraClara,
+    'color': color.name,
+    'altoContraste': altoContraste,
+    'modoOscuro': modoOscuro,
+    'menuArriba': menuArriba,
+    'mostrarPictogramas': mostrarPictogramas,
+    'mostrarTexto': mostrarTexto,
+    'leerEnVoz': leerEnVoz,
+    'filtroAntitemblor': filtroAntitemblor,
+    'vistasAgenda': [for (final vista in vistasAgenda) vista.name],
+  };
+
+  factory PreferenciasAccesibilidad.fromMap(Object? datos) {
+    const porDefecto = PreferenciasAccesibilidad();
+    if (datos is! Map) return porDefecto;
+
+    final vistas = {
+      for (final nombre in datos['vistasAgenda'] as List? ?? const [])
+        ?VistaAgenda.porNombre(nombre as String),
+    };
+    return PreferenciasAccesibilidad(
+      tamanoTexto: TamanoTexto.values.firstWhere(
+        (t) => t.name == datos['tamanoTexto'],
+        orElse: () => TamanoTexto.normal,
+      ),
+      letraClara: datos['letraClara'] as bool? ?? porDefecto.letraClara,
+      color: ColorPastel.porNombre(datos['color'] as String?),
+      altoContraste: datos['altoContraste'] as bool? ?? false,
+      modoOscuro: datos['modoOscuro'] as bool? ?? false,
+      menuArriba: datos['menuArriba'] as bool? ?? false,
+      mostrarPictogramas: datos['mostrarPictogramas'] as bool? ?? true,
+      mostrarTexto: datos['mostrarTexto'] as bool? ?? true,
+      leerEnVoz: datos['leerEnVoz'] as bool? ?? false,
+      filtroAntitemblor: datos['filtroAntitemblor'] as bool? ?? false,
+      vistasAgenda: vistas.isEmpty ? porDefecto.vistasAgenda : vistas,
     );
   }
 
   @override
   bool operator ==(Object other) =>
       other is PreferenciasAccesibilidad &&
-      other.textoGrande == textoGrande &&
+      other.tamanoTexto == tamanoTexto &&
+      other.letraClara == letraClara &&
+      other.color == color &&
       other.altoContraste == altoContraste &&
       other.modoOscuro == modoOscuro &&
-      other.color == color;
+      other.menuArriba == menuArriba &&
+      other.mostrarPictogramas == mostrarPictogramas &&
+      other.mostrarTexto == mostrarTexto &&
+      other.leerEnVoz == leerEnVoz &&
+      other.filtroAntitemblor == filtroAntitemblor &&
+      other.vistasAgenda.length == vistasAgenda.length &&
+      other.vistasAgenda.containsAll(vistasAgenda);
 
   @override
-  int get hashCode => Object.hash(textoGrande, altoContraste, modoOscuro, color);
+  int get hashCode => Object.hash(
+    tamanoTexto,
+    letraClara,
+    color,
+    altoContraste,
+    modoOscuro,
+    menuArriba,
+    mostrarPictogramas,
+    mostrarTexto,
+    leerEnVoz,
+    filtroAntitemblor,
+    Object.hashAllUnordered(vistasAgenda),
+  );
 }

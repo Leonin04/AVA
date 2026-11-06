@@ -11,10 +11,10 @@ class AgendaControlador extends ControladorCarga<List<Tarea>> {
     required String idEstudiante,
     DateTime? diaReferencia,
     DateTime Function()? reloj,
-  })  : _repositorio = repositorio,
-        _idEstudiante = idEstudiante,
-        _diaReferencia = diaReferencia,
-        _reloj = reloj ?? DateTime.now;
+  }) : _repositorio = repositorio,
+       _idEstudiante = idEstudiante,
+       _diaReferencia = diaReferencia,
+       _reloj = reloj ?? DateTime.now;
 
   final RepositorioTareas _repositorio;
   final String _idEstudiante;

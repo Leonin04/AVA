@@ -15,10 +15,10 @@ abstract final class CalculosAgenda {
 
   /// Lunes de la semana a la que pertenece [fecha].
   static DateTime inicioDeSemana(DateTime fecha) => DateTime(
-        fecha.year,
-        fecha.month,
-        fecha.day - (fecha.weekday - DateTime.monday),
-      );
+    fecha.year,
+    fecha.month,
+    fecha.day - (fecha.weekday - DateTime.monday),
+  );
 
   /// Los siete días (de lunes a domingo) de la semana de [fecha].
   static List<DateTime> diasDeSemana(DateTime fecha) {
@@ -47,7 +47,8 @@ abstract final class CalculosAgenda {
         ordenadas
             .where(
               (tarea) =>
-                  tarea.estado == EstadoTarea.pendiente && tarea.contiene(ahora),
+                  tarea.estado == EstadoTarea.pendiente &&
+                  tarea.contiene(ahora),
             )
             .firstOrNull;
   }

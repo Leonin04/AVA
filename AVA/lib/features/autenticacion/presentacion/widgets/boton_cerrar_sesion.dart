@@ -16,16 +16,19 @@ void cerrarSesion(BuildContext context) {
   );
 }
 
-/// Botón para la barra superior que cierra la sesión.
+/// Botón para la barra superior de las pantallas de gestión.
 class BotonCerrarSesion extends StatelessWidget {
   const BotonCerrarSesion({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      tooltip: 'Salir',
-      onPressed: () => cerrarSesion(context),
-      icon: const Icon(Icons.logout),
+    return Padding(
+      padding: const EdgeInsets.only(right: 12),
+      child: OutlinedButton.icon(
+        onPressed: () => cerrarSesion(context),
+        icon: const Icon(Icons.logout_rounded),
+        label: const Text('Salir'),
+      ),
     );
   }
 }

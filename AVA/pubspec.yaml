@@ -4,8 +4,8 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
 
 dependencies:
   flutter:
@@ -38,6 +38,10 @@ dependencies:
   # flutter_local_notifications: ^17.0.0
   shared_preferences: ^2.2.2
 
+  # Lectura en voz alta (RF-08, persona Álex) y fotografías propias (RF-13)
+  flutter_tts: ^4.2.5
+  image_picker: ^1.2.4
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -50,4 +54,12 @@ flutter:
     - assets/iconos/
     - assets/pictogramas/
     - assets/sonidos/
-    - assets/fuentes/
+
+  # Atkinson Hyperlegible: tipografía diseñada para baja visión (licencia OFL,
+  # ver assets/fuentes/OFL.txt). Va incluida para funcionar sin conexión.
+  fonts:
+    - family: AtkinsonHyperlegible
+      fonts:
+        - asset: assets/fuentes/AtkinsonHyperlegible-Regular.ttf
+        - asset: assets/fuentes/AtkinsonHyperlegible-Bold.ttf
+          weight: 700

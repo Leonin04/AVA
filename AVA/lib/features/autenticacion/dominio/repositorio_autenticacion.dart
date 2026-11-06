@@ -1,21 +1,27 @@
-import 'pictograma_clave.dart';
+import 'clave_acceso.dart';
+import 'cuenta.dart';
 
-/// Comprobación de credenciales de administradores, tutores y estudiantes.
+/// Comprobación y gestión de credenciales.
 ///
 /// Al conectar Firebase se implementará con Firebase Authentication.
 abstract interface class RepositorioAutenticacion {
-  Future<bool> validarAdministrador({
+  /// Devuelve la cuenta de administrador o tutor si las credenciales son
+  /// correctas, o `null` si no lo son (HU-17).
+  Future<Cuenta?> iniciarSesionGestion({
     required String usuario,
     required String contrasena,
   });
 
-  Future<bool> validarContrasenaEstudiante({
+  /// Comprueba la clave de un estudiante (HU-08).
+  Future<bool> validarEstudiante({
     required String idEstudiante,
-    required String contrasena,
+    required ClaveAcceso clave,
   });
 
-  Future<bool> validarPictogramasEstudiante({
-    required String idEstudiante,
-    required List<PictogramaClave> secuencia,
-  });
+  /// Guarda o cambia la clave de una cuenta.
+  Future<void> guardarClave(String idCuenta, ClaveAcceso clave);
+
+  /// Envía un enlace para recuperar la contraseña al correo indicado, si
+  /// pertenece a alguna cuenta (HU-17).
+  Future<void> solicitarRecuperacion(String email);
 }

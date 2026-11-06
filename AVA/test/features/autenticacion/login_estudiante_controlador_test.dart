@@ -1,87 +1,92 @@
-import 'package:ava/features/autenticacion/dominio/metodo_acceso.dart';
 import 'package:ava/features/autenticacion/dominio/pictograma_clave.dart';
 import 'package:ava/features/autenticacion/dominio/repositorio_autenticacion_simulado.dart';
 import 'package:ava/features/autenticacion/logica/login_estudiante_controlador.dart';
-import 'package:ava/features/perfil/dominio/estudiante.dart';
+import 'package:ava/features/perfil/dominio/repositorio_estudiantes_simulado.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void main() {
-  final repositorio = RepositorioAutenticacionSimulado();
+import '../../ayudas_prueba.dart';
 
-  group('Login con pictogramas', () {
-    const lucia = Estudiante(
-      id: 'e03',
-      nombre: 'Lucía',
-      idAula: '1A',
-      metodoAcceso: AccesoConPictogramas(longitudClave: 3),
+/// HU-08: inicio de sesión accesible del estudiante.
+void main() {
+  final almacen = almacenDePrueba();
+  final autenticacion = RepositorioAutenticacionSimulado(almacen);
+  final estudiantes = RepositorioEstudiantesSimulado(almacen);
+
+  Future<LoginEstudianteControlador> controladorDe(String id) async =>
+      LoginEstudianteControlador(
+        repositorio: autenticacion,
+        estudiante: (await estudiantes.obtener(id))!,
+      );
+
+  group('Con pictogramas', () {
+    test('la clave correcta da acceso al rellenar el último hueco', () async {
+      final login = await controladorDe('e03'); // Lucía, 3 pictogramas.
+
+      expect(login.longitudClave, 3);
+      expect(await login.anadirPictograma(PictogramaClave.sol), isFalse);
+      expect(await login.anadirPictograma(PictogramaClave.manzana), isFalse);
+      expect(await login.anadirPictograma(PictogramaClave.mariposa), isTrue);
+      expect(login.mensajeError, isNull);
+    });
+
+    test(
+      'una clave incorrecta vacía los huecos y avisa con claridad',
+      () async {
+        final login = await controladorDe('e03');
+
+        await login.anadirPictograma(PictogramaClave.coche);
+        await login.anadirPictograma(PictogramaClave.coche);
+        final correcto = await login.anadirPictograma(PictogramaClave.coche);
+
+        expect(correcto, isFalse);
+        expect(login.pictogramas, isEmpty);
+        expect(
+          login.mensajeError,
+          LoginEstudianteControlador.mensajeIncorrecto,
+        );
+      },
     );
 
-    test('la clave correcta da acceso al rellenar el último hueco', () async {
-      final controlador =
-          LoginEstudianteControlador(repositorio: repositorio, estudiante: lucia);
+    test('«Borrar» quita el último pictograma', () async {
+      final login = await controladorDe('e03');
 
-      expect(controlador.longitudClave, 3);
-      expect(await controlador.anadirPictograma(PictogramaClave.sol), isFalse);
-      expect(await controlador.anadirPictograma(PictogramaClave.luna), isFalse);
-      expect(
-        await controlador.anadirPictograma(PictogramaClave.estrella),
-        isTrue,
-      );
-      expect(controlador.mensajeError, isNull);
-    });
+      await login.anadirPictograma(PictogramaClave.sol);
+      await login.anadirPictograma(PictogramaClave.flor);
+      login.borrarUltimo();
 
-    test('una clave incorrecta vacía los huecos y avisa', () async {
-      final controlador =
-          LoginEstudianteControlador(repositorio: repositorio, estudiante: lucia);
-
-      await controlador.anadirPictograma(PictogramaClave.coche);
-      await controlador.anadirPictograma(PictogramaClave.coche);
-      final correcto = await controlador.anadirPictograma(PictogramaClave.coche);
-
-      expect(correcto, isFalse);
-      expect(controlador.seleccion, isEmpty);
-      expect(controlador.mensajeError, isNotNull);
-    });
-
-    test('borrar quita el último pictograma', () async {
-      final controlador =
-          LoginEstudianteControlador(repositorio: repositorio, estudiante: lucia);
-
-      await controlador.anadirPictograma(PictogramaClave.sol);
-      await controlador.anadirPictograma(PictogramaClave.flor);
-      controlador.borrarUltimoPictograma();
-
-      expect(controlador.seleccion, [PictogramaClave.sol]);
+      expect(login.pictogramas, [PictogramaClave.sol]);
     });
   });
 
-  group('Login con contraseña', () {
-    const carlos = Estudiante(
-      id: 'e02',
-      nombre: 'Carlos',
-      idAula: '1A',
-      metodoAcceso: AccesoConContrasena(),
-    );
+  group('Con número (PIN)', () {
+    test('se comprueba al pulsar la cuarta cifra', () async {
+      final login = await controladorDe('e05'); // Marta.
 
-    test('acepta la contraseña correcta', () async {
-      final controlador = LoginEstudianteControlador(
-        repositorio: repositorio,
-        estudiante: carlos,
-      );
-
-      expect(await controlador.comprobarContrasena('1234'), isTrue);
+      expect(login.longitudClave, 4);
+      for (final cifra in [1, 2, 3]) {
+        expect(await login.anadirDigito(cifra), isFalse);
+      }
+      expect(await login.anadirDigito(4), isTrue);
     });
 
-    test('rechaza una contraseña vacía o incorrecta', () async {
-      final controlador = LoginEstudianteControlador(
-        repositorio: repositorio,
-        estudiante: carlos,
-      );
+    test('un número incorrecto se vacía', () async {
+      final login = await controladorDe('e05');
+      for (final cifra in [9, 9, 9, 9]) {
+        await login.anadirDigito(cifra);
+      }
+      expect(login.digitos, isEmpty);
+      expect(login.mensajeError, isNotNull);
+    });
+  });
 
-      expect(await controlador.comprobarContrasena(''), isFalse);
-      expect(controlador.mensajeError, 'Escribe tu contraseña');
-      expect(await controlador.comprobarContrasena('0000'), isFalse);
-      expect(controlador.mensajeError, isNotNull);
+  group('Con contraseña', () {
+    test('acepta la correcta y rechaza la vacía o la incorrecta', () async {
+      final login = await controladorDe('e02'); // Carlos.
+
+      expect(await login.comprobarContrasena(''), isFalse);
+      expect(login.mensajeError, 'Escribe tu contraseña.');
+      expect(await login.comprobarContrasena('0000'), isFalse);
+      expect(await login.comprobarContrasena('1234'), isTrue);
     });
   });
 }

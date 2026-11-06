@@ -2,91 +2,107 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constantes/dimensiones.dart';
+import '../../../core/constantes/pictogramas.dart';
+import '../../../core/tema/ajustes_interfaz.dart';
 import '../../../core/widgets/avatar_usuario.dart';
+import '../../../core/widgets/boton_accesible.dart';
+import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/mensaje_informativo.dart';
+import '../../../core/widgets/pantalla_estudiante.dart';
+import '../../autenticacion/logica/sesion_controlador.dart';
 import '../dominio/estudiante.dart';
-import '../dominio/preferencias_accesibilidad.dart';
 import '../logica/preferencias_controlador.dart';
-import 'widgets/boton_opcion_accesibilidad.dart';
+import 'opciones_preferencias.dart';
 
-/// Perfil del estudiante: avatar, nombre y opciones de accesibilidad que
-/// cambian el aspecto de toda la aplicación (HU-14).
+/// Perfil del estudiante: su foto, su nombre y botones con pictogramas para
+/// cambiar el aspecto de toda la app (HU-14). Solo puede cambiarlos si su
+/// tutor se lo permite.
 class PantallaPerfil extends StatelessWidget {
   const PantallaPerfil({super.key, required this.estudiante});
 
   final Estudiante estudiante;
 
+  Future<void> _aplicar(BuildContext context, OpcionPreferencia opcion) async {
+    final preferencias = context.read<PreferenciasControlador>();
+    final sesion = context.read<SesionControlador>();
+    final ajustes = AjustesInterfaz.of(context);
+    final avisos = ScaffoldMessenger.of(context);
+
+    try {
+      final actualizado = await preferencias.cambiar(
+        opcion.aplicar(preferencias.preferencias),
+      );
+      if (actualizado != null) sesion.actualizarEstudiante(actualizado);
+    } on ArgumentError catch (error) {
+      final mensaje = '${error.message}';
+      if (ajustes.leerEnVoz) await ajustes.voz.decir(mensaje);
+      avisos.showSnackBar(SnackBar(content: Text(mensaje)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controlador = context.watch<PreferenciasControlador>();
-    final preferencias = controlador.preferencias;
+    final preferencias = context.watch<PreferenciasControlador>().preferencias;
+    final opciones = OpcionPreferencia.todas();
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Mi perfil')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(Dimensiones.espaciado),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: Dimensiones.anchoMaximoContenido,
-              ),
+    return PantallaEstudiante(
+      titulo: 'Mi perfil',
+      pictograma: Pictogramas.perfil,
+      icono: Icons.person_rounded,
+      color: estudiante.color,
+      textoVoz: estudiante.puedeModificarPreferencias
+          ? 'Mi perfil. Toca un botón para cambiar cómo ves la agenda.'
+          : 'Mi perfil. Tu profesor elige cómo ves la agenda.',
+      cuerpo: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: 220,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
               child: Column(
                 children: [
                   AvatarUsuario(
                     nombre: estudiante.nombre,
-                    urlImagen: estudiante.urlAvatar,
+                    imagen: estudiante.avatar,
+                    color: estudiante.color,
                     tamano: Dimensiones.avatarGrande,
                   ),
                   const SizedBox(height: Dimensiones.espaciadoPequeno),
                   Text(
                     estudiante.nombre,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                  ),
-                  const SizedBox(height: Dimensiones.espaciado * 1.5),
-                  Text(
-                    'Elige cómo quieres ver la aplicación',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: Dimensiones.espaciado),
-                  Wrap(
-                    spacing: Dimensiones.espaciado,
-                    runSpacing: Dimensiones.espaciado,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      BotonOpcionAccesibilidad(
-                        icono: Icons.text_increase,
-                        texto: 'Letra grande',
-                        seleccionada: preferencias.textoGrande,
-                        alPulsar: controlador.alternarTextoGrande,
-                      ),
-                      BotonOpcionAccesibilidad(
-                        icono: Icons.contrast,
-                        texto: 'Alto contraste',
-                        seleccionada: preferencias.altoContraste,
-                        alPulsar: controlador.alternarAltoContraste,
-                      ),
-                      BotonOpcionAccesibilidad(
-                        icono: Icons.dark_mode,
-                        texto: 'Modo oscuro',
-                        seleccionada: preferencias.modoOscuro,
-                        alPulsar: controlador.alternarModoOscuro,
-                      ),
-                      for (final color in ColorTema.values)
-                        BotonOpcionAccesibilidad(
-                          icono: Icons.palette,
-                          colorIcono: Color(color.valorArgb),
-                          texto: 'Color ${color.nombre.toLowerCase()}',
-                          seleccionada: preferencias.color == color,
-                          alPulsar: () => controlador.elegirColor(color),
-                        ),
-                    ],
+                    style: Theme.of(context).textTheme.headlineSmall,
                   ),
                 ],
               ),
             ),
           ),
-        ),
+          const SizedBox(width: Dimensiones.espaciado),
+          Expanded(
+            child: estudiante.puedeModificarPreferencias
+                ? CuadriculaPaginada<OpcionPreferencia>(
+                    elementos: opciones,
+                    maxColumnas: 4,
+                    anchoMinimoCelda: 180,
+                    altoMinimoCelda: 170,
+                    espaciado: Dimensiones.espaciadoPequeno,
+                    constructor: (context, opcion) => BotonAccesible(
+                      texto: opcion.texto,
+                      textoSecundario: opcion.estado(preferencias),
+                      pictograma: opcion.pictograma,
+                      icono: opcion.icono,
+                      color: opcion.color,
+                      seleccionado: opcion.activa(preferencias),
+                      alPulsar: () => _aplicar(context, opcion),
+                    ),
+                  )
+                : const MensajeInformativo(
+                    icono: Icons.school_rounded,
+                    pictograma: Pictogramas.maestro,
+                    texto: 'Tu profesor elige cómo ves la agenda.',
+                  ),
+          ),
+        ],
       ),
     );
   }

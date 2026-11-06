@@ -88,8 +88,11 @@ void main() {
         'taller',
       );
       expect(
-        CalculosAgenda.siguienteTarea([asambleaHecha, taller, recreo], ahora)
-            ?.id,
+        CalculosAgenda.siguienteTarea([
+          asambleaHecha,
+          taller,
+          recreo,
+        ], ahora)?.id,
         'taller',
       );
       expect(

@@ -1,55 +1,106 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/rutas.dart';
-import '../../../core/constantes/dimensiones.dart';
-import '../../../core/widgets/boton_grande.dart';
+import '../../../core/constantes/paleta.dart';
+import '../../../core/constantes/pictogramas.dart';
+import '../../../core/modelos/recurso_visual.dart';
+import '../../../core/widgets/boton_accesible.dart';
+import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/dialogo_confirmacion.dart';
+import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../autenticacion/presentacion/widgets/boton_cerrar_sesion.dart';
 import '../dominio/estudiante.dart';
 
-/// Pantalla principal del estudiante tras iniciar sesión: Perfil y Agenda.
+/// Pantalla principal del estudiante tras iniciar sesión: Agenda y Perfil
+/// (y crear tareas si su tutor se lo permite). Pocas opciones, grandes y
+/// de colores distintos.
 class PantallaMenuEstudiante extends StatelessWidget {
   const PantallaMenuEstudiante({super.key, required this.estudiante});
 
   final Estudiante estudiante;
 
+  Future<void> _salir(BuildContext context) async {
+    final confirmado = await mostrarDialogoConfirmacion(
+      context,
+      titulo: '¿Quieres salir?',
+      mensaje: 'Volverás a la pantalla de las clases.',
+      pictograma: Pictogramas.salir,
+      textoConfirmar: 'Sí, salir',
+    );
+    if (confirmado && context.mounted) cerrarSesion(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hola, ${estudiante.nombre}'),
-        actions: const [BotonCerrarSesion()],
+    final opciones = <_OpcionMenu>[
+      _OpcionMenu(
+        'Mi agenda',
+        Pictogramas.agenda,
+        Icons.calendar_month_rounded,
+        ColorPastel.cielo,
+        () => Navigator.pushNamed(context, Rutas.seleccionVistaAgenda),
       ),
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(Dimensiones.espaciado),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: Dimensiones.anchoMaximoFormulario,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BotonGrande(
-                    texto: 'Perfil',
-                    icono: Icons.person,
-                    alPulsar: () => Navigator.pushNamed(context, Rutas.perfil),
-                  ),
-                  const SizedBox(height: Dimensiones.espaciado * 2),
-                  BotonGrande(
-                    texto: 'Agenda',
-                    icono: Icons.calendar_month,
-                    alPulsar: () => Navigator.pushNamed(
-                      context,
-                      Rutas.seleccionVistaAgenda,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+      _OpcionMenu(
+        'Mi perfil',
+        Pictogramas.perfil,
+        Icons.person_rounded,
+        ColorPastel.lavanda,
+        () => Navigator.pushNamed(context, Rutas.perfil),
+      ),
+      if (estudiante.puedeGestionarTareas)
+        _OpcionMenu(
+          'Crear tarea',
+          Pictogramas.lapiz,
+          Icons.add_task_rounded,
+          ColorPastel.menta,
+          () => Navigator.pushNamed(context, Rutas.nuevaTareaEstudiante),
+        ),
+      _OpcionMenu(
+        'Salir',
+        Pictogramas.salir,
+        Icons.logout_rounded,
+        ColorPastel.rosa,
+        () => _salir(context),
+      ),
+    ];
+
+    return PantallaEstudiante(
+      titulo: 'Hola, ${estudiante.nombre}',
+      pictograma: estudiante.avatar ?? Pictogramas.hola,
+      icono: Icons.waving_hand_rounded,
+      color: estudiante.color,
+      textoVoz: 'Hola, ${estudiante.nombre}. ¿Qué quieres hacer?',
+      cuerpo: CuadriculaPaginada<_OpcionMenu>(
+        elementos: opciones,
+        maxColumnas: 4,
+        anchoMinimoCelda: 220,
+        altoMinimoCelda: 220,
+        altoMaximoCelda: 380,
+        constructor: (context, opcion) => BotonAccesible(
+          texto: opcion.texto,
+          pictograma: opcion.pictograma,
+          icono: opcion.icono,
+          color: opcion.color,
+          textoGrande: true,
+          alPulsar: opcion.alPulsar,
         ),
       ),
     );
   }
+}
+
+class _OpcionMenu {
+  const _OpcionMenu(
+    this.texto,
+    this.pictograma,
+    this.icono,
+    this.color,
+    this.alPulsar,
+  );
+
+  final String texto;
+  final RecursoVisual pictograma;
+  final IconData icono;
+  final ColorPastel color;
+  final VoidCallback alPulsar;
 }

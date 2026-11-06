@@ -4,6 +4,18 @@ import '../dominio/estudiante.dart';
 import '../dominio/preferencias_accesibilidad.dart';
 import '../dominio/repositorio_estudiantes.dart';
 
+/// Comprueba que unas preferencias son utilizables. Devuelve el motivo si
+/// no lo son.
+String? validarPreferencias(PreferenciasAccesibilidad preferencias) {
+  if (!preferencias.mostrarTexto && !preferencias.mostrarPictogramas) {
+    return 'Hay que mostrar el texto, los pictogramas o los dos.';
+  }
+  if (preferencias.vistasAgenda.isEmpty) {
+    return 'Elige al menos una forma de ver la agenda.';
+  }
+  return null;
+}
+
 /// Preferencias de accesibilidad activas en la aplicación (HU-14).
 ///
 /// Es único para toda la app: al cambiar, el tema se reconstruye y afecta a
@@ -32,26 +44,23 @@ class PreferenciasControlador extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> alternarTextoGrande() => _actualizar(
-        _preferencias.copyWith(textoGrande: !_preferencias.textoGrande),
-      );
+  /// Cambia las preferencias y las guarda en el perfil del estudiante.
+  /// Devuelve el perfil actualizado, o lanza [ArgumentError] si las
+  /// preferencias no son válidas.
+  Future<Estudiante?> cambiar(PreferenciasAccesibilidad nuevas) async {
+    final error = validarPreferencias(nuevas);
+    if (error != null) throw ArgumentError(error);
 
-  Future<void> alternarAltoContraste() => _actualizar(
-        _preferencias.copyWith(altoContraste: !_preferencias.altoContraste),
-      );
-
-  Future<void> alternarModoOscuro() => _actualizar(
-        _preferencias.copyWith(modoOscuro: !_preferencias.modoOscuro),
-      );
-
-  Future<void> elegirColor(ColorTema color) =>
-      _actualizar(_preferencias.copyWith(color: color));
-
-  Future<void> _actualizar(PreferenciasAccesibilidad nuevas) async {
     _preferencias = nuevas;
     notifyListeners();
 
     final id = _idEstudiante;
-    if (id != null) await _repositorio.guardarPreferencias(id, nuevas);
+    if (id == null) return null;
+    final estudiante = await _repositorio.obtener(id);
+    if (estudiante == null) return null;
+
+    final actualizado = estudiante.copyWith(preferencias: nuevas);
+    await _repositorio.guardar(actualizado);
+    return actualizado;
   }
 }

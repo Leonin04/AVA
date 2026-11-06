@@ -1,65 +1,54 @@
-import 'pictograma_clave.dart';
+import '../../../core/servicios/almacen_simulado.dart';
+import 'clave_acceso.dart';
+import 'cuenta.dart';
 import 'repositorio_autenticacion.dart';
+import 'repositorio_cuentas_simulado.dart';
 
-/// Credenciales de prueba mientras no se conecta Firebase Authentication.
-///
-/// - Administrador: usuario `admin`, contraseña `admin1234`.
-/// - Estudiantes con contraseña: `1234`.
-/// - Estudiantes con pictogramas: los N primeros pictogramas en orden
-///   (sol, luna, estrella, corazón, flor, coche), siendo N la longitud de su
-///   clave.
-///
-/// Los identificadores coinciden con los de `RepositorioEstudiantesSimulado`.
+/// Credenciales guardadas en el [AlmacenSimulado] mientras no se conecta
+/// Firebase Authentication. Las credenciales de prueba están en
+/// `lib/app/datos_iniciales.dart`.
 class RepositorioAutenticacionSimulado implements RepositorioAutenticacion {
-  static const _administradores = {'admin': 'admin1234'};
+  RepositorioAutenticacionSimulado(this._almacen);
 
-  static const _contrasenasEstudiantes = {
-    'e02': '1234',
-    'e05': '1234',
-    'e07': '1234',
-    'e10': '1234',
-    'e14': '1234',
-  };
+  static const coleccion = 'credenciales';
 
-  static const _longitudClavePictogramas = {
-    'e01': 4,
-    'e03': 3,
-    'e04': 6,
-    'e06': 5,
-    'e08': 3,
-    'e09': 4,
-    'e11': 4,
-    'e12': 3,
-    'e13': 5,
-    'e15': 4,
-  };
+  final AlmacenSimulado _almacen;
+
+  /// Correos a los que se ha pedido recuperar la contraseña (para pruebas).
+  final List<String> recuperacionesSolicitadas = [];
+
+  ClaveAcceso? _clave(String idCuenta) =>
+      ClaveAcceso.fromMap(_almacen.obtener(coleccion, idCuenta));
 
   @override
-  Future<bool> validarAdministrador({
+  Future<Cuenta?> iniciarSesionGestion({
     required String usuario,
     required String contrasena,
-  }) async =>
-      _administradores[usuario] == contrasena;
-
-  @override
-  Future<bool> validarContrasenaEstudiante({
-    required String idEstudiante,
-    required String contrasena,
-  }) async =>
-      _contrasenasEstudiantes[idEstudiante] == contrasena;
-
-  @override
-  Future<bool> validarPictogramasEstudiante({
-    required String idEstudiante,
-    required List<PictogramaClave> secuencia,
   }) async {
-    final longitud = _longitudClavePictogramas[idEstudiante];
-    if (longitud == null || secuencia.length != longitud) return false;
+    final datos = _almacen.obtener(
+      RepositorioCuentasSimulado.coleccion,
+      usuario,
+    );
+    if (datos == null) return null;
 
-    final esperada = PictogramaClave.values.take(longitud).toList();
-    for (var i = 0; i < longitud; i++) {
-      if (secuencia[i] != esperada[i]) return false;
-    }
-    return true;
+    final cuenta = Cuenta.fromMap(usuario, datos);
+    if (!cuenta.esGestion) return null;
+    return _clave(usuario) == ClaveContrasena(contrasena) ? cuenta : null;
+  }
+
+  @override
+  Future<bool> validarEstudiante({
+    required String idEstudiante,
+    required ClaveAcceso clave,
+  }) async => _clave(idEstudiante) == clave;
+
+  @override
+  Future<void> guardarClave(String idCuenta, ClaveAcceso clave) async {
+    _almacen.guardar(coleccion, idCuenta, clave.toMap());
+  }
+
+  @override
+  Future<void> solicitarRecuperacion(String email) async {
+    recuperacionesSolicitadas.add(email.trim().toLowerCase());
   }
 }

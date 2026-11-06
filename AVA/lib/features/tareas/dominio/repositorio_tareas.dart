@@ -12,6 +12,14 @@ abstract interface class RepositorioTareas {
     required DateTime hasta,
   });
 
+  /// Crea o actualiza una tarea (HU-03 a HU-07).
+  Future<void> guardar(Tarea tarea);
+
+  Future<void> eliminar(String idTarea);
+
   /// Guarda el nuevo estado de una tarea y devuelve la tarea actualizada.
   Future<Tarea> actualizarEstado(String idTarea, EstadoTarea estado);
+
+  /// Identificador libre para una tarea o un encargo nuevo.
+  String nuevoId(String prefijo);
 }

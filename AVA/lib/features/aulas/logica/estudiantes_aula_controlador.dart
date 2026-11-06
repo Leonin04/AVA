@@ -15,7 +15,7 @@ class EstudiantesAulaControlador extends ControladorCarga<List<Estudiante>> {
 
   @override
   Future<List<Estudiante>> obtenerDatos() =>
-      _repositorio.obtenerEstudiantesDeAula(aula.id);
+      _repositorio.listar(idAula: aula.id);
 
   @override
   String get mensajeErrorCarga => 'No se han podido cargar los alumnos.';

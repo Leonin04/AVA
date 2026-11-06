@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 
+import '../dominio/cuenta.dart';
 import '../dominio/repositorio_autenticacion.dart';
 
-/// Lógica del inicio de sesión de profesorado y administración (HU-17).
-class LoginAdministradorControlador extends ChangeNotifier {
-  LoginAdministradorControlador(this._repositorio);
+/// Lógica del inicio de sesión de tutores y administradores (HU-17).
+class LoginGestionControlador extends ChangeNotifier {
+  LoginGestionControlador(this._repositorio);
 
   final RepositorioAutenticacion _repositorio;
 
@@ -15,32 +16,34 @@ class LoginAdministradorControlador extends ChangeNotifier {
   String? get mensajeError => _mensajeError;
 
   String? validarUsuario(String? valor) =>
-      (valor == null || valor.trim().isEmpty) ? 'Escribe tu usuario' : null;
+      (valor == null || valor.trim().isEmpty) ? 'Escribe tu usuario.' : null;
 
   String? validarContrasena(String? valor) =>
-      (valor == null || valor.isEmpty) ? 'Escribe tu contraseña' : null;
+      (valor == null || valor.isEmpty) ? 'Escribe tu contraseña.' : null;
 
-  /// Devuelve `true` si las credenciales son correctas.
-  Future<bool> iniciarSesion({
+  /// Devuelve la cuenta si las credenciales son correctas, o `null`.
+  Future<Cuenta?> iniciarSesion({
     required String usuario,
     required String contrasena,
   }) async {
-    if (_comprobando) return false;
+    if (_comprobando) return null;
 
     _comprobando = true;
     _mensajeError = null;
     notifyListeners();
 
     try {
-      final correcto = await _repositorio.validarAdministrador(
+      final cuenta = await _repositorio.iniciarSesionGestion(
         usuario: usuario.trim(),
         contrasena: contrasena,
       );
-      if (!correcto) _mensajeError = 'Usuario o contraseña incorrectos';
-      return correcto;
+      if (cuenta == null) {
+        _mensajeError = 'El usuario o la contraseña no son correctos.';
+      }
+      return cuenta;
     } on Exception {
       _mensajeError = 'No se ha podido comprobar. Inténtalo de nuevo.';
-      return false;
+      return null;
     } finally {
       _comprobando = false;
       notifyListeners();

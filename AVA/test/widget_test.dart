@@ -1,64 +1,230 @@
-import 'package:ava/app/aplicacion_ava.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Recorrido completo con los datos simulados: inicio → clase → login con
-/// pictogramas → menú → agenda diaria.
+import 'ayudas_prueba.dart';
+
+/// Pruebas de la app completa con los datos de prueba, en una tableta
+/// horizontal de 1280 × 800.
 void main() {
-  testWidgets('Un estudiante entra con pictogramas y abre su agenda del día',
-      (tester) async {
-    tester.view.physicalSize = const Size(1280, 800);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
+  group('Flujo del estudiante', () {
+    testWidgets('Diego entra con pictogramas y abre su agenda del día', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      expect(find.text('AVA'), findsOneWidget);
+      expect(find.text('1ºA'), findsOneWidget);
 
-    await tester.pumpWidget(const AplicacionAva());
-    await tester.pumpAndSettle();
+      await entrarComoDiego(tester);
+      expect(find.text('Hola, Diego'), findsOneWidget);
 
-    expect(find.text('AVA'), findsOneWidget);
-    expect(find.text('1ºA'), findsOneWidget);
+      await pulsar(tester, 'Mi agenda');
+      expect(find.text('Semana'), findsOneWidget);
+      expect(find.text('Ahora y después'), findsOneWidget);
 
-    await tester.tap(find.text('1ºA'));
-    await tester.pumpAndSettle();
-    expect(find.text('Diego'), findsOneWidget);
+      await pulsar(tester, 'Hoy');
+      expect(find.text('Ver'), findsWidgets);
+    });
 
-    await tester.tap(find.text('Diego'));
-    await tester.pumpAndSettle();
+    testWidgets('una clave incorrecta muestra un aviso y no deja entrar', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await pulsar(tester, '1ºA');
+      await pulsar(tester, 'Lucía');
 
-    // Diego tiene una clave de 4 pictogramas: sol, luna, estrella, corazón.
-    for (final pictograma in ['Sol', 'Luna', 'Estrella', 'Corazón']) {
-      await tester.tap(find.text(pictograma));
-      await tester.pumpAndSettle();
-    }
-    expect(find.text('Hola, Diego'), findsOneWidget);
+      for (final pictograma in ['Coche', 'Perro', 'Flor']) {
+        await pulsar(tester, pictograma);
+      }
+      expect(find.text('No es correcto. Prueba otra vez.'), findsOneWidget);
+      expect(find.text('Hola, Lucía'), findsOneWidget); // Sigue en el login.
+      expect(find.text('Mi agenda'), findsNothing);
+    });
 
-    await tester.tap(find.text('Agenda'));
-    await tester.pumpAndSettle();
-    expect(find.text('Semana'), findsOneWidget);
-    expect(find.text('Siguiente tarea'), findsOneWidget);
+    testWidgets('Marta entra con su número', (tester) async {
+      await arrancarApp(tester);
+      await pulsar(tester, '1ºA');
+      await pulsar(tester, 'Marta');
+      for (final cifra in [1, 2, 3, 4]) {
+        await tester.tap(find.bySemanticsLabel('$cifra'));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('Mi agenda'), findsOneWidget);
+    });
 
-    await tester.tap(find.text('Día'));
-    await tester.pumpAndSettle();
-    expect(find.byIcon(Icons.visibility), findsWidgets);
+    testWidgets('el botón Ayuda está en todas las pantallas y la lee en voz', (
+      tester,
+    ) async {
+      final voz = await arrancarApp(tester);
+      await entrarComoDiego(tester);
+
+      await pulsar(tester, 'Ayuda');
+      expect(find.textContaining('Levanta la mano'), findsOneWidget);
+      expect(voz.dichos.last, contains('Levanta la mano'));
+      await pulsar(tester, 'Volver');
+
+      await pulsar(tester, 'Escuchar');
+      expect(voz.dichos.last, contains('Hola, Diego'));
+    });
+
+    testWidgets('cambiar una preferencia cambia toda la app (HU-14)', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi perfil');
+
+      final antes = Theme.of(tester.element(find.text('Mi perfil'))).brightness;
+      await pulsar(tester, 'Modo oscuro');
+      final despues = Theme.of(
+        tester.element(find.text('Mi perfil')),
+      ).brightness;
+
+      expect(antes, Brightness.light);
+      expect(despues, Brightness.dark);
+    });
+
+    testWidgets('sin permiso del tutor el perfil no se puede cambiar', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await pulsar(tester, '1ºA');
+      await pulsar(tester, 'Lucía');
+      for (final pictograma in ['Sol', 'Manzana', 'Mariposa']) {
+        await pulsar(tester, pictograma);
+      }
+      await pulsar(tester, 'Mi perfil');
+
+      expect(
+        find.text('Tu profesor elige cómo ves la agenda.'),
+        findsOneWidget,
+      );
+      expect(find.text('Modo oscuro'), findsNothing);
+    });
   });
 
-  testWidgets('Una clave de pictogramas incorrecta no deja entrar',
-      (tester) async {
-    tester.view.physicalSize = const Size(1280, 800);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
+  group('Sin desplazamiento (pantallas del estudiante)', () {
+    testWidgets('ninguna pantalla del recorrido necesita scroll', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      expect(find.byType(Scrollable), findsNothing, reason: 'Inicio');
 
-    await tester.pumpWidget(const AplicacionAva());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('1ºA'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Lucía'));
-    await tester.pumpAndSettle();
+      await pulsar(tester, '1ºA');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Clase');
 
-    for (final pictograma in ['Coche', 'Coche', 'Coche']) {
-      await tester.tap(find.text(pictograma));
+      await pulsar(tester, 'Diego');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Login');
+
+      for (final pictograma in ['Sol', 'Manzana', 'Mariposa', 'Flor']) {
+        await pulsar(tester, pictograma);
+      }
+      expect(find.byType(Scrollable), findsNothing, reason: 'Menú');
+
+      await pulsar(tester, 'Mi perfil');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Perfil');
+      await pulsar(tester, 'Atrás');
+
+      await pulsar(tester, 'Mi agenda');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Agenda');
+
+      await pulsar(tester, 'Semana');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Semana');
+      await pulsar(tester, 'Atrás');
+
+      await pulsar(tester, 'Ahora y después');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Ahora/después');
+      await pulsar(tester, 'Atrás');
+
+      await pulsar(tester, 'Hoy');
+      expect(find.byType(Scrollable), findsNothing, reason: 'Día');
+
+      await tester.tap(find.text('Ver').first);
       await tester.pumpAndSettle();
-    }
-    expect(find.text('No es correcto. Inténtalo otra vez.'), findsOneWidget);
-    expect(find.text('Hola, Lucía'), findsNothing);
+      expect(find.byType(Scrollable), findsNothing, reason: 'Detalle');
+      expect(find.text('Empezar'), findsOneWidget);
+    });
+
+    testWidgets('con la letra muy grande todo sigue cabiendo (Samuel)', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await pulsar(tester, '2ºB');
+      await pulsar(tester, 'Samuel');
+      for (final pictograma in ['Sol', 'Manzana', 'Mariposa']) {
+        await pulsar(tester, pictograma);
+      }
+      // Cualquier desbordamiento haría fallar la prueba.
+      await pulsar(tester, 'Mi agenda');
+      await pulsar(tester, 'Semana');
+      await pulsar(tester, 'Atrás');
+      await pulsar(tester, 'Hoy');
+      expect(find.byType(Scrollable), findsNothing);
+    });
+  });
+
+  group('Pautas de accesibilidad de Flutter', () {
+    testWidgets('inicio, clase y menú cumplen tamaño táctil y etiquetas', (
+      tester,
+    ) async {
+      final semantica = tester.ensureSemantics();
+      await arrancarApp(tester);
+
+      Future<void> comprobar() async {
+        await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+        await expectLater(tester, meetsGuideline(textContrastGuideline));
+      }
+
+      await comprobar();
+      await pulsar(tester, '1ºA');
+      await comprobar();
+      await pulsar(tester, 'Diego');
+      await comprobar();
+      for (final pictograma in ['Sol', 'Manzana', 'Mariposa', 'Flor']) {
+        await pulsar(tester, pictograma);
+      }
+      await comprobar();
+      await pulsar(tester, 'Mi agenda');
+      await pulsar(tester, 'Hoy');
+      await comprobar();
+      semantica.dispose();
+    });
+  });
+
+  group('Profesorado (HU-02, HU-16, HU-17)', () {
+    testWidgets('un tutor solo ve sus funciones y sus alumnos', (tester) async {
+      await arrancarApp(tester);
+      await entrarComoGestion(tester, 'javier', 'tutor1234');
+
+      expect(find.text('Hola, Javier Morales'), findsOneWidget);
+      expect(find.text('Mis alumnos'), findsOneWidget);
+      expect(find.text('Encargos del colegio'), findsOneWidget);
+      expect(find.text('Cuentas'), findsNothing);
+      expect(find.text('Aulas'), findsNothing);
+
+      await pulsar(tester, 'Mis alumnos');
+      expect(find.text('Diego'), findsOneWidget);
+      expect(find.text('Iván'), findsNothing); // De 2ºA, de otra tutora.
+    });
+
+    testWidgets('la administración ve cuentas y aulas', (tester) async {
+      await arrancarApp(tester);
+      await entrarComoGestion(tester, 'admin', 'admin1234');
+
+      expect(find.text('Cuentas'), findsOneWidget);
+      expect(find.text('Aulas'), findsOneWidget);
+    });
+
+    testWidgets('credenciales incorrectas muestran un mensaje claro', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoGestion(tester, 'javier', 'mal');
+      expect(
+        find.text('El usuario o la contraseña no son correctos.'),
+        findsOneWidget,
+      );
+    });
   });
 }

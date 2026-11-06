@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constantes/dimensiones.dart';
+import '../../../core/constantes/paleta.dart';
+import '../../../core/constantes/pictogramas.dart';
 import '../../../core/utilidades/formato_fecha.dart';
+import '../../../core/widgets/boton_accesible.dart';
+import '../../../core/widgets/cuadricula_paginada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
+import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../../perfil/dominio/estudiante.dart';
 import '../../tareas/dominio/tarea.dart';
 import '../logica/calculos_agenda.dart';
+import 'widgets/boton_tarea.dart';
 import 'widgets/estado_agenda_mixin.dart';
-import 'widgets/tarjeta_tarea.dart';
 
-/// Agenda de un día: las tareas ordenadas por hora, cada una con un botón
-/// para ver su detalle (HU-09). Se resaltan la tarea actual y la siguiente.
+/// Agenda de un día (HU-09): las tareas ordenadas por hora, cada una con un
+/// botón «Ver». Se distinguen la tarea de ahora y la de después (HU-10).
+/// Si no caben, se pasan de página en lugar de desplazarse.
 class PantallaAgendaDiaria extends StatefulWidget {
   const PantallaAgendaDiaria({super.key, required this.estudiante, this.dia});
 
@@ -36,128 +42,81 @@ class _PantallaAgendaDiariaState extends State<PantallaAgendaDiaria>
 
   DestacadoTarea _destacado(Tarea tarea) {
     if (tarea.id == agenda.tareaActual?.id) return DestacadoTarea.ahora;
-    if (tarea.id == agenda.siguienteTarea?.id) return DestacadoTarea.siguiente;
+    if (tarea.id == agenda.siguienteTarea?.id) return DestacadoTarea.despues;
     return DestacadoTarea.ninguno;
   }
 
   @override
   Widget build(BuildContext context) {
     final esHoy = CalculosAgenda.esMismoDia(_dia, agenda.ahora);
+    final nombreDia = FormatoFecha.diaCompleto(_dia);
 
-    return Scaffold(
-      appBar: AppBar(title: Text(esHoy ? 'Hoy' : 'Mi día')),
-      body: SafeArea(
-        child: VistaCarga<List<Tarea>>(
-          controlador: agenda,
-          constructor: (context, _) {
-            final tareas = agenda.tareasDelDia(_dia);
-
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: Dimensiones.anchoMaximoContenido,
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(Dimensiones.espaciado),
-                      child: _CabeceraDia(texto: FormatoFecha.diaCompleto(_dia)),
-                    ),
-                    Expanded(
-                      child: tareas.isEmpty
-                          ? const MensajeInformativo(
-                              icono: Icons.event_available,
-                              texto: 'No hay tareas para este día',
-                            )
-                          : ListView.separated(
-                              padding: const EdgeInsets.fromLTRB(
-                                Dimensiones.espaciado,
-                                0,
-                                Dimensiones.espaciado,
-                                Dimensiones.espaciado,
-                              ),
-                              itemCount: tareas.length,
-                              separatorBuilder: (_, __) => const SizedBox(
-                                height: Dimensiones.espaciado,
-                              ),
-                              itemBuilder: (context, indice) => _FilaTarea(
-                                tarea: tareas[indice],
-                                destacado: _destacado(tareas[indice]),
-                                alVer: () => abrirTarea(tareas[indice]),
-                              ),
-                            ),
-                    ),
-                  ],
-                ),
-              ),
+    return PantallaEstudiante(
+      titulo: esHoy ? 'Hoy, $nombreDia' : nombreDia,
+      pictograma: Pictogramas.calendario,
+      icono: Icons.today_rounded,
+      color: ColorPastel.paraIndice(_dia.weekday - 1),
+      textoVoz: _textoVoz(esHoy, nombreDia),
+      cuerpo: VistaCarga<List<Tarea>>(
+        controlador: agenda,
+        constructor: (context, _) {
+          final tareas = agenda.tareasDelDia(_dia);
+          if (tareas.isEmpty) {
+            return const MensajeInformativo(
+              icono: Icons.event_available_rounded,
+              pictograma: Pictogramas.descansar,
+              texto: 'Este día no tienes tareas.',
             );
-          },
-        ),
+          }
+          return CuadriculaPaginada<Tarea>(
+            elementos: tareas,
+            maxColumnas: 1,
+            anchoMinimoCelda: 400,
+            altoMinimoCelda: 104,
+            altoMaximoCelda: 140,
+            espaciado: Dimensiones.espaciadoPequeno,
+            constructor: (context, tarea) => Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: BotonTarea(
+                    tarea: tarea,
+                    destacado: _destacado(tarea),
+                    alPulsar: () => abrirTarea(tarea),
+                  ),
+                ),
+                const SizedBox(width: Dimensiones.espaciadoPequeno),
+                SizedBox(
+                  width: 160,
+                  child: BotonAccesible(
+                    texto: 'Ver',
+                    etiquetaSemantica: 'Ver ${tarea.titulo}',
+                    pictograma: Pictogramas.ojo,
+                    icono: Icons.visibility_rounded,
+                    color: ColorPastel.cielo,
+                    disposicion: DisposicionBoton.horizontal,
+                    alPulsar: () => abrirTarea(tarea),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
-}
 
-class _CabeceraDia extends StatelessWidget {
-  const _CabeceraDia({required this.texto});
-
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) {
-    final esquema = Theme.of(context).colorScheme;
-
-    return Semantics(
-      header: true,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(Dimensiones.espaciado),
-        decoration: BoxDecoration(
-          color: esquema.primary,
-          borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
-        ),
-        child: Text(
-          texto,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                color: esquema.onPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilaTarea extends StatelessWidget {
-  const _FilaTarea({
-    required this.tarea,
-    required this.destacado,
-    required this.alVer,
-  });
-
-  final Tarea tarea;
-  final DestacadoTarea destacado;
-  final VoidCallback alVer;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: TarjetaTarea(
-            tarea: tarea,
-            destacado: destacado,
-            alPulsar: alVer,
-          ),
-        ),
-        const SizedBox(width: Dimensiones.espaciadoPequeno),
-        IconButton.filledTonal(
-          tooltip: 'Ver ${tarea.titulo}',
-          onPressed: alVer,
-          icon: const Icon(Icons.visibility),
-        ),
-      ],
-    );
+  String _textoVoz(bool esHoy, String nombreDia) {
+    final tareas = agenda.tareasDelDia(_dia);
+    final inicio = esHoy ? 'Hoy es $nombreDia.' : '$nombreDia.';
+    if (tareas.isEmpty) return '$inicio No tienes tareas.';
+    final lista = tareas
+        .map(
+          (t) =>
+              '${t.titulo} a las ${t.inicio.hour}:'
+              '${t.inicio.minute.toString().padLeft(2, '0')}',
+        )
+        .join('. ');
+    return '$inicio Tus tareas son: $lista.';
   }
 }

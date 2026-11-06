@@ -15,11 +15,12 @@ abstract class ControladorCarga<T> extends ChangeNotifier {
   bool get cargando => _cargando;
   String? get mensajeError => _mensajeError;
 
-  /// Obtiene los datos del repositorio correspondiente.
+  /// Obtiene los datos del repositorio correspondiente. Puede lanzar
+  /// [ErrorConMensaje] para mostrar un mensaje concreto.
   @protected
   Future<T> obtenerDatos();
 
-  /// Mensaje que se muestra si la carga falla.
+  /// Mensaje que se muestra si la carga falla por otro motivo.
   @protected
   String get mensajeErrorCarga => 'No se han podido cargar los datos.';
 
@@ -32,12 +33,22 @@ abstract class ControladorCarga<T> extends ChangeNotifier {
 
     try {
       _datos = await obtenerDatos();
+    } on ErrorConMensaje catch (error) {
+      _datos = null;
+      _mensajeError = error.mensaje;
     } on Exception {
       _mensajeError = mensajeErrorCarga;
     } finally {
       _cargando = false;
       _notificar();
     }
+  }
+
+  /// Sustituye los datos tras guardar un cambio, sin volver a cargarlos.
+  @protected
+  void actualizarDatos(T datos) {
+    _datos = datos;
+    _notificar();
   }
 
   void _notificar() {
@@ -50,4 +61,14 @@ abstract class ControladorCarga<T> extends ChangeNotifier {
     _desechado = true;
     super.dispose();
   }
+}
+
+/// Error cuyo mensaje se puede mostrar directamente al usuario.
+class ErrorConMensaje implements Exception {
+  const ErrorConMensaje(this.mensaje);
+
+  final String mensaje;
+
+  @override
+  String toString() => mensaje;
 }

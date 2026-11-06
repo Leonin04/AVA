@@ -1,20 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../app/rutas.dart';
 import '../../../core/constantes/dimensiones.dart';
+import '../../../core/constantes/paleta.dart';
+import '../../../core/constantes/pictogramas.dart';
+import '../../../core/tema/ajustes_interfaz.dart';
 import '../../../core/utilidades/formato_fecha.dart';
-import '../../../core/widgets/boton_grande.dart';
+import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/dialogo_confirmacion.dart';
+import '../../../core/widgets/pantalla_estudiante.dart';
+import '../../../core/widgets/pictograma.dart';
+import '../../perfil/dominio/estudiante.dart';
 import '../dominio/repositorio_tareas.dart';
 import '../dominio/tarea.dart';
 import '../logica/detalle_tarea_controlador.dart';
-import 'widgets/etiqueta_estado_tarea.dart';
+import 'widgets/dialogo_celebracion.dart';
 
-/// Detalle de una tarea: título, horario, descripción y pasos (HU-05 y
-/// HU-06). Desde aquí el estudiante marca el inicio y el fin (HU-11).
+/// Detalle de una tarea (HU-05, HU-06): a la izquierda el pictograma, la
+/// hora y el estado; a la derecha la explicación, de una en una (primero
+/// qué hay que hacer y después cada paso), con botones para pasar.
+/// Abajo, el botón para empezar o terminar (HU-11).
 class PantallaDetalleTarea extends StatefulWidget {
-  const PantallaDetalleTarea({super.key, required this.tarea});
+  const PantallaDetalleTarea({
+    super.key,
+    required this.estudiante,
+    required this.tarea,
+  });
 
+  final Estudiante estudiante;
   final Tarea tarea;
 
   @override
@@ -30,6 +44,8 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
     _controlador = DetalleTareaControlador(
       repositorio: context.read<RepositorioTareas>(),
       tarea: widget.tarea,
+      idEstudiante: widget.estudiante.id,
+      puedeGestionarTareas: widget.estudiante.puedeGestionarTareas,
     );
   }
 
@@ -42,9 +58,10 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
   Future<void> _empezar() async {
     final confirmado = await mostrarDialogoConfirmacion(
       context,
-      titulo: '¿Empezar la tarea?',
+      titulo: '¿Empiezas ahora?',
       mensaje: _controlador.tarea.titulo,
-      textoConfirmar: 'Sí, empezar',
+      pictograma: Pictogramas.empezar,
+      textoConfirmar: 'Sí, empiezo',
     );
     if (confirmado) await _controlador.empezar();
   }
@@ -52,213 +69,319 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
   Future<void> _terminar() async {
     final confirmado = await mostrarDialogoConfirmacion(
       context,
-      titulo: '¿Has terminado la tarea?',
+      titulo: '¿Has terminado?',
       mensaje: _controlador.tarea.titulo,
+      pictograma: Pictogramas.terminar,
       textoConfirmar: 'Sí, he terminado',
     );
     if (!confirmado) return;
 
     final guardado = await _controlador.terminar();
-    if (!guardado || !mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('¡Muy bien! Has terminado la tarea.')),
+    if (guardado && mounted) await mostrarCelebracion(context);
+  }
+
+  Future<void> _borrar() async {
+    final confirmado = await mostrarDialogoConfirmacion(
+      context,
+      titulo: '¿Borrar esta tarea?',
+      mensaje: _controlador.tarea.titulo,
+      pictograma: Pictogramas.borrar,
+      textoConfirmar: 'Sí, borrar',
     );
+    if (!confirmado) return;
+    final borrada = await _controlador.eliminar();
+    if (borrada && mounted) Navigator.of(context).pop();
+  }
+
+  Future<void> _cambiar() async {
+    final cambiada = await Navigator.pushNamed(
+      context,
+      Rutas.nuevaTareaEstudiante,
+      arguments: _controlador.tarea,
+    );
+    if (cambiada is Tarea) _controlador.reemplazar(cambiada);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Tarea')),
-      body: SafeArea(
-        child: ListenableBuilder(
-          listenable: _controlador,
-          builder: (context, _) {
-            final tarea = _controlador.tarea;
+    return ListenableBuilder(
+      listenable: _controlador,
+      builder: (context, _) {
+        final tarea = _controlador.tarea;
+        final paginas = _controlador.paginas;
+        final pagina = _controlador.pagina;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(Dimensiones.espaciado),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxWidth: Dimensiones.anchoMaximoContenido,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _CajaTitulo(titulo: tarea.titulo),
-                      const SizedBox(height: Dimensiones.espaciado),
-                      _InformacionTarea(tarea: tarea),
-                      const SizedBox(height: Dimensiones.espaciado),
-                      if (_controlador.mensajeError case final mensaje?) ...[
-                        Text(
-                          mensaje,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.error,
-                          ),
+        return PantallaEstudiante(
+          titulo: tarea.titulo,
+          pictograma: tarea.pictograma,
+          icono: Icons.event_rounded,
+          color: tarea.tipo.color,
+          textoVoz: [
+            tarea.titulo,
+            FormatoFecha.intervaloHablado(tarea.inicio, tarea.fin),
+            if (paginas.isNotEmpty) paginas[pagina],
+          ].join('. '),
+          cuerpo: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(flex: 2, child: _Resumen(tarea: tarea)),
+              const SizedBox(width: Dimensiones.espaciado),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: _Explicacion(
+                        paginas: paginas,
+                        pagina: pagina,
+                        color: tarea.tipo.color,
+                      ),
+                    ),
+                    if (paginas.length > 1) ...[
+                      const SizedBox(height: Dimensiones.espaciadoPequeno),
+                      SizedBox(
+                        height: Dimensiones.objetivoTactilMinimo + 16,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: BotonAccesible(
+                                texto: 'Anterior',
+                                icono: Icons.arrow_back_rounded,
+                                color: ColorPastel.lavanda,
+                                disposicion: DisposicionBoton.horizontal,
+                                alPulsar: pagina > 0
+                                    ? () => _controlador.irAPagina(pagina - 1)
+                                    : null,
+                              ),
+                            ),
+                            const SizedBox(width: Dimensiones.espaciadoPequeno),
+                            Expanded(
+                              child: BotonAccesible(
+                                texto: 'Siguiente',
+                                icono: Icons.arrow_forward_rounded,
+                                color: ColorPastel.lavanda,
+                                disposicion: DisposicionBoton.horizontal,
+                                alPulsar: pagina < paginas.length - 1
+                                    ? () => _controlador.irAPagina(pagina + 1)
+                                    : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: Dimensiones.espaciadoPequeno),
-                      ],
-                      _botonAccion(),
+                      ),
                     ],
-                  ),
+                    const SizedBox(height: Dimensiones.espaciadoPequeno),
+                    SizedBox(
+                      height: Dimensiones.altoBotonGrande,
+                      child: Row(
+                        children: [
+                          Expanded(flex: 2, child: _botonPrincipal()),
+                          if (_controlador.puedeModificar) ...[
+                            const SizedBox(width: Dimensiones.espaciadoPequeno),
+                            Expanded(
+                              child: BotonAccesible(
+                                texto: 'Cambiar',
+                                pictograma: Pictogramas.lapiz,
+                                icono: Icons.edit_rounded,
+                                color: ColorPastel.amarillo,
+                                disposicion: DisposicionBoton.horizontal,
+                                alPulsar: _cambiar,
+                              ),
+                            ),
+                            const SizedBox(width: Dimensiones.espaciadoPequeno),
+                            Expanded(
+                              child: BotonAccesible(
+                                texto: 'Borrar',
+                                pictograma: Pictogramas.borrar,
+                                icono: Icons.delete_rounded,
+                                color: ColorPastel.rosa,
+                                disposicion: DisposicionBoton.horizontal,
+                                alPulsar: _borrar,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
-      ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _botonAccion() {
+  Widget _botonPrincipal() {
     final ocupado = _controlador.guardando;
-
     if (_controlador.puedeEmpezar) {
-      return BotonGrande(
+      return BotonAccesible(
         texto: 'Empezar',
-        icono: Icons.play_arrow,
+        pictograma: Pictogramas.empezar,
+        icono: Icons.play_arrow_rounded,
+        color: ColorPastel.cielo,
+        disposicion: DisposicionBoton.horizontal,
         alPulsar: ocupado ? null : _empezar,
       );
     }
     if (_controlador.puedeTerminar) {
-      return BotonGrande(
+      return BotonAccesible(
         texto: 'He terminado',
-        icono: Icons.check,
+        pictograma: Pictogramas.terminar,
+        icono: Icons.check_rounded,
+        color: ColorPastel.menta,
+        disposicion: DisposicionBoton.horizontal,
         alPulsar: ocupado ? null : _terminar,
       );
     }
-    return const Center(
-      child: EtiquetaEstadoTarea(estado: EstadoTarea.completada),
+    return const BotonAccesible(
+      texto: 'Tarea terminada',
+      pictograma: Pictogramas.exito,
+      icono: Icons.check_circle_rounded,
+      color: ColorPastel.menta,
+      disposicion: DisposicionBoton.horizontal,
+      seleccionado: true,
+      alPulsar: null,
     );
   }
 }
 
-class _CajaTitulo extends StatelessWidget {
-  const _CajaTitulo({required this.titulo});
-
-  final String titulo;
-
-  @override
-  Widget build(BuildContext context) {
-    final esquema = Theme.of(context).colorScheme;
-
-    return Semantics(
-      header: true,
-      child: Container(
-        padding: const EdgeInsets.all(Dimensiones.espaciado),
-        decoration: BoxDecoration(
-          color: esquema.primaryContainer,
-          borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
-        ),
-        child: Text(
-          titulo,
-          textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: esquema.onPrimaryContainer,
-                fontWeight: FontWeight.w700,
-              ),
-        ),
-      ),
-    );
-  }
-}
-
-class _InformacionTarea extends StatelessWidget {
-  const _InformacionTarea({required this.tarea});
+class _Resumen extends StatelessWidget {
+  const _Resumen({required this.tarea});
 
   final Tarea tarea;
 
   @override
   Widget build(BuildContext context) {
+    final ajustes = AjustesInterfaz.of(context);
+    final estilo = ajustes.estiloDe(tarea.tipo.color);
     final textos = Theme.of(context).textTheme;
+    final momento = MomentoDia.de(tarea.inicio);
 
-    return Card(
-      margin: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.all(Dimensiones.espaciado),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Dato(
-              icono: Icons.schedule,
-              texto: '${FormatoFecha.diaCompleto(tarea.inicio)}\n'
-                  '${FormatoFecha.intervalo(tarea.inicio, tarea.fin)}',
+    return Container(
+      padding: const EdgeInsets.all(Dimensiones.espaciado),
+      decoration: BoxDecoration(
+        color: estilo.fondo,
+        borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
+        border: Border.all(color: estilo.borde, width: Dimensiones.grosorBorde),
+      ),
+      child: LayoutBuilder(
+        builder: (context, restricciones) => FittedBox(
+          fit: BoxFit.scaleDown,
+          child: SizedBox(
+            width: restricciones.maxWidth,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (ajustes.mostrarPictogramas)
+                  Pictograma(
+                    recurso: tarea.pictograma,
+                    tamano: (restricciones.maxHeight * 0.45).clamp(80, 220),
+                    iconoRespaldo: Icons.event_rounded,
+                    colorRespaldo: estilo.acento,
+                  ),
+                const SizedBox(height: Dimensiones.espaciadoPequeno),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (ajustes.mostrarPictogramas) ...[
+                        Pictograma(recurso: momento.pictograma, tamano: 48),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        FormatoFecha.intervalo(tarea.inicio, tarea.fin),
+                        style: textos.headlineSmall?.copyWith(
+                          color: estilo.texto,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Text(
+                  momento.nombre,
+                  style: textos.titleMedium?.copyWith(color: estilo.texto),
+                ),
+                const SizedBox(height: Dimensiones.espaciadoPequeno),
+                Text(
+                  '${tarea.tipo.nombre} · ${tarea.estado.nombre}',
+                  textAlign: TextAlign.center,
+                  style: textos.titleMedium?.copyWith(color: estilo.texto),
+                ),
+              ],
             ),
-            if (tarea.tipo == TipoTarea.encargoCentro)
-              const _Dato(icono: Icons.school, texto: 'Encargo del centro'),
-            const SizedBox(height: Dimensiones.espaciadoPequeno),
-            EtiquetaEstadoTarea(estado: tarea.estado),
-            if (tarea.descripcion.isNotEmpty) ...[
-              const SizedBox(height: Dimensiones.espaciado),
-              Text('Qué hay que hacer', style: textos.titleLarge),
-              const SizedBox(height: 8),
-              Text(tarea.descripcion, style: textos.titleMedium),
-            ],
-            if (tarea.pasos.isNotEmpty) ...[
-              const SizedBox(height: Dimensiones.espaciado),
-              Text('Pasos', style: textos.titleLarge),
-              const SizedBox(height: 8),
-              for (var i = 0; i < tarea.pasos.length; i++)
-                _Paso(numero: i + 1, texto: tarea.pasos[i]),
-            ],
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _Dato extends StatelessWidget {
-  const _Dato({required this.icono, required this.texto});
+class _Explicacion extends StatelessWidget {
+  const _Explicacion({
+    required this.paginas,
+    required this.pagina,
+    required this.color,
+  });
 
-  final IconData icono;
-  final String texto;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icono, color: Theme.of(context).colorScheme.primary),
-          const SizedBox(width: Dimensiones.espaciadoPequeno),
-          Expanded(
-            child: Text(texto, style: Theme.of(context).textTheme.titleMedium),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Paso extends StatelessWidget {
-  const _Paso({required this.numero, required this.texto});
-
-  final int numero;
-  final String texto;
+  final List<String> paginas;
+  final int pagina;
+  final ColorPastel color;
 
   @override
   Widget build(BuildContext context) {
     final esquema = Theme.of(context).colorScheme;
+    final textos = Theme.of(context).textTheme;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: Dimensiones.espaciadoPequeno),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: esquema.primary,
-            foregroundColor: esquema.onPrimary,
-            child: Text('$numero'),
-          ),
-          const SizedBox(width: Dimensiones.espaciadoPequeno),
-          Expanded(
-            child: Text(texto, style: Theme.of(context).textTheme.titleMedium),
-          ),
-        ],
+    return Container(
+      padding: const EdgeInsets.all(Dimensiones.espaciado),
+      decoration: BoxDecoration(
+        color: esquema.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
+        border: Border.all(color: esquema.outline, width: 2),
       ),
+      child: paginas.isEmpty
+          ? Center(
+              child: Text(
+                'Esta tarea no tiene explicación.',
+                style: textos.titleLarge,
+              ),
+            )
+          : Semantics(
+              liveRegion: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    paginas.length > 1
+                        ? '${pagina + 1} de ${paginas.length}'
+                        : 'Qué hay que hacer',
+                    style: textos.titleMedium?.copyWith(
+                      color: esquema.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: Dimensiones.espaciadoPequeno),
+                  Expanded(
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 560),
+                          child: Text(
+                            paginas[pagina],
+                            textAlign: TextAlign.center,
+                            style: textos.headlineMedium,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
