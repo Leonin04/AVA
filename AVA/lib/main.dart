@@ -3,8 +3,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/servicios/autenticacion.dart';
+import 'features/aulas/presentacion/pantalla_clase.dart';
+import 'features/aulas/presentacion/pantalla_seleccion_aula.dart';
+import 'features/autenticacion/presentacion/pantalla_login_admin.dart';
 import 'firebase_options.dart';
-import 'pantalla_login.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,7 +56,10 @@ class AplicacionAva extends StatelessWidget {
   }
 }
 
-/// Decide qué pantalla mostrar según haya sesión iniciada o no.
+/// Decide qué pantalla mostrar según la sesión:
+/// - sin sesión: prepara la tableta (sesión anónima);
+/// - sesión anónima: pantalla de inicio con las aulas;
+/// - sesión de admin, tutor o alumno: su pantalla (de momento, [PantallaInicio]).
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
 
@@ -68,15 +74,97 @@ class AuthGate extends StatelessWidget {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        if (snapshot.hasData) {
-          return PantallaInicio(usuario: snapshot.data!);
-        }
-        return const PantallaLogin();
+        final usuario = snapshot.data;
+        if (usuario == null) return const PreparandoTableta();
+        if (usuario.isAnonymous) return const PantallaTableta();
+        return PantallaInicio(usuario: usuario);
       },
     );
   }
 }
 
+/// Abre la sesión anónima de la tableta. Se ve solo un instante.
+class PreparandoTableta extends StatefulWidget {
+  const PreparandoTableta({super.key});
+
+  @override
+  State<PreparandoTableta> createState() => _PreparandoTabletaState();
+}
+
+class _PreparandoTabletaState extends State<PreparandoTableta> {
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _preparar();
+  }
+
+  Future<void> _preparar() async {
+    setState(() => _error = null);
+    try {
+      await Autenticacion().prepararTableta();
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: _error == null
+            ? const CircularProgressIndicator()
+            : Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.wifi_off, size: 64),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'No se pudo preparar la tableta.',
+                      style: TextStyle(fontSize: 22),
+                    ),
+                    const SizedBox(height: 8),
+                    SelectableText(_error!, textAlign: TextAlign.center),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _preparar,
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+}
+
+/// Pantalla de inicio de la tableta: AVA, aulas y acceso de administración.
+class PantallaTableta extends StatelessWidget {
+  const PantallaTableta({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return PantallaSeleccionAula(
+      alAbrirAva: () {
+        // Pendiente: aún no está definido qué abre el botón AVA.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AVA estará disponible pronto.')),
+        );
+      },
+      alElegirAula: (aula) => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => PantallaClase(aula: aula)),
+      ),
+      alAbrirAdmin: () => Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const PantallaLoginAdmin()),
+      ),
+    );
+  }
+}
+
+/// Pantalla provisional para quien ya ha iniciado sesión (admin, tutor o alumno).
 class PantallaInicio extends StatelessWidget {
   const PantallaInicio({super.key, required this.usuario});
 
@@ -96,7 +184,7 @@ class PantallaInicio extends StatelessWidget {
           IconButton(
             tooltip: 'Cerrar sesión',
             icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () => Autenticacion().salir(),
           ),
         ],
       ),
