@@ -17,10 +17,26 @@
       ]
     },
     {
+      "collectionGroup": "acceso",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aulaId", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "tareas",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "estudiantes", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "horaInicio", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tareas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aulaId", "order": "ASCENDING" },
         { "fieldPath": "horaInicio", "order": "ASCENDING" }
       ]
     },

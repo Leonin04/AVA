@@ -2,21 +2,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'preferencias.dart';
 
-/// Forma de entrar del estudiante (RF-03).
+/// Forma de entrar del estudiante (HU-09).
 enum MetodoLogin { pin, pictograma, contrasena }
 
-/// Documento `estudiantes/{uid}` (RF-01, RF-03, RF-04, RF-06 a RF-09).
+/// Documento `estudiantes/{uid}` (HU-01, HU-02, HU-15, HU-16, HU-17, HU-19).
+/// El id es el uid de la cuenta de Authentication del estudiante.
 class Estudiante {
-  final String id; // uid de su cuenta de Authentication
+  final String id;
   final String nombre;
-  final String usuario; // nombre corto para entrar
+  final String usuario; // nombre corto para entrar (su correo interno sale de aquí)
   final String lugarResidencia;
-  final String fotoUrl;
+  final String fotoUrl; // foto o avatar (Cloud Storage o ARASAAC)
   final String queLeCalma;
   final String queNecesita;
+  final List<String> intereses; // HU-19
   final MetodoLogin metodoLogin;
   final String? aulaId;
-  final List<String> tutores; // uids de sus tutores
+  final List<String> tutores; // uids de sus tutores (centro y familiares)
+  final bool puedeCambiarPreferencias; // HU-15
   final Preferencias preferencias;
 
   const Estudiante({
@@ -27,9 +30,11 @@ class Estudiante {
     this.fotoUrl = '',
     this.queLeCalma = '',
     this.queNecesita = '',
+    this.intereses = const [],
     this.metodoLogin = MetodoLogin.pin,
     this.aulaId,
     this.tutores = const [],
+    this.puedeCambiarPreferencias = false,
     this.preferencias = const Preferencias(),
   });
 
@@ -43,22 +48,26 @@ class Estudiante {
       fotoUrl: d['fotoUrl'] as String? ?? '',
       queLeCalma: d['queLeCalma'] as String? ?? '',
       queNecesita: d['queNecesita'] as String? ?? '',
-      metodoLogin: MetodoLogin.values.byName(d['metodoLogin'] as String? ?? 'pin'),
+      intereses: List<String>.from(d['intereses'] as List? ?? const []),
+      metodoLogin:
+          MetodoLogin.values.byName(d['metodoLogin'] as String? ?? 'pin'),
       aulaId: d['aulaId'] as String?,
       tutores: List<String>.from(d['tutores'] as List? ?? const []),
+      puedeCambiarPreferencias: d['puedeCambiarPreferencias'] as bool? ?? false,
       preferencias:
           Preferencias.fromMap(d['preferencias'] as Map<String, dynamic>?),
     );
   }
 
-  /// Datos que el tutor puede editar (RF-07). No incluye tutores ni aula,
-  /// que solo cambia el administrador.
+  /// Datos del perfil que puede editar el tutor (HU-19).
+  /// No incluye tutores, aula ni usuario, que solo cambia el administrador.
   Map<String, dynamic> toMapPerfil() => {
         'nombre': nombre,
         'lugarResidencia': lugarResidencia,
         'fotoUrl': fotoUrl,
         'queLeCalma': queLeCalma,
         'queNecesita': queNecesita,
+        'intereses': intereses,
       };
 
   /// Documento completo, para que el administrador lo cree.
@@ -68,6 +77,7 @@ class Estudiante {
         'metodoLogin': metodoLogin.name,
         'aulaId': aulaId,
         'tutores': tutores,
+        'puedeCambiarPreferencias': puedeCambiarPreferencias,
         'preferencias': preferencias.toMap(),
       };
 
@@ -77,9 +87,11 @@ class Estudiante {
     String? fotoUrl,
     String? queLeCalma,
     String? queNecesita,
+    List<String>? intereses,
     MetodoLogin? metodoLogin,
     String? aulaId,
     List<String>? tutores,
+    bool? puedeCambiarPreferencias,
     Preferencias? preferencias,
   }) =>
       Estudiante(
@@ -90,9 +102,12 @@ class Estudiante {
         fotoUrl: fotoUrl ?? this.fotoUrl,
         queLeCalma: queLeCalma ?? this.queLeCalma,
         queNecesita: queNecesita ?? this.queNecesita,
+        intereses: intereses ?? this.intereses,
         metodoLogin: metodoLogin ?? this.metodoLogin,
         aulaId: aulaId ?? this.aulaId,
         tutores: tutores ?? this.tutores,
+        puedeCambiarPreferencias:
+            puedeCambiarPreferencias ?? this.puedeCambiarPreferencias,
         preferencias: preferencias ?? this.preferencias,
       );
 }

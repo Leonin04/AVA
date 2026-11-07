@@ -28,6 +28,7 @@ class Tarea {
   final String? fecha; // "yyyy-MM-dd" si no se repite
   final String creadaPor; // uid
   final List<String> estudiantes; // uids (T-67)
+  final String? aulaId; // encargo para toda un aula (HU-08)
 
   const Tarea({
     required this.id,
@@ -41,6 +42,7 @@ class Tarea {
     this.fecha,
     required this.creadaPor,
     this.estudiantes = const [],
+    this.aulaId,
   });
 
   /// "2026-11-07" para un [DateTime].
@@ -73,6 +75,7 @@ class Tarea {
       fecha: d['fecha'] as String?,
       creadaPor: d['creadaPor'] as String? ?? '',
       estudiantes: List<String>.from(d['estudiantes'] as List? ?? const []),
+      aulaId: d['aulaId'] as String?,
     );
   }
 
@@ -87,5 +90,6 @@ class Tarea {
         'fecha': seRepite ? null : fecha,
         'creadaPor': creadaPor,
         'estudiantes': estudiantes,
+        'aulaId': aulaId,
       };
 }

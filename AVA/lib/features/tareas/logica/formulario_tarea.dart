@@ -31,6 +31,7 @@ class FormularioTarea extends ChangeNotifier {
     diasSemana.addAll(t.diasSemana);
     fecha = t.fecha == null ? null : DateTime.tryParse(t.fecha!);
     estudiantes.addAll(t.estudiantes);
+    aulaId = t.aulaId;
     for (final p in pasosTarea) {
       pasos.add(PasoEditable(_siguienteClave++, p.texto));
     }
@@ -48,6 +49,7 @@ class FormularioTarea extends ChangeNotifier {
   final Set<int> diasSemana = {}; // T-73
   DateTime? fecha; // si no se repite
   final Set<String> estudiantes = {}; // T-67
+  String? aulaId; // encargo para toda un aula (HU-08)
   final List<PasoEditable> pasos = []; // T-74 a T-77
 
   int _siguienteClave = 0;
@@ -82,6 +84,11 @@ class FormularioTarea extends ChangeNotifier {
 
   void cambiarFecha(DateTime? f) {
     fecha = f;
+    notifyListeners();
+  }
+
+  void cambiarAula(String? id) {
+    aulaId = id;
     notifyListeners();
   }
 
@@ -131,7 +138,9 @@ class FormularioTarea extends ChangeNotifier {
     if (diasSemana.isEmpty && fecha == null) {
       e.add('Elige los días en que se repite o una fecha concreta.');
     }
-    if (estudiantes.isEmpty) e.add('Asigna la tarea al menos a un estudiante.');
+    if (estudiantes.isEmpty && aulaId == null) {
+      e.add('Asigna la tarea al menos a un estudiante o a un aula.');
+    }
     if (pasos.any((p) => p.texto.trim().isEmpty)) {
       e.add('Hay pasos vacíos: escríbelos o elimínalos.');
     }
@@ -151,6 +160,7 @@ class FormularioTarea extends ChangeNotifier {
         fecha: fecha == null ? null : Tarea.claveFecha(fecha!),
         creadaPor: creadaPor,
         estudiantes: estudiantes.toList(),
+        aulaId: aulaId,
       );
 
   List<Paso> aPasos() => [

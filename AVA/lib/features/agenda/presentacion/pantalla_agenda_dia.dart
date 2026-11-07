@@ -22,7 +22,7 @@ class PantallaAgendaDia extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(fechaLarga(hoy))),
       body: StreamBuilder<List<Tarea>>(
-        stream: BaseDatos().tareasDeEstudiante(estudiante.id),
+        stream: BaseDatos().tareasParaAgenda(estudiante), // propias + encargos del aula
         builder: (context, snap) {
           if (snap.hasError) return Center(child: Text('Error: ${snap.error}'));
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/servicios/base_datos.dart';
+import '../../aulas/dominio/aula.dart';
 import '../../autenticacion/dominio/usuario.dart';
 import '../../perfil/dominio/estudiante.dart';
 import '../dominio/tarea.dart';
@@ -272,7 +273,7 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
         const SizedBox(height: 24),
 
         // ---------- Estudiantes (T-67) ----------
-        const _Titulo('Para qué estudiantes *'),
+        const _Titulo('Para qué estudiantes'),
         StreamBuilder<List<Estudiante>>(
           stream: _estudiantesDisponibles,
           builder: (context, snap) {
@@ -289,6 +290,33 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
                     label: Text(e.nombre),
                     selected: f.estudiantes.contains(e.id),
                     onSelected: (_) => f.alternarEstudiante(e.id),
+                  ),
+              ],
+            );
+          },
+        ),
+        const SizedBox(height: 24),
+
+        // ---------- O para toda un aula (encargo del centro, HU-08) ----------
+        const _Titulo('O para toda un aula (encargo del centro)'),
+        StreamBuilder<List<Aula>>(
+          stream: _bd.aulas(),
+          builder: (context, snap) {
+            final aulas = snap.data ?? const <Aula>[];
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ChoiceChip(
+                  label: const Text('Ninguna'),
+                  selected: f.aulaId == null,
+                  onSelected: (_) => f.cambiarAula(null),
+                ),
+                for (final a in aulas)
+                  ChoiceChip(
+                    label: Text(a.nombre),
+                    selected: f.aulaId == a.id,
+                    onSelected: (_) => f.cambiarAula(a.id),
                   ),
               ],
             );

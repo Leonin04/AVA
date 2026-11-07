@@ -1,4 +1,5 @@
 import '../../tareas/dominio/tarea.dart';
+import '../dominio/registro.dart';
 
 /// Lógica de la agenda del día, sin Flutter ni Firebase
 /// (así se puede probar con tests unitarios).
@@ -26,4 +27,22 @@ const _meses = [
 String fechaLarga(DateTime d) {
   final dia = _diasSemana[d.weekday - 1];
   return '${dia[0].toUpperCase()}${dia.substring(1)}, ${d.day} de ${_meses[d.month - 1]}';
+}
+
+/// Estado de una tarea según los registros del día (HU-12).
+EstadoTarea estadoDe(Tarea t, List<Registro> registros) {
+  for (final r in registros) {
+    if (r.tareaId == t.id) return r.estado;
+  }
+  return EstadoTarea.pendiente;
+}
+
+/// HU-11: la siguiente tarea pendiente del día (la primera, por hora,
+/// que no está terminada). null si ya no queda ninguna.
+/// [deHoy] tiene que venir ya ordenada (usar [tareasDelDia]).
+Tarea? siguienteTarea(List<Tarea> deHoy, List<Registro> registros) {
+  for (final t in deHoy) {
+    if (estadoDe(t, registros) != EstadoTarea.terminada) return t;
+  }
+  return null;
 }
