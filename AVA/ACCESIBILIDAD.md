@@ -26,7 +26,9 @@ comprobado con pruebas automáticas (`flutter test`).
   el fondo de toda la app, manteniendo el contraste del texto por encima de
   7:1.
 - **Voz.** «Escuchar» usa la voz del navegador o de la tableta; si el
-  dispositivo no tiene ninguna instalada, lo dice en pantalla.
+  dispositivo no tiene ninguna instalada, lo dice en pantalla. El botón se
+  quita o se pone con la opción «Botón Escuchar» del perfil, y «Leer en voz
+  alta» decide si se leen solos los botones, los avisos y la ayuda.
 - **Colores pastel diferenciables.** Ocho familias de color repartidas por el
   círculo cromático (`core/constantes/paleta.dart`). El texto siempre va en
   tinta oscura sobre pastel. Cada clase, alumno, tipo de tarea y día de la
@@ -53,7 +55,7 @@ comprobado con pruebas automáticas (`flutter test`).
 
 Tamaño de letra (normal, grande, muy grande), letra clara, alto contraste,
 modo oscuro, color principal, ver pictogramas, ver palabras, leer en voz
-alta, evitar toques dobles, posición de los botones y vistas de agenda
+alta, botón Escuchar, evitar toques dobles, posición de los botones y vistas de agenda
 habilitadas. El alumno solo las cambia si su tutor se lo permite.
 
 ## Cobertura de las historias de usuario
@@ -79,7 +81,5 @@ habilitadas. El alumno solo las cambia si su tutor se lo permite.
 
 ## Pendiente para próximas iteraciones
 
-- Conectar Firebase (los repositorios simulados ya usan el formato de
-  Firestore con `toMap`/`fromMap`).
 - Probar con TalkBack, VoiceOver y Accessibility Scanner en tabletas reales.
 - Validar los textos con personas usuarias (lectura fácil).

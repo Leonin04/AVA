@@ -1,3 +1,4 @@
+import 'package:ava/core/constantes/dimensiones.dart';
 import 'package:ava/core/constantes/paleta.dart';
 import 'package:ava/core/servicios/servicio_voz.dart';
 import 'package:ava/core/tema/tema_app.dart';
@@ -58,11 +59,26 @@ void main() {
       tester,
     ) async {
       final voz = await arrancarApp(tester) as ServicioVozSilencioso;
-      await entrarComoDiego(tester);
+      // Álex tiene activado «Leer en voz alta».
+      await entrarConPictogramas(tester, 'Álex', ['Sol', 'Casa', 'Perro']);
 
       await pulsar(tester, 'Ayuda');
       expect(find.textContaining('Levanta la mano'), findsOneWidget);
       expect(voz.dichos.last, contains('Levanta la mano'));
+      await pulsar(tester, 'Volver');
+
+      await pulsar(tester, 'Escuchar');
+      expect(voz.dichos.last, contains('Hola, Álex'));
+    });
+
+    testWidgets('sin voz activada, Ayuda no habla pero «Escuchar» sí', (
+      tester,
+    ) async {
+      final voz = await arrancarApp(tester) as ServicioVozSilencioso;
+      await entrarComoDiego(tester);
+
+      await pulsar(tester, 'Ayuda');
+      expect(voz.dichos, isEmpty);
       await pulsar(tester, 'Volver');
 
       await pulsar(tester, 'Escuchar');
@@ -117,15 +133,28 @@ void main() {
       expect(find.textContaining('no tiene voz instalada'), findsOneWidget);
     });
 
+    testWidgets('el botón «Escuchar» se puede quitar y volver a poner', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi perfil');
+      expect(find.text('Escuchar'), findsOneWidget);
+
+      await pulsar(tester, 'Botón Escuchar');
+      expect(find.text('Escuchar'), findsNothing);
+
+      // El botón ignora un segundo toque seguido (evitar dobles toques).
+      await tester.runAsync(() => Future.delayed(Dimensiones.esperaDobleToque));
+      await pulsar(tester, 'Botón Escuchar');
+      expect(find.text('Escuchar'), findsOneWidget);
+    });
+
     testWidgets('sin permiso del tutor el perfil no se puede cambiar', (
       tester,
     ) async {
       await arrancarApp(tester);
-      await pulsar(tester, '1ºA');
-      await pulsar(tester, 'Lucía');
-      for (final pictograma in ['Sol', 'Casa', 'Perro']) {
-        await pulsar(tester, pictograma);
-      }
+      await entrarConPictogramas(tester, 'Lucía', ['Sol', 'Casa', 'Perro']);
       await pulsar(tester, 'Mi perfil');
 
       expect(
@@ -182,11 +211,11 @@ void main() {
       tester,
     ) async {
       await arrancarApp(tester);
-      await pulsar(tester, '2ºB');
-      await pulsar(tester, 'Samuel');
-      for (final pictograma in ['Sol', 'Casa', 'Perro']) {
-        await pulsar(tester, pictograma);
-      }
+      await entrarConPictogramas(tester, 'Samuel', [
+        'Sol',
+        'Casa',
+        'Perro',
+      ], aula: '2ºB');
       // Cualquier desbordamiento haría fallar la prueba.
       await pulsar(tester, 'Mi agenda');
       await pulsar(tester, 'Semana');

@@ -36,7 +36,7 @@ interfaz usa un valor por defecto.
 | `estudiantes/{id}` | `color` | Color de su tarjeta |
 | `estudiantes/{id}` | `observaciones` | Notas de progreso del tutor (HU-18) |
 | `estudiantes/{id}` | `puedeGestionarTareas` | Si puede crear y borrar sus tareas (HU-03) |
-| `estudiantes/{id}.preferencias.ava` | `color`, `modoOscuro`, `filtroAntitemblor`, `vistasAgenda` | Preferencias de accesibilidad que no tenía el esquema (HU-14) |
+| `estudiantes/{id}.preferencias.ava` | `color`, `modoOscuro`, `botonEscuchar`, `filtroAntitemblor`, `vistasAgenda` | Preferencias de accesibilidad que no tenía el esquema (HU-14) |
 | `tareas/{id}` | `categoria` | Tipo de tarea con su color: clase, personal, ocio, casa o encargo |
 
 **Ojo:** si otra pantalla guarda las preferencias con

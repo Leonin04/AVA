@@ -16,7 +16,8 @@ import 'preferencias_accesibilidad.dart';
 /// campos nuevos que no afectan a los demás:
 /// - `estudiantes/{id}`: `color`, `observaciones` y `puedeGestionarTareas`.
 /// - `preferencias.ava`: color principal, modo oscuro (junto al alto
-///   contraste), evitar toques dobles y vistas de la agenda.
+///   contraste), botón «Escuchar», evitar toques dobles y vistas de la
+///   agenda.
 abstract final class ConversionFirestore {
   static const _tamanos = {
     TamanoTexto.normal: 22.0,
@@ -93,6 +94,7 @@ abstract final class ConversionFirestore {
           : TamanoTexto.muyGrande,
       menuArriba: visual['posicionMenus'] == 'arriba',
       color: ColorPastel.porNombre(ava['color'] as String?),
+      botonEscuchar: ava['botonEscuchar'] as bool? ?? true,
       filtroAntitemblor: ava['filtroAntitemblor'] as bool? ?? false,
       vistasAgenda: vistas.isEmpty ? porDefecto.vistasAgenda : vistas,
     );
@@ -128,6 +130,7 @@ abstract final class ConversionFirestore {
       'ava': {
         'color': p.color.name,
         'modoOscuro': p.modoOscuro,
+        'botonEscuchar': p.botonEscuchar,
         'filtroAntitemblor': p.filtroAntitemblor,
         'vistasAgenda': [for (final v in p.vistasAgenda) v.name],
       },

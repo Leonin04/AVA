@@ -46,14 +46,23 @@ Future<void> pulsar(WidgetTester tester, String texto) async {
   await tester.pumpAndSettle();
 }
 
-/// Entra como Diego (1ºA, clave de 4 pictogramas).
-Future<void> entrarComoDiego(WidgetTester tester) async {
-  await pulsar(tester, '1ºA');
-  await pulsar(tester, 'Diego');
-  for (final pictograma in ['Sol', 'Casa', 'Perro', 'Coche']) {
+/// Entra como el alumno [nombre] del [aula] con su clave de [pictogramas].
+Future<void> entrarConPictogramas(
+  WidgetTester tester,
+  String nombre,
+  List<String> pictogramas, {
+  String aula = '1ºA',
+}) async {
+  await pulsar(tester, aula);
+  await pulsar(tester, nombre);
+  for (final pictograma in pictogramas) {
     await pulsar(tester, pictograma);
   }
 }
+
+/// Entra como Diego (1ºA, clave de 4 pictogramas).
+Future<void> entrarComoDiego(WidgetTester tester) =>
+    entrarConPictogramas(tester, 'Diego', ['Sol', 'Casa', 'Perro', 'Coche']);
 
 /// Entra en el panel de gestión con las credenciales dadas.
 Future<void> entrarComoGestion(

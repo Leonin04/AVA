@@ -52,8 +52,9 @@ final class PictogramaArasaac extends RecursoVisual {
   int get hashCode => id.hashCode;
 }
 
-/// Fotografía propia. [url] puede ser una dirección web o, mientras no hay
-/// Firebase Storage, una imagen incrustada (`data:image/...;base64,...`).
+/// Fotografía propia. [url] es una dirección web o, recién elegida y antes
+/// de subirla a Cloud Storage, una imagen incrustada
+/// (`data:image/...;base64,...`).
 final class FotoPropia extends RecursoVisual {
   const FotoPropia(this.url);
 

@@ -148,6 +148,7 @@ class _AplicacionConTema extends StatelessWidget {
           child: AjustesInterfaz(
             voz: voz,
             leerEnVoz: preferencias.leerEnVoz,
+            botonEscuchar: preferencias.botonEscuchar,
             filtroAntitemblor: preferencias.filtroAntitemblor,
             mostrarPictogramas: preferencias.mostrarPictogramas,
             mostrarTexto: preferencias.mostrarTexto,

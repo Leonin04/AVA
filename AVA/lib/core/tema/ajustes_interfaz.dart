@@ -13,6 +13,7 @@ class AjustesInterfaz extends InheritedWidget {
     required this.voz,
     required super.child,
     this.leerEnVoz = false,
+    this.botonEscuchar = true,
     this.filtroAntitemblor = false,
     this.mostrarPictogramas = true,
     this.mostrarTexto = true,
@@ -25,6 +26,9 @@ class AjustesInterfaz extends InheritedWidget {
 
   /// Leer en voz alta el texto de cada botón al pulsarlo.
   final bool leerEnVoz;
+
+  /// Mostrar el botón «Escuchar» en la cabecera.
+  final bool botonEscuchar;
 
   /// Ignorar pulsaciones repetidas durante un tiempo (temblores, espasmos).
   final bool filtroAntitemblor;
@@ -76,6 +80,7 @@ class AjustesInterfaz extends InheritedWidget {
   bool updateShouldNotify(AjustesInterfaz oldWidget) =>
       voz != oldWidget.voz ||
       leerEnVoz != oldWidget.leerEnVoz ||
+      botonEscuchar != oldWidget.botonEscuchar ||
       filtroAntitemblor != oldWidget.filtroAntitemblor ||
       mostrarPictogramas != oldWidget.mostrarPictogramas ||
       mostrarTexto != oldWidget.mostrarTexto ||

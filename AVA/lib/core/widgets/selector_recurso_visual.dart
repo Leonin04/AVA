@@ -44,7 +44,7 @@ class SelectorRecursoVisual extends StatelessWidget {
       if (archivo == null) return;
       final bytes = await archivo.readAsBytes();
       final tipo = archivo.mimeType ?? 'image/jpeg';
-      // Hasta conectar Firebase Storage, la foto se guarda incrustada.
+      // Se guarda incrustada; el repositorio la sube a Cloud Storage.
       alCambiar(FotoPropia('data:$tipo;base64,${base64Encode(bytes)}'));
     } on Exception {
       avisos.showSnackBar(

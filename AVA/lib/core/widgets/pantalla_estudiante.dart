@@ -12,7 +12,8 @@ import 'pictograma.dart';
 ///
 /// - Ocupa exactamente la pantalla: el contenido se adapta al espacio y
 ///   nunca hay que desplazarse.
-/// - La cabecera (pictograma, título y botón «Escuchar») y la barra de
+/// - La cabecera (pictograma, título y, si está activado, el botón
+///   «Escuchar») y la barra de
 ///   navegación (Atrás, Inicio y Ayuda) están siempre en el mismo sitio
 ///   (WCAG 3.2.3 navegación consistente, RNF-11). La barra puede ir arriba
 ///   o abajo según las preferencias (RNF-05).
@@ -137,19 +138,21 @@ class _Cabecera extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: Dimensiones.espaciado),
-          SizedBox(
-            width: 220,
-            child: BotonAccesible(
-              texto: 'Escuchar',
-              etiquetaSemantica: 'Escuchar en voz alta',
-              pictograma: Pictogramas.escuchar,
-              icono: Icons.volume_up_rounded,
-              color: ColorPastel.amarillo,
-              disposicion: DisposicionBoton.horizontal,
-              alPulsar: () => escuchar(context, textoVoz),
+          if (ajustes.botonEscuchar) ...[
+            const SizedBox(width: Dimensiones.espaciado),
+            SizedBox(
+              width: 220,
+              child: BotonAccesible(
+                texto: 'Escuchar',
+                etiquetaSemantica: 'Escuchar en voz alta',
+                pictograma: Pictogramas.escuchar,
+                icono: Icons.volume_up_rounded,
+                color: ColorPastel.amarillo,
+                disposicion: DisposicionBoton.horizontal,
+                alPulsar: () => escuchar(context, textoVoz),
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -235,7 +238,7 @@ class _BarraNavegacion extends StatelessWidget {
 Future<void> mostrarAyuda(BuildContext context) {
   const mensaje = 'Levanta la mano. Tu profesor viene a ayudarte.';
   final ajustes = AjustesInterfaz.of(context);
-  ajustes.voz.decir(mensaje);
+  if (ajustes.leerEnVoz) ajustes.voz.decir(mensaje);
 
   return showDialog<void>(
     context: context,

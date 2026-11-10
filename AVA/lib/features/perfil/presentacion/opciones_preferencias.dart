@@ -111,6 +111,14 @@ class OpcionPreferencia {
       aplicar: (p) => p.copyWith(leerEnVoz: !p.leerEnVoz),
     ),
     OpcionPreferencia(
+      texto: 'Botón Escuchar',
+      icono: Icons.record_voice_over_rounded,
+      pictograma: Pictogramas.escuchar,
+      color: ColorPastel.amarillo,
+      activa: (p) => p.botonEscuchar,
+      aplicar: (p) => p.copyWith(botonEscuchar: !p.botonEscuchar),
+    ),
+    OpcionPreferencia(
       texto: 'Evitar toques dobles',
       icono: Icons.touch_app_rounded,
       pictograma: Pictogramas.pulsar,

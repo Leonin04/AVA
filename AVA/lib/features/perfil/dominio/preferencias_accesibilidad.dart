@@ -26,6 +26,7 @@ class PreferenciasAccesibilidad {
     this.mostrarPictogramas = true,
     this.mostrarTexto = true,
     this.leerEnVoz = false,
+    this.botonEscuchar = true,
     this.filtroAntitemblor = false,
     this.vistasAgenda = const {
       VistaAgenda.semanal,
@@ -50,6 +51,9 @@ class PreferenciasAccesibilidad {
   final bool mostrarTexto;
   final bool leerEnVoz;
 
+  /// Botón «Escuchar» en la cabecera de cada pantalla.
+  final bool botonEscuchar;
+
   /// Ignora pulsaciones repetidas (temblores o espasmos).
   final bool filtroAntitemblor;
 
@@ -66,6 +70,7 @@ class PreferenciasAccesibilidad {
     bool? mostrarPictogramas,
     bool? mostrarTexto,
     bool? leerEnVoz,
+    bool? botonEscuchar,
     bool? filtroAntitemblor,
     Set<VistaAgenda>? vistasAgenda,
   }) {
@@ -79,6 +84,7 @@ class PreferenciasAccesibilidad {
       mostrarPictogramas: mostrarPictogramas ?? this.mostrarPictogramas,
       mostrarTexto: mostrarTexto ?? this.mostrarTexto,
       leerEnVoz: leerEnVoz ?? this.leerEnVoz,
+      botonEscuchar: botonEscuchar ?? this.botonEscuchar,
       filtroAntitemblor: filtroAntitemblor ?? this.filtroAntitemblor,
       vistasAgenda: vistasAgenda ?? this.vistasAgenda,
     );
@@ -94,6 +100,7 @@ class PreferenciasAccesibilidad {
     'mostrarPictogramas': mostrarPictogramas,
     'mostrarTexto': mostrarTexto,
     'leerEnVoz': leerEnVoz,
+    'botonEscuchar': botonEscuchar,
     'filtroAntitemblor': filtroAntitemblor,
     'vistasAgenda': [for (final vista in vistasAgenda) vista.name],
   };
@@ -119,6 +126,7 @@ class PreferenciasAccesibilidad {
       mostrarPictogramas: datos['mostrarPictogramas'] as bool? ?? true,
       mostrarTexto: datos['mostrarTexto'] as bool? ?? true,
       leerEnVoz: datos['leerEnVoz'] as bool? ?? false,
+      botonEscuchar: datos['botonEscuchar'] as bool? ?? true,
       filtroAntitemblor: datos['filtroAntitemblor'] as bool? ?? false,
       vistasAgenda: vistas.isEmpty ? porDefecto.vistasAgenda : vistas,
     );
@@ -136,6 +144,7 @@ class PreferenciasAccesibilidad {
       other.mostrarPictogramas == mostrarPictogramas &&
       other.mostrarTexto == mostrarTexto &&
       other.leerEnVoz == leerEnVoz &&
+      other.botonEscuchar == botonEscuchar &&
       other.filtroAntitemblor == filtroAntitemblor &&
       other.vistasAgenda.length == vistasAgenda.length &&
       other.vistasAgenda.containsAll(vistasAgenda);
@@ -151,6 +160,7 @@ class PreferenciasAccesibilidad {
     mostrarPictogramas,
     mostrarTexto,
     leerEnVoz,
+    botonEscuchar,
     filtroAntitemblor,
     Object.hashAllUnordered(vistasAgenda),
   );

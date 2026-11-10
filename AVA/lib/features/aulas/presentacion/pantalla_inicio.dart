@@ -57,23 +57,30 @@ class _PantallaInicioState extends State<PantallaInicio> {
                 height: Dimensiones.altoBarraNavegacion,
                 child: Row(
                   children: [
-                    SizedBox(
-                      width: 290,
-                      child: BotonAccesible(
-                        texto: 'Escuchar',
-                        pictograma: Pictogramas.escuchar,
-                        icono: Icons.volume_up_rounded,
-                        color: ColorPastel.amarillo,
-                        disposicion: DisposicionBoton.horizontal,
-                        alPulsar: () =>
-                            escuchar(context, 'Hola. Toca tu clase.'),
+                    _HuecoBoton(
+                      alineacion: MainAxisAlignment.start,
+                      child: AjustesInterfaz.of(context).botonEscuchar
+                          ? BotonAccesible(
+                              texto: 'Escuchar',
+                              pictograma: Pictogramas.escuchar,
+                              icono: Icons.volume_up_rounded,
+                              color: ColorPastel.amarillo,
+                              disposicion: DisposicionBoton.horizontal,
+                              alPulsar: () =>
+                                  escuchar(context, 'Hola. Toca tu clase.'),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: Dimensiones.espaciado),
+                    const Flexible(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: _Logotipo(),
                       ),
                     ),
-                    const Spacer(),
-                    const _Logotipo(),
-                    const Spacer(),
-                    SizedBox(
-                      width: 290,
+                    const SizedBox(width: Dimensiones.espaciado),
+                    _HuecoBoton(
+                      alineacion: MainAxisAlignment.end,
                       child: BotonAccesible(
                         texto: 'Profesorado',
                         etiquetaSemantica: 'Acceso para profesorado',
@@ -183,6 +190,36 @@ class _Logotipo extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Hueco lateral de la barra superior. El botón mide como mucho 290 px y
+/// se estrecha si la pantalla no da para más; si no hay botón, el hueco se
+/// mantiene para que el logotipo no cambie de sitio.
+class _HuecoBoton extends StatelessWidget {
+  const _HuecoBoton({required this.alineacion, required this.child});
+
+  final MainAxisAlignment alineacion;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final boton = child;
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: alineacion,
+        children: [
+          if (boton != null)
+            Flexible(
+              child: SizedBox(
+                width: 290,
+                height: double.infinity,
+                child: boton,
+              ),
+            ),
+        ],
       ),
     );
   }
