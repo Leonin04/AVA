@@ -4,7 +4,7 @@ import '../../../../core/constantes/dimensiones.dart';
 import '../../../../core/constantes/paleta.dart';
 import '../../../../core/constantes/pictogramas.dart';
 import '../../../../core/widgets/boton_accesible.dart';
-import '../../../../core/widgets/cuadricula_paginada.dart';
+import '../../../../core/widgets/cuadricula_ajustada.dart';
 import '../../dominio/pictograma_clave.dart';
 import '../../logica/login_estudiante_controlador.dart';
 
@@ -34,7 +34,7 @@ class TecladoPictogramas extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: CuadriculaPaginada<PictogramaClave>(
+              child: CuadriculaAjustada<PictogramaClave>(
                 elementos: PictogramaClave.values,
                 maxColumnas: 3,
                 anchoMinimoCelda: 150,

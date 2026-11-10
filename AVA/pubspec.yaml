@@ -41,6 +41,7 @@ dependencies:
   # Lectura en voz alta (RF-08, persona Álex) y fotografías propias (RF-13)
   flutter_tts: ^4.2.5
   image_picker: ^1.2.4
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:

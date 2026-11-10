@@ -5,7 +5,7 @@ import '../../../../core/constantes/paleta.dart';
 import '../../../../core/constantes/pictogramas.dart';
 import '../../../../core/tema/ajustes_interfaz.dart';
 import '../../../../core/widgets/boton_accesible.dart';
-import '../../../../core/widgets/cuadricula_paginada.dart';
+import '../../../../core/widgets/cuadricula_ajustada.dart';
 import '../../logica/login_estudiante_controlador.dart';
 
 /// Teclado numérico grande para el acceso con número (PIN), con un color
@@ -36,7 +36,7 @@ class TecladoNumerico extends StatelessWidget {
         return Column(
           children: [
             Expanded(
-              child: CuadriculaPaginada<int>(
+              child: CuadriculaAjustada<int>(
                 elementos: _cifras,
                 maxColumnas: 5,
                 anchoMinimoCelda: 96,

@@ -1,5 +1,6 @@
 import 'package:ava/core/constantes/paleta.dart';
-import 'package:ava/core/utilidades/paginacion.dart';
+import 'package:ava/core/tema/tema_app.dart';
+import 'package:ava/core/utilidades/distribucion_cuadricula.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -44,30 +45,64 @@ void main() {
     });
   });
 
-  group('Paginación sin desplazamiento', () {
-    test('reparte los elementos en páginas', () {
-      const p = Paginacion(total: 10, porPagina: 4);
-      expect(p.numeroPaginas, 3);
-      expect([p.inicio(2), p.fin(2)], [8, 10]);
+  group('Color principal elegido', () {
+    for (final color in ColorPastel.values) {
+      test('${color.nombre}: tiñe el fondo y el texto sigue a 7:1', () {
+        final tema = TemaApp.construir(color: color);
+        final fondo = tema.scaffoldBackgroundColor;
+
+        expect(fondo, isNot(Paleta.fondoClaro));
+        expect(contraste(Paleta.tinta, fondo), greaterThanOrEqualTo(7));
+      });
+    }
+
+    test('cada color da un fondo distinto', () {
+      final fondos = {
+        for (final c in ColorPastel.values)
+          TemaApp.construir(color: c).scaffoldBackgroundColor,
+      };
+      expect(fondos, hasLength(ColorPastel.values.length));
+    });
+  });
+
+  group('Cuadrícula en la que cabe todo', () {
+    test('cuatro elementos anchos se reparten en 2 × 2', () {
+      final reparto = DistribucionCuadricula.calcular(
+        total: 4,
+        ancho: 1000,
+        alto: 600,
+        espaciado: 20,
+        maxColumnas: 2,
+        proporcion: 2,
+      );
+      expect([reparto.columnas, reparto.filas], [2, 2]);
     });
 
-    test('calcula cuántos elementos caben', () {
-      expect(
-        Paginacion.cuantosCaben(
-          disponible: 500,
-          tamanoMinimo: 100,
-          espaciado: 20,
-        ),
-        4,
+    test('caben todos los elementos aunque sean muchos', () {
+      for (final total in [1, 6, 15, 20, 40]) {
+        final reparto = DistribucionCuadricula.calcular(
+          total: total,
+          ancho: 1000,
+          alto: 600,
+          espaciado: 12,
+          maxColumnas: 5,
+        );
+        expect(reparto.columnas * reparto.filas, greaterThanOrEqualTo(total));
+        final altoTotal =
+            reparto.altoCelda * reparto.filas + 12 * (reparto.filas - 1);
+        expect(altoTotal, lessThanOrEqualTo(600.001));
+      }
+    });
+
+    test('no pasa del alto máximo con pocos elementos', () {
+      final reparto = DistribucionCuadricula.calcular(
+        total: 2,
+        ancho: 1000,
+        alto: 800,
+        espaciado: 20,
+        altoMaximo: 300,
       );
-      expect(
-        Paginacion.cuantosCaben(
-          disponible: 50,
-          tamanoMinimo: 100,
-          espaciado: 0,
-        ),
-        1,
-      );
+      expect(reparto.altoCelda, lessThanOrEqualTo(300));
     });
   });
 }

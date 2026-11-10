@@ -13,21 +13,31 @@ AlmacenSimulado almacenDePrueba() {
 }
 
 /// Arranca la app en una tableta horizontal de 1280 × 800.
-Future<ServicioVozSilencioso> arrancarApp(
+Future<ServicioVoz> arrancarApp(
   WidgetTester tester, {
   AlmacenSimulado? almacen,
+  ServicioVoz? conVoz,
   Size tamano = const Size(1280, 800),
 }) async {
   tester.view.physicalSize = tamano;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
 
-  final voz = ServicioVozSilencioso();
+  final voz = conVoz ?? ServicioVozSilencioso();
   await tester.pumpWidget(
     AplicacionAva(almacen: almacen ?? almacenDePrueba(), voz: voz),
   );
   await tester.pumpAndSettle();
   return voz;
+}
+
+/// Voz de un dispositivo que no tiene ninguna voz instalada.
+class VozNoDisponible implements ServicioVoz {
+  @override
+  Future<bool> decir(String texto) async => false;
+
+  @override
+  Future<void> parar() async {}
 }
 
 /// Pulsa el texto indicado y espera a que la pantalla se estabilice.

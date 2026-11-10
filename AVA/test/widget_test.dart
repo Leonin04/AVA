@@ -1,3 +1,6 @@
+import 'package:ava/core/constantes/paleta.dart';
+import 'package:ava/core/servicios/servicio_voz.dart';
+import 'package:ava/core/tema/tema_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -54,7 +57,7 @@ void main() {
     testWidgets('el botón Ayuda está en todas las pantallas y la lee en voz', (
       tester,
     ) async {
-      final voz = await arrancarApp(tester);
+      final voz = await arrancarApp(tester) as ServicioVozSilencioso;
       await entrarComoDiego(tester);
 
       await pulsar(tester, 'Ayuda');
@@ -81,6 +84,37 @@ void main() {
 
       expect(antes, Brightness.light);
       expect(despues, Brightness.dark);
+    });
+
+    testWidgets('el color elegido en el perfil cambia el fondo de la app', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi perfil');
+
+      Color fondo() => Theme.of(
+        tester.element(find.text('Mi perfil')),
+      ).scaffoldBackgroundColor;
+      await pulsar(tester, 'Color rosa');
+
+      expect(
+        fondo(),
+        TemaApp.construir(color: ColorPastel.rosa).scaffoldBackgroundColor,
+      );
+      await pulsar(tester, 'Color menta');
+      expect(
+        fondo(),
+        TemaApp.construir(color: ColorPastel.menta).scaffoldBackgroundColor,
+      );
+    });
+
+    testWidgets('«Escuchar» avisa si el dispositivo no tiene voz', (
+      tester,
+    ) async {
+      await arrancarApp(tester, conVoz: VozNoDisponible());
+      await pulsar(tester, 'Escuchar');
+      expect(find.textContaining('no tiene voz instalada'), findsOneWidget);
     });
 
     testWidgets('sin permiso del tutor el perfil no se puede cambiar', (

@@ -5,7 +5,7 @@ import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/dialogo_confirmacion.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../autenticacion/presentacion/widgets/boton_cerrar_sesion.dart';
@@ -70,7 +70,7 @@ class PantallaMenuEstudiante extends StatelessWidget {
       icono: Icons.waving_hand_rounded,
       color: estudiante.color,
       textoVoz: 'Hola, ${estudiante.nombre}. ¿Qué quieres hacer?',
-      cuerpo: CuadriculaPaginada<_OpcionMenu>(
+      cuerpo: CuadriculaAjustada<_OpcionMenu>(
         elementos: opciones,
         maxColumnas: 4,
         anchoMinimoCelda: 220,

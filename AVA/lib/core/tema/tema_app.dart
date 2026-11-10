@@ -160,7 +160,8 @@ abstract final class TemaApp {
             onPrimary: Paleta.tinta,
             primaryContainer: color.fondo,
             onPrimaryContainer: Paleta.tinta,
-            surface: Paleta.fondoOscuro,
+            // El color elegido tiñe el fondo para que el cambio se note.
+            surface: Color.lerp(Paleta.fondoOscuro, color.acento, 0.22),
             onSurface: const Color(0xFFF4F4F8),
             surfaceContainerLowest: Paleta.superficieOscura,
             surfaceContainerLow: Paleta.superficieOscura,
@@ -170,7 +171,9 @@ abstract final class TemaApp {
             onPrimary: Colors.white,
             primaryContainer: color.fondo,
             onPrimaryContainer: Paleta.tinta,
-            surface: Paleta.fondoClaro,
+            // El color elegido tiñe el fondo para que el cambio se note en
+            // toda la app; el texto sigue contrastando más de 7:1.
+            surface: Color.lerp(Paleta.fondoClaro, color.fondo, 0.8),
             onSurface: Paleta.tinta,
             onSurfaceVariant: Paleta.tintaSuave,
             surfaceContainerLowest: Colors.white,

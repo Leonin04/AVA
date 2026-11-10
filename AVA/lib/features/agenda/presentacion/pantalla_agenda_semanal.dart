@@ -6,7 +6,6 @@ import '../../../app/rutas.dart';
 import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/utilidades/formato_fecha.dart';
-import '../../../core/utilidades/paginacion.dart';
 import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
@@ -17,8 +16,8 @@ import 'widgets/boton_tarea.dart';
 import 'widgets/estado_agenda_mixin.dart';
 
 /// Agenda de la semana (HU-09): una columna por día, de lunes a domingo,
-/// cada día con su color y su pictograma. Si las tareas de un día no caben,
-/// se muestra «Ver N más», que abre ese día. Nunca hay que desplazarse.
+/// cada día con su color. Se ven todas las tareas de la semana a la vez:
+/// cada día reparte su alto entre sus tareas. Nunca hay que desplazarse.
 class PantallaAgendaSemanal extends StatefulWidget {
   const PantallaAgendaSemanal({super.key, required this.estudiante});
 
@@ -88,7 +87,7 @@ class _ColumnaDia extends StatelessWidget {
   });
 
   static const _altoCabecera = 112.0;
-  static const _altoMinimoTarea = 92.0;
+  static const _altoMaximoTarea = 150.0;
   static const _separacion = 8.0;
 
   final DateTime dia;
@@ -133,22 +132,17 @@ class _ColumnaDia extends StatelessWidget {
                 );
               }
 
-              final caben = Paginacion.cuantosCaben(
-                disponible: restricciones.maxHeight,
-                tamanoMinimo: _altoMinimoTarea * escala,
-                espaciado: _separacion,
-              );
-              final hayMas = tareas.length > caben;
-              final visibles = hayMas ? math.max(0, caben - 1) : tareas.length;
-              final filas = hayMas ? caben : tareas.length;
+              // Todas las tareas del día se reparten el alto disponible, para
+              // verlas todas a la vez sin desplazarse.
               final alto = math.min(
-                (restricciones.maxHeight - _separacion * (filas - 1)) / filas,
-                150 * escala,
+                (restricciones.maxHeight - _separacion * (tareas.length - 1)) /
+                    tareas.length,
+                _altoMaximoTarea * escala,
               );
 
               return Column(
                 children: [
-                  for (var i = 0; i < visibles; i++) ...[
+                  for (var i = 0; i < tareas.length; i++) ...[
                     if (i > 0) const SizedBox(height: _separacion),
                     SizedBox(
                       height: alto,
@@ -162,18 +156,6 @@ class _ColumnaDia extends StatelessWidget {
                             ? DestacadoTarea.despues
                             : DestacadoTarea.ninguno,
                         alPulsar: () => alPulsarTarea(tareas[i]),
-                      ),
-                    ),
-                  ],
-                  if (hayMas) ...[
-                    if (visibles > 0) const SizedBox(height: _separacion),
-                    SizedBox(
-                      height: alto,
-                      child: BotonAccesible(
-                        texto: 'Ver ${tareas.length - visibles} más',
-                        icono: Icons.more_horiz_rounded,
-                        color: color,
-                        alPulsar: alPulsarDia,
                       ),
                     ),
                   ],

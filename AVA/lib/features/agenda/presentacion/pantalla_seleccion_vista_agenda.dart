@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../app/rutas.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../perfil/dominio/estudiante.dart';
 import '../../perfil/logica/preferencias_controlador.dart';
@@ -47,7 +47,7 @@ class PantallaSeleccionVistaAgenda extends StatelessWidget {
       textoVoz:
           'Mi agenda. ¿Cómo la quieres ver? '
           '${vistas.map((v) => v.nombre).join(', ')}.',
-      cuerpo: CuadriculaPaginada<VistaAgenda>(
+      cuerpo: CuadriculaAjustada<VistaAgenda>(
         elementos: vistas,
         maxColumnas: 3,
         anchoMinimoCelda: 240,

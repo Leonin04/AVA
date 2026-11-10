@@ -147,10 +147,28 @@ class _Cabecera extends StatelessWidget {
               icono: Icons.volume_up_rounded,
               color: ColorPastel.amarillo,
               disposicion: DisposicionBoton.horizontal,
-              alPulsar: () => ajustes.voz.decir(textoVoz),
+              alPulsar: () => escuchar(context, textoVoz),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Lee [texto] en voz alta. Si el dispositivo no tiene ninguna voz
+/// instalada, lo avisa en pantalla en lugar de no hacer nada.
+Future<void> escuchar(BuildContext context, String texto) async {
+  final voz = AjustesInterfaz.of(context).voz;
+  final avisos = ScaffoldMessenger.maybeOf(context);
+  final hablando = await voz.decir(texto);
+  if (!hablando) {
+    avisos?.showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Este dispositivo no tiene voz instalada. '
+          'Actívala en los ajustes de accesibilidad del sistema.',
+        ),
       ),
     );
   }

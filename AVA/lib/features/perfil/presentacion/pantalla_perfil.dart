@@ -6,7 +6,7 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/tema/ajustes_interfaz.dart';
 import '../../../core/widgets/avatar_usuario.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../autenticacion/logica/sesion_controlador.dart';
@@ -80,9 +80,9 @@ class PantallaPerfil extends StatelessWidget {
           const SizedBox(width: Dimensiones.espaciado),
           Expanded(
             child: estudiante.puedeModificarPreferencias
-                ? CuadriculaPaginada<OpcionPreferencia>(
+                ? CuadriculaAjustada<OpcionPreferencia>(
                     elementos: opciones,
-                    maxColumnas: 4,
+                    maxColumnas: 5,
                     anchoMinimoCelda: 180,
                     altoMinimoCelda: 170,
                     espaciado: Dimensiones.espaciadoPequeno,

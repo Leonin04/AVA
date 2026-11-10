@@ -7,7 +7,7 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 import '../../../core/widgets/atribucion_arasaac.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../dominio/cuenta.dart';
 import '../logica/permisos.dart';
 import 'widgets/boton_cerrar_sesion.dart';
@@ -79,7 +79,7 @@ class PantallaPanelGestion extends StatelessWidget {
           child: Column(
             children: [
               Expanded(
-                child: CuadriculaPaginada<_OpcionPanel>(
+                child: CuadriculaAjustada<_OpcionPanel>(
                   elementos: opciones,
                   maxColumnas: 2,
                   anchoMinimoCelda: 320,

@@ -7,7 +7,7 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/tema/ajustes_interfaz.dart';
 import '../../../core/utilidades/formato_fecha.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
 import '../../agenda/presentacion/widgets/boton_tarea.dart';
@@ -115,7 +115,7 @@ class _PasoQue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CuadriculaPaginada<ActividadPersonal>(
+    return CuadriculaAjustada<ActividadPersonal>(
       elementos: ActividadPersonal.catalogo,
       maxColumnas: 4,
       anchoMinimoCelda: 200,
@@ -148,7 +148,7 @@ class _PasoCuando extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: CuadriculaPaginada<DateTime>(
+          child: CuadriculaAjustada<DateTime>(
             elementos: controlador.diasDisponibles,
             maxColumnas: 4,
             anchoMinimoCelda: 130,

@@ -7,7 +7,7 @@ import '../../../app/rutas.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/widgets/avatar_usuario.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_gestion.dart';
 import '../../../core/widgets/vista_carga.dart';
@@ -67,7 +67,7 @@ class _PantallaListaAlumnosState extends State<PantallaListaAlumnos> {
                 pictograma: Pictogramas.alumno,
                 texto: 'No tienes alumnos asignados todavía.',
               )
-            : CuadriculaPaginada<AlumnoConAula>(
+            : CuadriculaAjustada<AlumnoConAula>(
                 elementos: alumnos,
                 maxColumnas: 5,
                 anchoMinimoCelda: 180,

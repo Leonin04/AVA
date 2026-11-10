@@ -1,39 +1,35 @@
-import 'package:flutter_tts/flutter_tts.dart';
+import 'voz_plataforma_nativa.dart'
+    if (dart.library.js_interop) 'voz_plataforma_web.dart'
+    as plataforma;
 
-/// Lectura en voz alta de textos (RF-08, persona Álex).
+/// Lectura en voz alta de textos (RF-08, personas Álex y Samuel).
 abstract interface class ServicioVoz {
-  Future<void> decir(String texto);
+  /// Lee [texto] en voz alta. Devuelve `false` si el dispositivo no tiene
+  /// ninguna voz disponible, para poder avisar en pantalla.
+  Future<bool> decir(String texto);
 
   Future<void> parar();
 }
 
-/// Implementación con la síntesis de voz del dispositivo.
+/// Implementación con la síntesis de voz del dispositivo: la del navegador
+/// en la web y la del sistema en Android e iOS.
 class ServicioVozDispositivo implements ServicioVoz {
-  final FlutterTts _tts = FlutterTts();
-  bool _configurado = false;
-
   @override
-  Future<void> decir(String texto) async {
-    if (texto.trim().isEmpty) return;
+  Future<bool> decir(String texto) async {
+    if (texto.trim().isEmpty) return true;
     try {
-      if (!_configurado) {
-        await _tts.setLanguage('es-ES');
-        // Ritmo pausado para facilitar la comprensión (persona Samuel).
-        await _tts.setSpeechRate(0.45);
-        _configurado = true;
-      }
-      await _tts.stop();
-      await _tts.speak(texto);
-    } on Exception {
-      // Si el dispositivo no tiene voz, la app sigue funcionando sin ella.
+      return await plataforma.hablar(texto);
+    } on Object {
+      // Si el dispositivo falla al hablar, la app sigue funcionando.
+      return false;
     }
   }
 
   @override
   Future<void> parar() async {
     try {
-      await _tts.stop();
-    } on Exception {
+      await plataforma.callar();
+    } on Object {
       // Sin voz disponible no hay nada que parar.
     }
   }
@@ -44,7 +40,10 @@ class ServicioVozSilencioso implements ServicioVoz {
   final List<String> dichos = [];
 
   @override
-  Future<void> decir(String texto) async => dichos.add(texto);
+  Future<bool> decir(String texto) async {
+    dichos.add(texto);
+    return true;
+  }
 
   @override
   Future<void> parar() async {}

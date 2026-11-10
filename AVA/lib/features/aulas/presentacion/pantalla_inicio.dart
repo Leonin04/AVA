@@ -10,8 +10,9 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/tema/ajustes_interfaz.dart';
 import '../../../core/widgets/atribucion_arasaac.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
+import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../dominio/aula.dart';
@@ -46,8 +47,6 @@ class _PantallaInicioState extends State<PantallaInicio> {
 
   @override
   Widget build(BuildContext context) {
-    final voz = AjustesInterfaz.of(context).voz;
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -66,7 +65,8 @@ class _PantallaInicioState extends State<PantallaInicio> {
                         icono: Icons.volume_up_rounded,
                         color: ColorPastel.amarillo,
                         disposicion: DisposicionBoton.horizontal,
-                        alPulsar: () => voz.decir('Hola. Toca tu clase.'),
+                        alPulsar: () =>
+                            escuchar(context, 'Hola. Toca tu clase.'),
                       ),
                     ),
                     const Spacer(),
@@ -106,7 +106,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
                       : Center(
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 1000),
-                            child: CuadriculaPaginada<Aula>(
+                            child: CuadriculaAjustada<Aula>(
                               elementos: aulas,
                               maxColumnas: 2,
                               anchoMinimoCelda: 280,

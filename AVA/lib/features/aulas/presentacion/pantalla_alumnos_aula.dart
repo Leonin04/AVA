@@ -7,7 +7,7 @@ import '../../../app/rutas.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/widgets/avatar_usuario.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
@@ -63,7 +63,7 @@ class _PantallaAlumnosAulaState extends State<PantallaAlumnosAula> {
                 pictograma: Pictogramas.alumno,
                 texto: 'Esta clase todavía no tiene alumnos.',
               )
-            : CuadriculaPaginada<Estudiante>(
+            : CuadriculaAjustada<Estudiante>(
                 elementos: estudiantes,
                 anchoMinimoCelda: 210,
                 altoMinimoCelda: 200,

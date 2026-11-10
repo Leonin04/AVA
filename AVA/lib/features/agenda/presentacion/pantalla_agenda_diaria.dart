@@ -5,7 +5,7 @@ import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/utilidades/formato_fecha.dart';
 import '../../../core/widgets/boton_accesible.dart';
-import '../../../core/widgets/cuadricula_paginada.dart';
+import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
@@ -17,7 +17,7 @@ import 'widgets/estado_agenda_mixin.dart';
 
 /// Agenda de un día (HU-09): las tareas ordenadas por hora, cada una con un
 /// botón «Ver». Se distinguen la tarea de ahora y la de después (HU-10).
-/// Si no caben, se pasan de página en lugar de desplazarse.
+/// Se ven todas a la vez: si hay muchas, se hacen más pequeñas.
 class PantallaAgendaDiaria extends StatefulWidget {
   const PantallaAgendaDiaria({super.key, required this.estudiante, this.dia});
 
@@ -68,9 +68,9 @@ class _PantallaAgendaDiariaState extends State<PantallaAgendaDiaria>
               texto: 'Este día no tienes tareas.',
             );
           }
-          return CuadriculaPaginada<Tarea>(
+          return CuadriculaAjustada<Tarea>(
             elementos: tareas,
-            maxColumnas: 1,
+            maxColumnas: tareas.length > 6 ? 2 : 1,
             anchoMinimoCelda: 400,
             altoMinimoCelda: 104,
             altoMaximoCelda: 140,
