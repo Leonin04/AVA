@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 
 /// Actividad que el estudiante puede elegir al crear una tarea personal.
 class ActividadPersonal {

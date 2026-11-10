@@ -10,8 +10,8 @@ import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
 import '../../../core/widgets/vista_carga.dart';
-import '../../perfil/dominio/estudiante.dart';
-import '../../tareas/dominio/tarea.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
+import '../../tareas/dominio/tarea_agenda.dart';
 import 'widgets/boton_tarea.dart';
 import 'widgets/estado_agenda_mixin.dart';
 

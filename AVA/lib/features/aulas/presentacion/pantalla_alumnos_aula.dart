@@ -11,9 +11,9 @@ import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 import '../logica/estudiantes_aula_controlador.dart';
 
 /// Alumnos de una clase. Cada alumno toca su foto para ir a su login.

@@ -1,4 +1,4 @@
-import 'tarea.dart';
+import 'tarea_agenda.dart';
 
 /// Acceso a las tareas de los estudiantes.
 ///

@@ -1,4 +1,4 @@
-import 'estudiante.dart';
+import 'perfil_estudiante.dart';
 
 /// Acceso a los perfiles de los estudiantes.
 ///

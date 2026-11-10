@@ -9,7 +9,7 @@ import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/dialogo_confirmacion.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../autenticacion/presentacion/widgets/boton_cerrar_sesion.dart';
-import '../dominio/estudiante.dart';
+import '../dominio/perfil_estudiante.dart';
 
 /// Pantalla principal del estudiante tras iniciar sesión: Agenda y Perfil
 /// (y crear tareas si su tutor se lo permite). Pocas opciones, grandes y

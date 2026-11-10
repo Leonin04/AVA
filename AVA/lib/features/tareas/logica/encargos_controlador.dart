@@ -1,6 +1,6 @@
 import '../../../core/modelos/recurso_visual.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 import 'validacion_tareas.dart';
 
 /// Creación de encargos del centro para varios estudiantes o un aula

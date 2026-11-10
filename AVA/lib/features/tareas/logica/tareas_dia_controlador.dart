@@ -1,6 +1,6 @@
 import '../../../core/utilidades/controlador_carga.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 
 /// Tareas de un estudiante en un día, para que el tutor las gestione
 /// (HU-03 a HU-06).

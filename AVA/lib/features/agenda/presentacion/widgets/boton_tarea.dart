@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/utilidades/formato_fecha.dart';
 import '../../../../core/widgets/boton_accesible.dart';
-import '../../../tareas/dominio/tarea.dart';
+import '../../../tareas/dominio/tarea_agenda.dart';
 
 /// Marca visual para distinguir la tarea actual y la siguiente (HU-10).
 enum DestacadoTarea {

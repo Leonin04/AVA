@@ -1,8 +1,8 @@
 import '../../../core/constantes/paleta.dart';
 import '../../../core/utilidades/controlador_carga.dart';
-import '../../aulas/dominio/aula.dart';
+import '../../aulas/dominio/ficha_aula.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/clave_acceso.dart';
 import '../dominio/cuenta.dart';

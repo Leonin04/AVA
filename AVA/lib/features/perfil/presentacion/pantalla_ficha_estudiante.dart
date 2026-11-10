@@ -8,7 +8,7 @@ import '../../../core/widgets/vista_carga.dart';
 import '../../autenticacion/dominio/cuenta.dart';
 import '../../autenticacion/dominio/repositorio_autenticacion.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
-import '../dominio/estudiante.dart';
+import '../dominio/perfil_estudiante.dart';
 import '../dominio/repositorio_estudiantes.dart';
 import '../logica/ficha_estudiante_controlador.dart';
 import 'widgets/pestana_acceso.dart';

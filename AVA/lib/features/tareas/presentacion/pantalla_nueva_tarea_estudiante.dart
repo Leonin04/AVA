@@ -11,9 +11,9 @@ import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
 import '../../agenda/presentacion/widgets/boton_tarea.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 import '../logica/tarea_estudiante_controlador.dart';
 
 /// Asistente para que el estudiante cree o cambie una tarea personal

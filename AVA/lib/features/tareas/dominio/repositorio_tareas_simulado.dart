@@ -2,7 +2,7 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 import '../../../core/servicios/almacen_simulado.dart';
 import 'repositorio_tareas.dart';
-import 'tarea.dart';
+import 'tarea_agenda.dart';
 
 /// Tareas guardadas en el [AlmacenSimulado].
 ///

@@ -1,6 +1,6 @@
 import '../../../core/servicios/almacen_simulado.dart';
 import '../../../core/utilidades/orden_alfabetico.dart';
-import 'estudiante.dart';
+import 'perfil_estudiante.dart';
 import 'repositorio_estudiantes.dart';
 
 /// Perfiles guardados en el [AlmacenSimulado].

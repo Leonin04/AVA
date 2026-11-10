@@ -1,9 +1,9 @@
 import '../../../core/utilidades/controlador_carga.dart';
 import '../../autenticacion/dominio/cuenta.dart';
 import '../../autenticacion/logica/permisos.dart';
-import '../../aulas/dominio/aula.dart';
+import '../../aulas/dominio/ficha_aula.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
-import '../dominio/estudiante.dart';
+import '../dominio/perfil_estudiante.dart';
 import '../dominio/repositorio_estudiantes.dart';
 
 /// Alumno con el aula a la que pertenece.

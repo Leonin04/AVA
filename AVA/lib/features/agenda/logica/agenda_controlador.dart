@@ -1,6 +1,6 @@
 import '../../../core/utilidades/controlador_carga.dart';
 import '../../tareas/dominio/repositorio_tareas.dart';
-import '../../tareas/dominio/tarea.dart';
+import '../../tareas/dominio/tarea_agenda.dart';
 import 'calculos_agenda.dart';
 
 /// Carga las tareas de una semana del estudiante y las organiza para las

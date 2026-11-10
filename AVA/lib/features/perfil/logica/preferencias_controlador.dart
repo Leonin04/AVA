@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../dominio/estudiante.dart';
+import '../dominio/perfil_estudiante.dart';
 import '../dominio/preferencias_accesibilidad.dart';
 import '../dominio/repositorio_estudiantes.dart';
 

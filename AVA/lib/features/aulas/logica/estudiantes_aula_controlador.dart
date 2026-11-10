@@ -1,7 +1,7 @@
 import '../../../core/utilidades/controlador_carga.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 
 /// Carga los estudiantes de un aula.
 class EstudiantesAulaControlador extends ControladorCarga<List<Estudiante>> {

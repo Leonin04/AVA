@@ -5,7 +5,7 @@ import 'package:ava/features/autenticacion/dominio/rol.dart';
 import 'package:ava/features/aulas/dominio/repositorio_aulas_simulado.dart';
 import 'package:ava/features/perfil/dominio/repositorio_estudiantes_simulado.dart';
 import 'package:ava/features/tareas/dominio/repositorio_tareas_simulado.dart';
-import 'package:ava/features/tareas/dominio/tarea.dart';
+import 'package:ava/features/tareas/dominio/tarea_agenda.dart';
 import 'package:ava/features/tareas/logica/detalle_tarea_controlador.dart';
 import 'package:ava/features/tareas/logica/encargos_controlador.dart';
 import 'package:ava/features/tareas/logica/formulario_tarea_controlador.dart';

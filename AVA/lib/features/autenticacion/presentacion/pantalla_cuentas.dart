@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constantes/dimensiones.dart';
 import '../../../core/widgets/pantalla_gestion.dart';
 import '../../../core/widgets/vista_carga.dart';
-import '../../aulas/dominio/aula.dart';
+import '../../aulas/dominio/ficha_aula.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/clave_acceso.dart';

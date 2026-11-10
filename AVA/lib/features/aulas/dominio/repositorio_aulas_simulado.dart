@@ -1,6 +1,6 @@
 import '../../../core/servicios/almacen_simulado.dart';
 import '../../../core/utilidades/orden_alfabetico.dart';
-import 'aula.dart';
+import 'ficha_aula.dart';
 import 'repositorio_aulas.dart';
 
 /// Aulas guardadas en el [AlmacenSimulado].

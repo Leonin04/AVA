@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 
 /// Detalle de una tarea para el estudiante.
 ///

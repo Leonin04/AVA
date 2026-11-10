@@ -1,5 +1,5 @@
 import 'package:ava/features/agenda/logica/calculos_agenda.dart';
-import 'package:ava/features/tareas/dominio/tarea.dart';
+import 'package:ava/features/tareas/dominio/tarea_agenda.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Tarea _tarea(

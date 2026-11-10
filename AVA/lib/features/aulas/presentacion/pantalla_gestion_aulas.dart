@@ -13,7 +13,7 @@ import '../../../core/widgets/selector_recurso_visual.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../../autenticacion/dominio/repositorio_cuentas.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 import '../dominio/repositorio_aulas.dart';
 import '../logica/gestion_aulas_controlador.dart';
 

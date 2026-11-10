@@ -2,9 +2,9 @@ import '../../../core/utilidades/controlador_carga.dart';
 import '../../autenticacion/dominio/cuenta.dart';
 import '../../autenticacion/dominio/repositorio_cuentas.dart';
 import '../../autenticacion/dominio/rol.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 import '../dominio/repositorio_aulas.dart';
 
 /// Datos que necesita la gestión de aulas.

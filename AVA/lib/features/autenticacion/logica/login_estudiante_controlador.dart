@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/clave_acceso.dart';
 import '../dominio/metodo_acceso.dart';
 import '../dominio/pictograma_clave.dart';

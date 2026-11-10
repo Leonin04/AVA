@@ -11,10 +11,10 @@ import '../../../../core/widgets/pictograma.dart';
 import '../../../../core/widgets/vista_carga.dart';
 import '../../../autenticacion/dominio/cuenta.dart';
 import '../../../tareas/dominio/repositorio_tareas.dart';
-import '../../../tareas/dominio/tarea.dart';
+import '../../../tareas/dominio/tarea_agenda.dart';
 import '../../../tareas/logica/tareas_dia_controlador.dart';
-import '../../../tareas/presentacion/pantalla_formulario_tarea.dart';
-import '../../dominio/estudiante.dart';
+import '../../../tareas/presentacion/pantalla_editar_tarea.dart';
+import '../../dominio/perfil_estudiante.dart';
 
 /// Tareas del alumno día a día, para crearlas, cambiarlas o borrarlas
 /// (HU-03 a HU-06).

@@ -1,4 +1,4 @@
-import '../../tareas/dominio/tarea.dart';
+import '../../tareas/dominio/tarea_agenda.dart';
 
 /// Funciones puras para organizar las tareas en la agenda.
 ///

@@ -10,7 +10,7 @@ import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../autenticacion/logica/sesion_controlador.dart';
-import '../dominio/estudiante.dart';
+import '../dominio/perfil_estudiante.dart';
 import '../logica/preferencias_controlador.dart';
 import 'opciones_preferencias.dart';
 

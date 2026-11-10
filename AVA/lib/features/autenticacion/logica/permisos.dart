@@ -1,5 +1,5 @@
-import '../../aulas/dominio/aula.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../aulas/dominio/ficha_aula.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/cuenta.dart';
 import '../dominio/rol.dart';
 

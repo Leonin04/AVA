@@ -10,7 +10,7 @@ import '../../../core/widgets/selector_recurso_visual.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../../autenticacion/dominio/cuenta.dart';
 import '../../autenticacion/presentacion/widgets/aviso_error.dart';
-import '../../aulas/dominio/aula.dart';
+import '../../aulas/dominio/ficha_aula.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../../perfil/logica/lista_alumnos_controlador.dart';

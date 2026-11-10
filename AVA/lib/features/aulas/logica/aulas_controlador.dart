@@ -1,5 +1,5 @@
 import '../../../core/utilidades/controlador_carga.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 import '../dominio/repositorio_aulas.dart';
 
 /// Carga las aulas que se muestran en la pantalla de inicio.

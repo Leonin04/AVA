@@ -11,9 +11,9 @@ import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/dialogo_confirmacion.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 import '../logica/detalle_tarea_controlador.dart';
 import 'widgets/dialogo_celebracion.dart';
 

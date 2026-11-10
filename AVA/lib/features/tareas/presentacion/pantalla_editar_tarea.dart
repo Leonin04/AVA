@@ -11,7 +11,7 @@ import '../../autenticacion/presentacion/widgets/aviso_error.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 import '../logica/formulario_tarea_controlador.dart';
 import '../logica/validacion_tareas.dart';
 import 'widgets/editor_pasos.dart';

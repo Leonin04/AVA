@@ -15,7 +15,7 @@ import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/pictograma.dart';
 import '../../../core/widgets/vista_carga.dart';
-import '../dominio/aula.dart';
+import '../dominio/ficha_aula.dart';
 import '../dominio/repositorio_aulas.dart';
 import '../logica/aulas_controlador.dart';
 

@@ -8,9 +8,9 @@ import '../features/autenticacion/dominio/pictograma_clave.dart';
 import '../features/autenticacion/dominio/repositorio_autenticacion_simulado.dart';
 import '../features/autenticacion/dominio/repositorio_cuentas_simulado.dart';
 import '../features/autenticacion/dominio/rol.dart';
-import '../features/aulas/dominio/aula.dart';
+import '../features/aulas/dominio/ficha_aula.dart';
 import '../features/aulas/dominio/repositorio_aulas_simulado.dart';
-import '../features/perfil/dominio/estudiante.dart';
+import '../features/perfil/dominio/perfil_estudiante.dart';
 import '../features/perfil/dominio/preferencias_accesibilidad.dart';
 import '../features/perfil/dominio/repositorio_estudiantes_simulado.dart';
 

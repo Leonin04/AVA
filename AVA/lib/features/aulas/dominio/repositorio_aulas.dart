@@ -1,4 +1,4 @@
-import 'aula.dart';
+import 'ficha_aula.dart';
 
 /// Acceso a los datos de las aulas.
 ///

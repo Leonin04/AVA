@@ -5,7 +5,7 @@ import '../../autenticacion/logica/permisos.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/repositorio_tareas.dart';
-import '../dominio/tarea.dart';
+import '../dominio/tarea_agenda.dart';
 import 'validacion_tareas.dart';
 
 /// Creación y edición de una tarea por el tutor: nombre, tipo, imagen de

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../app/rutas.dart';
 import '../../../tareas/dominio/repositorio_tareas.dart';
-import '../../../tareas/dominio/tarea.dart';
+import '../../../tareas/dominio/tarea_agenda.dart';
 import '../../logica/agenda_controlador.dart';
 
 /// Comportamiento común a las vistas de la agenda: crear y liberar el

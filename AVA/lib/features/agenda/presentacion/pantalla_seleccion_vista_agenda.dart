@@ -6,7 +6,7 @@ import '../../../core/constantes/pictogramas.dart';
 import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
-import '../../perfil/dominio/estudiante.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/logica/preferencias_controlador.dart';
 import '../dominio/vista_agenda.dart';
 

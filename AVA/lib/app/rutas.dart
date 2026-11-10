@@ -5,7 +5,7 @@ import '../features/agenda/presentacion/pantalla_agenda_diaria.dart';
 import '../features/agenda/presentacion/pantalla_agenda_semanal.dart';
 import '../features/agenda/presentacion/pantalla_seleccion_vista_agenda.dart';
 import '../features/agenda/presentacion/pantalla_siguiente_tarea.dart';
-import '../features/aulas/dominio/aula.dart';
+import '../features/aulas/dominio/ficha_aula.dart';
 import '../features/aulas/presentacion/pantalla_alumnos_aula.dart';
 import '../features/aulas/presentacion/pantalla_gestion_aulas.dart';
 import '../features/aulas/presentacion/pantalla_inicio.dart';
@@ -17,15 +17,15 @@ import '../features/autenticacion/presentacion/pantalla_login_estudiante.dart';
 import '../features/autenticacion/presentacion/pantalla_login_gestion.dart';
 import '../features/autenticacion/presentacion/pantalla_panel_gestion.dart';
 import '../features/autenticacion/presentacion/pantalla_recuperar_contrasena.dart';
-import '../features/perfil/dominio/estudiante.dart';
+import '../features/perfil/dominio/perfil_estudiante.dart';
 import '../features/perfil/presentacion/pantalla_ficha_estudiante.dart';
 import '../features/perfil/presentacion/pantalla_lista_alumnos.dart';
 import '../features/perfil/presentacion/pantalla_menu_estudiante.dart';
 import '../features/perfil/presentacion/pantalla_perfil.dart';
-import '../features/tareas/dominio/tarea.dart';
+import '../features/tareas/dominio/tarea_agenda.dart';
 import '../features/tareas/presentacion/pantalla_detalle_tarea.dart';
 import '../features/tareas/presentacion/pantalla_encargos.dart';
-import '../features/tareas/presentacion/pantalla_formulario_tarea.dart';
+import '../features/tareas/presentacion/pantalla_editar_tarea.dart';
 import '../features/tareas/presentacion/pantalla_nueva_tarea_estudiante.dart';
 
 /// Nombres de las rutas de la aplicación y construcción de cada pantalla.
