@@ -92,8 +92,9 @@ abstract final class Pictogramas {
 
   // Claves de acceso con pictogramas.
   static const sol = PictogramaArasaac(2798);
-  static const manzana = PictogramaArasaac(2462);
+  static const pelota = PictogramaArasaac(3241);
   static const mariposa = PictogramaArasaac(2465);
+  static const manzana = PictogramaArasaac(2462);
   static const perro = PictogramaArasaac(7202);
   static const flor = PictogramaArasaac(3102);
   static const coche = PictogramaArasaac(2339);

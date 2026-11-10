@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Reglas de Cloud Storage de AVA: fotos de estudiantes (HU-19) e imágenes de tareas (HU-06)
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function sesion() {
+      return request.auth != null;
+    }
+    function usuario() {
+      return firestore.get(/databases/(default)/documents/usuarios/$(request.auth.uid)).data;
+    }
+    function esPersonal() {
+      return sesion()
+          && firestore.exists(/databases/(default)/documents/usuarios/$(request.auth.uid));
+    }
+    function esAdmin() {
+      return esPersonal() && usuario().rol == 'admin';
+    }
+    function esTutorDe(estId) {
+      return esPersonal()
+          && request.auth.uid in firestore.get(
+               /databases/(default)/documents/estudiantes/$(estId)).data.tutores;
+    }
+    function imagenValida() {
+      return request.resource.size < 5 * 1024 * 1024
+          && request.resource.contentType.matches('image/.*');
+    }
+
+    // Foto o avatar del estudiante. Se lee con cualquier sesión (también la anónima
+    // de la tableta, para la pantalla "elige quién eres").
+    match /estudiantes/{estId}/{archivo} {
+      allow read: if sesion();
+      allow write: if (esAdmin() || esTutorDe(estId)) && imagenValida();
+      allow delete: if esAdmin() || esTutorDe(estId);
+    }
+
+    // Imágenes propias de tareas y pasos
+    match /tareas/{tareaId}/{archivo} {
+      allow read: if sesion();
+      allow write: if (esPersonal()
+                       || firestore.exists(/databases/(default)/documents/estudiantes/$(request.auth.uid)))
+                    && imagenValida();
+      allow delete: if esPersonal();
+    }
+  }
+}

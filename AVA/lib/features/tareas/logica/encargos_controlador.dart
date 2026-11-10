@@ -11,14 +11,16 @@ class EncargosControlador {
   final RepositorioTareas _repositorio;
 
   /// Crea el encargo en la agenda de cada estudiante de [idsEstudiantes].
-  /// Devuelve cuántas tareas se han creado. Lanza [ArgumentError] si los
-  /// datos no son válidos.
+  /// Si se indica [idAula], el encargo es para toda el aula (también para
+  /// los alumnos que se incorporen después). Devuelve a cuántos alumnos
+  /// llega. Lanza [ArgumentError] si los datos no son válidos.
   Future<int> crear({
     required String titulo,
     required DateTime inicio,
     required DateTime fin,
     required Set<String> idsEstudiantes,
     required String creadaPor,
+    String? idAula,
     String descripcion = '',
     List<String> pasos = const [],
     RecursoVisual? pictograma,
@@ -29,24 +31,22 @@ class EncargosControlador {
         (idsEstudiantes.isEmpty ? 'Elige al menos un alumno o un aula.' : null);
     if (error != null) throw ArgumentError(error);
 
-    final idEncargo = _repositorio.nuevoId('encargo');
-    for (final idEstudiante in idsEstudiantes) {
-      await _repositorio.guardar(
-        Tarea(
-          id: _repositorio.nuevoId('tarea'),
-          idEstudiante: idEstudiante,
-          titulo: titulo.trim(),
-          descripcion: descripcion.trim(),
-          pasos: ValidacionTareas.limpiarPasos(pasos),
-          inicio: inicio,
-          fin: fin,
-          tipo: TipoTarea.encargoCentro,
-          pictograma: pictograma,
-          creadaPor: creadaPor,
-          idEncargo: idEncargo,
-        ),
-      );
-    }
+    await _repositorio.crearEncargo(
+      Tarea(
+        id: _repositorio.nuevoId('encargo'),
+        idEstudiante: idsEstudiantes.first,
+        titulo: titulo.trim(),
+        descripcion: descripcion.trim(),
+        pasos: ValidacionTareas.limpiarPasos(pasos),
+        inicio: inicio,
+        fin: fin,
+        tipo: TipoTarea.encargoCentro,
+        pictograma: pictograma,
+        creadaPor: creadaPor,
+      ),
+      idsEstudiantes: idsEstudiantes,
+      idAula: idAula,
+    );
     return idsEstudiantes.length;
   }
 }

@@ -43,7 +43,8 @@ class DistribucionCuadricula {
       );
       // Lado útil de una celda con la proporción deseada.
       final tamano = math.min(anchoCelda / proporcion, altoCelda);
-      if (tamano > mejorTamano) {
+      // Con el mismo tamaño se prefieren más columnas (más a la vista).
+      if (tamano >= mejorTamano) {
         mejorTamano = tamano;
         mejor = DistribucionCuadricula(
           columnas: columnas,

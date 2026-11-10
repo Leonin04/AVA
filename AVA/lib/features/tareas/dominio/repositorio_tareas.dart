@@ -2,7 +2,8 @@ import 'tarea_agenda.dart';
 
 /// Acceso a las tareas de los estudiantes.
 ///
-/// Al conectar Firebase se implementará con Cloud Firestore.
+/// Implementaciones: `RepositorioTareasSimulado` (pruebas) y
+/// `RepositorioTareasFirebase` (Cloud Firestore).
 abstract interface class RepositorioTareas {
   /// Tareas del estudiante que empiezan en el intervalo [desde, hasta),
   /// ordenadas por hora de inicio.
@@ -12,8 +13,16 @@ abstract interface class RepositorioTareas {
     required DateTime hasta,
   });
 
-  /// Crea o actualiza una tarea (HU-03 a HU-07).
+  /// Crea o actualiza una tarea (HU-03 a HU-06).
   Future<void> guardar(Tarea tarea);
+
+  /// Crea un encargo del centro (HU-07) a partir de [plantilla] para
+  /// [idsEstudiantes] o, si se indica, para toda el aula [idAula].
+  Future<void> crearEncargo(
+    Tarea plantilla, {
+    required Set<String> idsEstudiantes,
+    String? idAula,
+  });
 
   Future<void> eliminar(String idTarea);
 

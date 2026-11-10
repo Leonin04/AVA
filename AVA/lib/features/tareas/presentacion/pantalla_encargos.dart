@@ -100,6 +100,7 @@ class _PantallaEncargosState extends State<PantallaEncargos> {
         inicio: _combinar(_inicio),
         fin: _combinar(_fin),
         idsEstudiantes: _destinatarios(alumnos),
+        idAula: _destino == _Destino.aula ? _idAula : null,
         creadaPor: widget.cuenta.id,
       );
       avisos.showSnackBar(

@@ -31,9 +31,13 @@ abstract final class Permisos {
     if (cuenta == null) return false;
     return switch (cuenta.rol) {
       Rol.administrador => true,
-      Rol.tutor => aulas.any(
-        (aula) => aula.id == estudiante.idAula && aula.idTutor == cuenta.id,
-      ),
+      // Es su tutor (del centro o familiar) o el responsable de su aula.
+      Rol.tutor =>
+        estudiante.tutores.contains(cuenta.id) ||
+            aulas.any(
+              (aula) =>
+                  aula.id == estudiante.idAula && aula.idTutor == cuenta.id,
+            ),
       Rol.estudiante => cuenta.id == estudiante.id,
     };
   }

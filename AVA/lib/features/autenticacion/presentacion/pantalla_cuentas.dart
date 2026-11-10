@@ -98,8 +98,7 @@ class _PantallaCuentasState extends State<PantallaCuentas> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 subtitle: Text(
-                  'Usuario: ${cuenta.id}'
-                  '${cuenta.email == null ? '' : ' · ${cuenta.email}'}',
+                  cuenta.email ?? 'Usuario: ${cuenta.usuario ?? cuenta.id}',
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -145,11 +144,14 @@ class _FormularioCuenta extends StatefulWidget {
 
 class _FormularioCuentaState extends State<_FormularioCuenta> {
   final _formulario = GlobalKey<FormState>();
-  late final _usuario = TextEditingController(text: widget.cuenta?.id);
+  late final _usuario = TextEditingController(
+    text: widget.cuenta?.usuario ?? widget.cuenta?.id,
+  );
   late final _nombre = TextEditingController(text: widget.cuenta?.nombre);
   late final _email = TextEditingController(text: widget.cuenta?.email);
   final _contrasena = TextEditingController();
   late Rol _rol = widget.cuenta?.rol ?? Rol.tutor;
+  late bool _esFamiliar = widget.cuenta?.esFamiliar ?? false;
   String? _idAula;
   ClaveAcceso? _claveEstudiante;
   String? _error;
@@ -195,23 +197,28 @@ class _FormularioCuentaState extends State<_FormularioCuenta> {
       _guardando = true;
       _error = null;
     });
+    final esEstudiante = _rol == Rol.estudiante;
+    final usuario = _usuario.text.trim().toLowerCase();
     final cuenta = Cuenta(
-      id: _usuario.text.trim(),
+      // En las cuentas nuevas de tutores y administración el identificador
+      // lo asigna el repositorio (en Firebase, el uid).
+      id: widget.cuenta?.id ?? (esEstudiante ? usuario : ''),
       nombre: _nombre.text.trim(),
       rol: _rol,
-      email: _email.text.trim().isEmpty ? null : _email.text.trim(),
+      email: esEstudiante || _email.text.trim().isEmpty
+          ? null
+          : _email.text.trim(),
+      usuario: esEstudiante ? usuario : null,
+      esFamiliar: _rol == Rol.tutor && _esFamiliar,
     );
 
-    String? error;
-    if (_esNueva) {
-      error = await widget.controlador.crear(
-        cuenta: cuenta,
-        clave: clave!,
-        idAula: _idAula,
-      );
-    } else {
-      await widget.controlador.actualizar(cuenta, nuevaClave: clave);
-    }
+    final error = _esNueva
+        ? await widget.controlador.crear(
+            cuenta: cuenta,
+            clave: clave!,
+            idAula: _idAula,
+          )
+        : await widget.controlador.actualizar(cuenta, nuevaClave: clave);
     if (!mounted) return;
     setState(() {
       _guardando = false;
@@ -262,41 +269,66 @@ class _FormularioCuentaState extends State<_FormularioCuenta> {
                     selected: {_rol},
                     onSelectionChanged: (s) => setState(() => _rol = s.first),
                   ),
-                  const TituloSeccion('Datos'),
-                  TextFormField(
-                    controller: _usuario,
-                    enabled: _esNueva,
-                    decoration: const InputDecoration(
-                      labelText: 'Usuario (no se puede cambiar después)',
+                  if (_rol == Rol.tutor) ...[
+                    const SizedBox(height: Dimensiones.espaciado),
+                    SegmentedButton<bool>(
+                      segments: const [
+                        ButtonSegment(
+                          value: false,
+                          label: Text('Tutor del centro'),
+                        ),
+                        ButtonSegment(value: true, label: Text('Familiar')),
+                      ],
+                      selected: {_esFamiliar},
+                      onSelectionChanged: (s) =>
+                          setState(() => _esFamiliar = s.first),
                     ),
-                    validator: c.validarUsuario,
-                  ),
-                  const SizedBox(height: Dimensiones.espaciado),
+                  ],
+                  const TituloSeccion('Datos'),
                   TextFormField(
                     controller: _nombre,
                     decoration: const InputDecoration(labelText: 'Nombre'),
                     validator: c.validarNombre,
                   ),
-                  if (_rol != Rol.estudiante) ...[
+                  if (_rol == Rol.estudiante) ...[
+                    const SizedBox(height: Dimensiones.espaciado),
+                    TextFormField(
+                      controller: _usuario,
+                      enabled: _esNueva,
+                      decoration: const InputDecoration(
+                        labelText: 'Usuario (no se puede cambiar después)',
+                        helperText:
+                            'El alumno no lo escribe: sirve para '
+                            'crear su cuenta.',
+                      ),
+                      validator: c.validarUsuario,
+                    ),
+                  ] else ...[
                     const SizedBox(height: Dimensiones.espaciado),
                     TextFormField(
                       controller: _email,
+                      enabled: _esNueva,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Correo'),
+                      decoration: const InputDecoration(
+                        labelText: 'Correo (con él se entra en AVA)',
+                      ),
                       validator: (v) => c.validarEmail(v, rol: _rol),
                     ),
-                    const SizedBox(height: Dimensiones.espaciado),
-                    TextFormField(
-                      controller: _contrasena,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        labelText: _esNueva
-                            ? 'Contraseña'
-                            : 'Contraseña nueva (vacía para no cambiarla)',
+                    if (_esNueva) ...[
+                      const SizedBox(height: Dimensiones.espaciado),
+                      TextFormField(
+                        controller: _contrasena,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Contraseña inicial',
+                          helperText:
+                              'Después, cada persona puede cambiarla '
+                              'con «¿Has olvidado la contraseña?».',
+                        ),
+                        validator: (v) =>
+                            c.validarContrasena(v, obligatoria: true),
                       ),
-                      validator: (v) =>
-                          c.validarContrasena(v, obligatoria: _esNueva),
-                    ),
+                    ],
                   ],
                   if (_rol == Rol.estudiante && _esNueva) ...[
                     const TituloSeccion('Aula'),

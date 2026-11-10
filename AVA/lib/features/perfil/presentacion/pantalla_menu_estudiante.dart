@@ -27,7 +27,7 @@ class PantallaMenuEstudiante extends StatelessWidget {
       pictograma: Pictogramas.salir,
       textoConfirmar: 'Sí, salir',
     );
-    if (confirmado && context.mounted) cerrarSesion(context);
+    if (confirmado && context.mounted) await cerrarSesion(context);
   }
 
   @override

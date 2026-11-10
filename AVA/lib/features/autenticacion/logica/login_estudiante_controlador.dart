@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/utilidades/controlador_carga.dart';
 import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/clave_acceso.dart';
 import '../dominio/metodo_acceso.dart';
@@ -23,18 +24,40 @@ class LoginEstudianteControlador extends ChangeNotifier {
   String _digitos = '';
   bool _comprobando = false;
   String? _mensajeError;
+  Estudiante? _perfil;
 
   bool get comprobando => _comprobando;
   String? get mensajeError => _mensajeError;
   List<PictogramaClave> get pictogramas => List.unmodifiable(_pictogramas);
   String get digitos => _digitos;
 
-  /// Número de huecos de la clave (0 si usa contraseña).
+  /// Perfil completo del estudiante una vez que ha entrado.
+  Estudiante? get perfil => _perfil;
+
+  /// Número de huecos de la clave (0 si usa contraseña). Si no se sabe
+  /// cuántos pictogramas tiene, se muestran los huecos que se van llenando
+  /// hasta el máximo.
   int get longitudClave => switch (estudiante.metodoAcceso) {
-    AccesoConPictogramas(:final longitudClave) => longitudClave,
+    AccesoConPictogramas(:final longitudClave) =>
+      longitudClave ??
+          (_pictogramas.length + 1).clamp(
+            AccesoConPictogramas.longitudMinima,
+            AccesoConPictogramas.longitudMaxima,
+          ),
     AccesoConPin() => AccesoConPin.longitud,
     AccesoConContrasena() => 0,
   };
+
+  /// La longitud de la clave de pictogramas no se conoce: el estudiante
+  /// tiene que pulsar «Entrar» al terminar.
+  bool get necesitaConfirmar => switch (estudiante.metodoAcceso) {
+    AccesoConPictogramas(:final longitudClave) => longitudClave == null,
+    _ => false,
+  };
+
+  bool get puedeConfirmar =>
+      !_comprobando &&
+      _pictogramas.length >= AccesoConPictogramas.longitudMinima;
 
   Future<bool> comprobarContrasena(String contrasena) async {
     if (contrasena.isEmpty) {
@@ -45,18 +68,27 @@ class LoginEstudianteControlador extends ChangeNotifier {
     return _comprobar(ClaveContrasena(contrasena));
   }
 
-  /// Añade un pictograma. Al rellenar todos los huecos se comprueba la clave
-  /// automáticamente; si no es correcta, los huecos se vacían.
+  /// Añade un pictograma. Si se sabe cuántos tiene la clave, al rellenar el
+  /// último hueco se comprueba automáticamente; si no es correcta, los
+  /// huecos se vacían.
   ///
   /// Devuelve `true` solo cuando la clave completa es correcta.
   Future<bool> anadirPictograma(PictogramaClave pictograma) async {
-    if (_comprobando || _pictogramas.length >= longitudClave) return false;
+    final maximo = necesitaConfirmar
+        ? AccesoConPictogramas.longitudMaxima
+        : longitudClave;
+    if (_comprobando || _pictogramas.length >= maximo) return false;
 
     _pictogramas.add(pictograma);
     _mensajeError = null;
     notifyListeners();
 
-    if (_pictogramas.length < longitudClave) return false;
+    if (necesitaConfirmar || _pictogramas.length < longitudClave) return false;
+    return confirmarPictogramas();
+  }
+
+  /// Comprueba los pictogramas pulsados.
+  Future<bool> confirmarPictogramas() async {
     final correcto = await _comprobar(ClavePictogramas(List.of(_pictogramas)));
     if (!correcto) {
       _pictogramas.clear();
@@ -100,12 +132,15 @@ class LoginEstudianteControlador extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final correcto = await _repositorio.validarEstudiante(
-        idEstudiante: estudiante.id,
+      _perfil = await _repositorio.entrarEstudiante(
+        estudiante: estudiante,
         clave: clave,
       );
-      if (!correcto) _mensajeError = mensajeIncorrecto;
-      return correcto;
+      if (_perfil == null) _mensajeError = mensajeIncorrecto;
+      return _perfil != null;
+    } on ErrorConMensaje catch (error) {
+      _mensajeError = error.mensaje;
+      return false;
     } on Exception {
       _mensajeError = 'No se ha podido comprobar. Prueba otra vez.';
       return false;

@@ -1,19 +1,19 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../app/rutas.dart';
 import '../../../perfil/logica/preferencias_controlador.dart';
+import '../../dominio/repositorio_autenticacion.dart';
 import '../../logica/sesion_controlador.dart';
 
-/// Cierra la sesión, devuelve el aspecto por defecto y vuelve al inicio.
-void cerrarSesion(BuildContext context) {
+/// Cierra la sesión, devuelve el aspecto por defecto y vuelve al inicio con
+/// el dispositivo listo para el siguiente alumno.
+Future<void> cerrarSesion(BuildContext context) async {
+  final navegador = Navigator.of(context);
   context.read<SesionControlador>().cerrarSesion();
   context.read<PreferenciasControlador>().restablecer();
-  unawaited(
-    Navigator.pushNamedAndRemoveUntil(context, Rutas.inicio, (_) => false),
-  );
+  await context.read<RepositorioAutenticacion>().cerrarSesion();
+  await navegador.pushNamedAndRemoveUntil(Rutas.inicio, (_) => false);
 }
 
 /// Botón para la barra superior de las pantallas de gestión.

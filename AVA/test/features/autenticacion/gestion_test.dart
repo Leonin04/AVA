@@ -119,12 +119,17 @@ void main() {
 
         final perfil = await estudiantes.obtener('nuevo');
         expect(perfil?.idAula, '2A');
+        final conectado = await autenticacion.entrarEstudiante(
+          estudiante: perfil!,
+          clave: const ClavePin('5678'),
+        );
+        expect(conectado?.nombre, 'Nuevo');
         expect(
-          await autenticacion.validarEstudiante(
-            idEstudiante: 'nuevo',
-            clave: const ClavePin('5678'),
+          await autenticacion.entrarEstudiante(
+            estudiante: perfil,
+            clave: const ClavePin('0000'),
           ),
-          isTrue,
+          isNull,
         );
       },
     );

@@ -1,0 +1,53 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "estudiantes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "tutores", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "estudiantes",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aulaId", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "acceso",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aulaId", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tareas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "estudiantes", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "horaInicio", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tareas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "aulaId", "order": "ASCENDING" },
+        { "fieldPath": "horaInicio", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "tareas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "creadaPor", "order": "ASCENDING" },
+        { "fieldPath": "nombre", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

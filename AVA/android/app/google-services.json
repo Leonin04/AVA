@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1087325866675",
+    "project_id": "proyecto-ava-54b58",
+    "storage_bucket": "proyecto-ava-54b58.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087325866675:android:5ddcbbf898838f40973ec6",
+        "android_client_info": {
+          "package_name": "com.ava.ava"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC95oW9xJi1xqRZpzgjWXWcFKionIDktb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

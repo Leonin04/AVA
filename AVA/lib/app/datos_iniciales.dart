@@ -22,7 +22,7 @@ import '../features/perfil/dominio/repositorio_estudiantes_simulado.dart';
 ///   `tutor1234`.
 /// - Estudiantes con contraseña o con número (PIN): `1234`.
 /// - Estudiantes con pictogramas: los N primeros pictogramas en orden
-///   (sol, manzana, mariposa, flor, coche, perro), siendo N la longitud de
+///   (sol, casa, perro, coche, flor, pelota), siendo N la longitud de
 ///   su clave.
 void cargarDatosIniciales(AlmacenSimulado almacen) {
   void cuenta(Cuenta cuenta, ClaveAcceso clave) {
@@ -256,7 +256,7 @@ void cargarDatosIniciales(AlmacenSimulado almacen) {
       AccesoConContrasena() => const ClaveContrasena('1234'),
       AccesoConPin() => const ClavePin('1234'),
       AccesoConPictogramas(:final longitudClave) => ClavePictogramas(
-        PictogramaClave.values.take(longitudClave).toList(),
+        PictogramaClave.values.take(longitudClave ?? 3).toList(),
       ),
     };
     cuenta(Cuenta(id: id, nombre: nombre, rol: Rol.estudiante), clave);

@@ -50,7 +50,7 @@ Future<void> pulsar(WidgetTester tester, String texto) async {
 Future<void> entrarComoDiego(WidgetTester tester) async {
   await pulsar(tester, '1ºA');
   await pulsar(tester, 'Diego');
-  for (final pictograma in ['Sol', 'Manzana', 'Mariposa', 'Flor']) {
+  for (final pictograma in ['Sol', 'Casa', 'Perro', 'Coche']) {
     await pulsar(tester, pictograma);
   }
 }

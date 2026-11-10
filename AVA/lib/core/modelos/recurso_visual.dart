@@ -14,6 +14,25 @@ sealed class RecursoVisual {
       _ => null,
     };
   }
+
+  static final _urlArasaac = RegExp(r'arasaac\.org/pictograms/(\d+)/');
+
+  /// Recurso a partir de la dirección guardada en la base de datos
+  /// (`fotoUrl`, `pictogramaUrl`): si es de ARASAAC se reconoce su número.
+  static RecursoVisual? desdeUrl(String? url) {
+    if (url == null || url.isEmpty) return null;
+    final arasaac = _urlArasaac.firstMatch(url);
+    return arasaac == null
+        ? FotoPropia(url)
+        : PictogramaArasaac(int.parse(arasaac.group(1)!));
+  }
+
+  /// Dirección que se guarda en la base de datos.
+  String get url => switch (this) {
+    PictogramaArasaac(:final id) =>
+      'https://static.arasaac.org/pictograms/$id/${id}_300.png',
+    FotoPropia(:final url) => url,
+  };
 }
 
 /// Pictograma de ARASAAC identificado por su número.
@@ -38,6 +57,7 @@ final class PictogramaArasaac extends RecursoVisual {
 final class FotoPropia extends RecursoVisual {
   const FotoPropia(this.url);
 
+  @override
   final String url;
 
   @override

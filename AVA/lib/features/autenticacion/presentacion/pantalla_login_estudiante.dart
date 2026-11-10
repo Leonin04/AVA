@@ -54,10 +54,11 @@ class _PantallaLoginEstudianteState extends State<PantallaLoginEstudiante> {
   void _acceder() {
     if (!mounted) return;
 
-    context.read<SesionControlador>().iniciarComoEstudiante(widget.estudiante);
-    context.read<PreferenciasControlador>().aplicarDeEstudiante(
-      widget.estudiante,
-    );
+    // Perfil completo (con sus preferencias), que solo se puede leer una
+    // vez iniciada la sesión.
+    final perfil = _controlador.perfil ?? widget.estudiante;
+    context.read<SesionControlador>().iniciarComoEstudiante(perfil);
+    context.read<PreferenciasControlador>().aplicarDeEstudiante(perfil);
     unawaited(
       Navigator.pushNamedAndRemoveUntil(
         context,

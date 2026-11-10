@@ -24,6 +24,10 @@ class TecladoPictogramas extends StatelessWidget {
     if (await controlador.anadirPictograma(pictograma)) alAcceder();
   }
 
+  Future<void> _confirmar() async {
+    if (await controlador.confirmarPictogramas()) alAcceder();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -51,15 +55,36 @@ class TecladoPictogramas extends StatelessWidget {
             const SizedBox(height: Dimensiones.espaciado),
             SizedBox(
               height: Dimensiones.altoBarraNavegacion,
-              child: BotonAccesible(
-                texto: 'Borrar el último',
-                pictograma: Pictogramas.borrar,
-                icono: Icons.backspace_rounded,
-                color: ColorPastel.rosa,
-                disposicion: DisposicionBoton.horizontal,
-                alPulsar: bloqueado || controlador.pictogramas.isEmpty
-                    ? null
-                    : controlador.borrarUltimo,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: BotonAccesible(
+                      texto: 'Borrar el último',
+                      pictograma: Pictogramas.borrar,
+                      icono: Icons.backspace_rounded,
+                      color: ColorPastel.rosa,
+                      disposicion: DisposicionBoton.horizontal,
+                      alPulsar: bloqueado || controlador.pictogramas.isEmpty
+                          ? null
+                          : controlador.borrarUltimo,
+                    ),
+                  ),
+                  if (controlador.necesitaConfirmar) ...[
+                    const SizedBox(width: Dimensiones.espaciado),
+                    Expanded(
+                      child: BotonAccesible(
+                        texto: 'Entrar',
+                        pictograma: Pictogramas.entrar,
+                        icono: Icons.login_rounded,
+                        color: ColorPastel.menta,
+                        disposicion: DisposicionBoton.horizontal,
+                        alPulsar: controlador.puedeConfirmar
+                            ? _confirmar
+                            : null,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ],

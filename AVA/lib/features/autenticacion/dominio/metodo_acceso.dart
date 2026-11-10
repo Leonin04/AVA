@@ -14,8 +14,7 @@ sealed class MetodoAcceso {
     return switch (datos['tipo']) {
       'pin' => const AccesoConPin(),
       'pictogramas' => AccesoConPictogramas(
-        longitudClave:
-            datos['longitud'] as int? ?? AccesoConPictogramas.longitudMinima,
+        longitudClave: datos['longitud'] as int?,
       ),
       _ => const AccesoConContrasena(),
     };
@@ -48,16 +47,20 @@ final class AccesoConPin extends MetodoAcceso {
 
 /// El estudiante pulsa una secuencia de pictogramas.
 final class AccesoConPictogramas extends MetodoAcceso {
-  const AccesoConPictogramas({required this.longitudClave})
+  const AccesoConPictogramas({this.longitudClave})
     : assert(
-        longitudClave >= longitudMinima && longitudClave <= longitudMaxima,
+        longitudClave == null ||
+            (longitudClave >= longitudMinima &&
+                longitudClave <= longitudMaxima),
       );
 
   static const int longitudMinima = 3;
   static const int longitudMaxima = 6;
 
-  /// Número de pictogramas que forman la clave (entre 3 y 6).
-  final int longitudClave;
+  /// Número de pictogramas que forman la clave (entre 3 y 6), o `null` si
+  /// no se conoce. Si se conoce, la clave se comprueba sola al rellenar el
+  /// último hueco; si no, el estudiante pulsa «Entrar».
+  final int? longitudClave;
 
   @override
   String get nombre => 'Pictogramas';

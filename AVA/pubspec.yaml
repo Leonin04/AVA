@@ -18,24 +18,18 @@ dependencies:
   flutter_bloc: ^8.1.3
 
   # Backend Firebase (Sección 1.3 DGP0 y 1.5 MDA0)
-  # Desactivado hasta conectar la base de datos: estas versiones no compilan
-  # con el SDK de Flutter actual. Al conectar Firebase, añadir las versiones
-  # vigentes con `flutter pub add firebase_core firebase_auth cloud_firestore
-  # firebase_storage firebase_messaging` y `flutterfire configure`.
-  # firebase_core: ^2.24.2
-  # firebase_auth: ^4.16.0
-  # cloud_firestore: ^4.14.0
-  # firebase_storage: ^11.6.0
-  # firebase_messaging: ^14.7.10
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  cloud_firestore: ^7.1.0
+  firebase_storage: ^14.0.1
+  firebase_messaging: ^17.0.1
 
   # Conexión HTTP para API de ARASAAC (RF-13)
-  http: ^1.2.0
+  http: ^1.6.0
 
   # Accesibilidad, multimedia y refuerzos sonoros (Persona Álex / Carlos)
-  # Desactivados hasta que se usen (temporizadores y avisos, Iteración 2),
-  # por el mismo motivo que Firebase.
-  # audioplayers: ^5.2.1
-  # flutter_local_notifications: ^17.0.0
+  audioplayers: ^5.2.1
+  flutter_local_notifications: ^17.0.0
   shared_preferences: ^2.2.2
 
   # Lectura en voz alta (RF-08, persona Álex) y fotografías propias (RF-13)

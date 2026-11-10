@@ -123,7 +123,7 @@ void main() {
       await arrancarApp(tester);
       await pulsar(tester, '1ºA');
       await pulsar(tester, 'Lucía');
-      for (final pictograma in ['Sol', 'Manzana', 'Mariposa']) {
+      for (final pictograma in ['Sol', 'Casa', 'Perro']) {
         await pulsar(tester, pictograma);
       }
       await pulsar(tester, 'Mi perfil');
@@ -149,7 +149,7 @@ void main() {
       await pulsar(tester, 'Diego');
       expect(find.byType(Scrollable), findsNothing, reason: 'Login');
 
-      for (final pictograma in ['Sol', 'Manzana', 'Mariposa', 'Flor']) {
+      for (final pictograma in ['Sol', 'Casa', 'Perro', 'Coche']) {
         await pulsar(tester, pictograma);
       }
       expect(find.byType(Scrollable), findsNothing, reason: 'Menú');
@@ -184,7 +184,7 @@ void main() {
       await arrancarApp(tester);
       await pulsar(tester, '2ºB');
       await pulsar(tester, 'Samuel');
-      for (final pictograma in ['Sol', 'Manzana', 'Mariposa']) {
+      for (final pictograma in ['Sol', 'Casa', 'Perro']) {
         await pulsar(tester, pictograma);
       }
       // Cualquier desbordamiento haría fallar la prueba.
@@ -215,7 +215,7 @@ void main() {
       await comprobar();
       await pulsar(tester, 'Diego');
       await comprobar();
-      for (final pictograma in ['Sol', 'Manzana', 'Mariposa', 'Flor']) {
+      for (final pictograma in ['Sol', 'Casa', 'Perro', 'Coche']) {
         await pulsar(tester, pictograma);
       }
       await comprobar();
@@ -256,7 +256,7 @@ void main() {
       await arrancarApp(tester);
       await entrarComoGestion(tester, 'javier', 'mal');
       expect(
-        find.text('El usuario o la contraseña no son correctos.'),
+        find.text('El correo o la contraseña no son correctos.'),
         findsOneWidget,
       );
     });

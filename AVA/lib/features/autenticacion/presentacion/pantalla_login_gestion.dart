@@ -94,10 +94,10 @@ class _PantallaLoginGestionState extends State<PantallaLoginGestion> {
                           controller: _usuario,
                           enabled: !_controlador.comprobando,
                           textInputAction: TextInputAction.next,
-                          autofillHints: const [AutofillHints.username],
+                          autofillHints: const [AutofillHints.email],
                           decoration: const InputDecoration(
-                            labelText: 'Usuario',
-                            prefixIcon: Icon(Icons.person_outline_rounded),
+                            labelText: 'Correo',
+                            prefixIcon: Icon(Icons.mail_outline_rounded),
                           ),
                           validator: _controlador.validarUsuario,
                         ),

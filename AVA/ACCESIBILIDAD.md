@@ -16,10 +16,17 @@ comprobado con pruebas automáticas (`flutter test`).
 
 ## Decisiones de diseño para el alumnado
 
-- **Sin desplazamiento.** Ninguna pantalla del alumno tiene scroll: el
-  contenido se adapta al espacio y, si no cabe, se reparte en páginas con
-  botones grandes «Anterior» y «Siguiente» (`CuadriculaPaginada`). Hay una
+- **Todo a la vista, sin desplazamiento ni páginas.** Ninguna pantalla del
+  alumno tiene scroll ni botones de pasar página: todos los elementos se
+  reparten el espacio y, si hay muchos, se hacen más pequeños
+  (`CuadriculaAjustada`). Los botones «Anterior» y «Siguiente» solo
+  aparecen en los pasos de una tarea, para verlos de uno en uno. Hay una
   prueba que lo comprueba en todo el recorrido, también con letra muy grande.
+- **Color elegido visible.** El color que elige el alumno en su perfil tiñe
+  el fondo de toda la app, manteniendo el contraste del texto por encima de
+  7:1.
+- **Voz.** «Escuchar» usa la voz del navegador o de la tableta; si el
+  dispositivo no tiene ninguna instalada, lo dice en pantalla.
 - **Colores pastel diferenciables.** Ocho familias de color repartidas por el
   círculo cromático (`core/constantes/paleta.dart`). El texto siempre va en
   tinta oscura sobre pastel. Cada clase, alumno, tipo de tarea y día de la

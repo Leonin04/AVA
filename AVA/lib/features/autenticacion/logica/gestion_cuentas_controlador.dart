@@ -1,8 +1,6 @@
-import '../../../core/constantes/paleta.dart';
 import '../../../core/utilidades/controlador_carga.dart';
 import '../../aulas/dominio/ficha_aula.dart';
 import '../../aulas/dominio/repositorio_aulas.dart';
-import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/clave_acceso.dart';
 import '../dominio/cuenta.dart';
@@ -24,7 +22,8 @@ class GestionCuentasControlador extends ControladorCarga<List<Cuenta>> {
 
   static final _formatoUsuario = RegExp(r'^[a-z0-9._-]{3,}$');
   static final _formatoEmail = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-  static const longitudMinimaContrasena = 8;
+  // Firebase Authentication exige al menos 6 caracteres.
+  static const longitudMinimaContrasena = 6;
 
   final RepositorioCuentas _cuentas;
   final RepositorioAutenticacion _autenticacion;
@@ -71,7 +70,7 @@ class GestionCuentasControlador extends ControladorCarga<List<Cuenta>> {
         : null;
   }
 
-  /// Crea una cuenta con su clave. Si es de estudiante crea también su
+  /// Crea una cuenta con su clave. Si es de estudiante se crea también su
   /// perfil en [idAula]. Devuelve un mensaje de error o `null` si todo va
   /// bien.
   Future<String?> crear({
@@ -80,46 +79,39 @@ class GestionCuentasControlador extends ControladorCarga<List<Cuenta>> {
     String? idAula,
   }) async {
     try {
-      await _cuentas.crear(cuenta);
+      await _cuentas.crear(cuenta, clave, idAula: idAula);
     } on CuentaDuplicada catch (error) {
       return error.toString();
-    }
-
-    await _autenticacion.guardarClave(cuenta.id, clave);
-    if (cuenta.rol == Rol.estudiante) {
-      final total = (await _estudiantes.listar()).length;
-      await _estudiantes.guardar(
-        Estudiante(
-          id: cuenta.id,
-          nombre: cuenta.nombre,
-          idAula: idAula,
-          metodoAcceso: clave.metodo,
-          color: ColorPastel.paraIndice(total),
-        ),
-      );
+    } on ErrorConMensaje catch (error) {
+      return error.mensaje;
     }
     await cargar();
     return null;
   }
 
   /// Actualiza nombre, rol y correo. Si [nuevaClave] no es `null`, cambia
-  /// también la clave.
-  Future<void> actualizar(Cuenta cuenta, {ClaveAcceso? nuevaClave}) async {
-    await _cuentas.actualizar(cuenta);
-    if (nuevaClave != null) {
-      await _autenticacion.guardarClave(cuenta.id, nuevaClave);
-    }
-    if (cuenta.rol == Rol.estudiante) {
-      final perfil = await _estudiantes.obtener(cuenta.id);
-      if (perfil != null) {
-        await _estudiantes.guardar(
-          perfil.copyWith(
-            nombre: cuenta.nombre,
-            metodoAcceso: nuevaClave?.metodo,
-          ),
-        );
+  /// también la clave. Devuelve un mensaje de error o `null`.
+  Future<String?> actualizar(Cuenta cuenta, {ClaveAcceso? nuevaClave}) async {
+    try {
+      await _cuentas.actualizar(cuenta);
+      if (nuevaClave != null) {
+        await _autenticacion.guardarClave(cuenta.id, nuevaClave);
       }
+      if (cuenta.rol == Rol.estudiante) {
+        final perfil = await _estudiantes.obtener(cuenta.id);
+        if (perfil != null) {
+          await _estudiantes.guardar(
+            perfil.copyWith(
+              nombre: cuenta.nombre,
+              metodoAcceso: nuevaClave?.metodo,
+            ),
+          );
+        }
+      }
+    } on ErrorConMensaje catch (error) {
+      return error.mensaje;
     }
     await cargar();
+    return null;
   }
 }

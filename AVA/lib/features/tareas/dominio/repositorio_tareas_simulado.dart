@@ -48,6 +48,31 @@ class RepositorioTareasSimulado implements RepositorioTareas {
   }
 
   @override
+  Future<void> crearEncargo(
+    Tarea plantilla, {
+    required Set<String> idsEstudiantes,
+    String? idAula,
+  }) async {
+    // Aquí no hay consultas por aula: se crea una copia para cada alumno.
+    for (final idEstudiante in idsEstudiantes) {
+      final copia = Tarea(
+        id: nuevoId('tarea'),
+        idEstudiante: idEstudiante,
+        titulo: plantilla.titulo,
+        descripcion: plantilla.descripcion,
+        pasos: plantilla.pasos,
+        inicio: plantilla.inicio,
+        fin: plantilla.fin,
+        tipo: plantilla.tipo,
+        pictograma: plantilla.pictograma,
+        creadaPor: plantilla.creadaPor,
+        idEncargo: plantilla.id,
+      );
+      _almacen.guardar(coleccion, copia.id, copia.toMap());
+    }
+  }
+
+  @override
   Future<void> eliminar(String idTarea) async {
     _almacen.eliminar(coleccion, idTarea);
   }

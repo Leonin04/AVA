@@ -24,8 +24,8 @@ void main() {
 
       expect(login.longitudClave, 3);
       expect(await login.anadirPictograma(PictogramaClave.sol), isFalse);
-      expect(await login.anadirPictograma(PictogramaClave.manzana), isFalse);
-      expect(await login.anadirPictograma(PictogramaClave.mariposa), isTrue);
+      expect(await login.anadirPictograma(PictogramaClave.casa), isFalse);
+      expect(await login.anadirPictograma(PictogramaClave.perro), isTrue);
       expect(login.mensajeError, isNull);
     });
 

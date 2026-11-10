@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../../core/utilidades/controlador_carga.dart';
 import '../dominio/cuenta.dart';
 import '../dominio/repositorio_autenticacion.dart';
 
@@ -16,7 +17,7 @@ class LoginGestionControlador extends ChangeNotifier {
   String? get mensajeError => _mensajeError;
 
   String? validarUsuario(String? valor) =>
-      (valor == null || valor.trim().isEmpty) ? 'Escribe tu usuario.' : null;
+      (valor == null || valor.trim().isEmpty) ? 'Escribe tu correo.' : null;
 
   String? validarContrasena(String? valor) =>
       (valor == null || valor.isEmpty) ? 'Escribe tu contraseña.' : null;
@@ -38,9 +39,12 @@ class LoginGestionControlador extends ChangeNotifier {
         contrasena: contrasena,
       );
       if (cuenta == null) {
-        _mensajeError = 'El usuario o la contraseña no son correctos.';
+        _mensajeError = 'El correo o la contraseña no son correctos.';
       }
       return cuenta;
+    } on ErrorConMensaje catch (error) {
+      _mensajeError = error.mensaje;
+      return null;
     } on Exception {
       _mensajeError = 'No se ha podido comprobar. Inténtalo de nuevo.';
       return null;

@@ -1,9 +1,15 @@
+import '../../../core/constantes/paleta.dart';
 import '../../../core/servicios/almacen_simulado.dart';
 import '../../../core/utilidades/orden_alfabetico.dart';
+import '../../perfil/dominio/perfil_estudiante.dart';
+import '../../perfil/dominio/repositorio_estudiantes_simulado.dart';
+import 'clave_acceso.dart';
 import 'cuenta.dart';
+import 'repositorio_autenticacion_simulado.dart';
 import 'repositorio_cuentas.dart';
+import 'rol.dart';
 
-/// Cuentas guardadas en el [AlmacenSimulado].
+/// Cuentas guardadas en el [AlmacenSimulado], para las pruebas automáticas.
 class RepositorioCuentasSimulado implements RepositorioCuentas {
   RepositorioCuentasSimulado(this._almacen);
 
@@ -24,9 +30,50 @@ class RepositorioCuentasSimulado implements RepositorioCuentas {
   }
 
   @override
-  Future<void> crear(Cuenta cuenta) async {
-    if (_almacen.existe(coleccion, cuenta.id)) throw CuentaDuplicada(cuenta.id);
-    _almacen.guardar(coleccion, cuenta.id, cuenta.toMap());
+  Future<String> crear(
+    Cuenta cuenta,
+    ClaveAcceso clave, {
+    String? idAula,
+  }) async {
+    final email = cuenta.email?.trim().toLowerCase();
+    final id = cuenta.id.isNotEmpty
+        ? cuenta.id
+        : (cuenta.usuario ?? email?.split('@').first ?? '');
+    final correoRepetido =
+        email != null &&
+        _almacen
+            .listar(
+              coleccion,
+              donde: (d) => (d['email'] as String?)?.toLowerCase() == email,
+            )
+            .isNotEmpty;
+    if (id.isEmpty || _almacen.existe(coleccion, id) || correoRepetido) {
+      throw CuentaDuplicada(email ?? id);
+    }
+
+    _almacen.guardar(coleccion, id, {...cuenta.toMap(), 'usuario': id});
+    _almacen.guardar(
+      RepositorioAutenticacionSimulado.coleccion,
+      id,
+      clave.toMap(),
+    );
+
+    if (cuenta.rol == Rol.estudiante) {
+      final total = _almacen.listar(RepositorioEstudiantesSimulado.coleccion);
+      _almacen.guardar(
+        RepositorioEstudiantesSimulado.coleccion,
+        id,
+        Estudiante(
+          id: id,
+          nombre: cuenta.nombre,
+          usuario: id,
+          idAula: idAula,
+          metodoAcceso: clave.metodo,
+          color: ColorPastel.paraIndice(total.length),
+        ).toMap(),
+      );
+    }
+    return id;
   }
 
   @override
