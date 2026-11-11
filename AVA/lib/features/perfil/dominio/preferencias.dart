@@ -62,7 +62,7 @@ enum EsquemaColores { alto_contraste, claro, oscuro }
 
 enum Posicion { arriba, abajo, izquierda, derecha }
 
-/// Preferencias visuales del estudiante (RF-09).
+/// Preferencias visuales del estudiante (HU-15).
 class PreferenciasVisual {
   final EsquemaColores colores;
   final String tipografia;

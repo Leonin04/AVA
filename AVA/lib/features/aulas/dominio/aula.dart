@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Documento `aulas/{aulaId}` (RF-05).
+/// Documento `aulas/{aulaId}` (HU-16).
 class Aula {
   final String id;
   final String nombre;

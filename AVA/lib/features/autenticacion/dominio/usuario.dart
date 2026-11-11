@@ -6,7 +6,7 @@ enum Rol { admin, tutor }
 /// Tipo de tutor (HU-01).
 enum TipoTutor { centro, familiar }
 
-/// Administrador o tutor. Documento `usuarios/{uid}` (RF-01, RF-02).
+/// Administrador o tutor. Documento `usuarios/{uid}` (HU-01 a HU-03).
 class Usuario {
   final String id; // uid de Firebase Authentication
   final String nombre;

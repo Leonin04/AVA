@@ -128,8 +128,13 @@ class BaseDatos {
   }
 
   /// HU-15: preferencias (admin, tutor, o el propio estudiante si está autorizado).
+  /// Solo cambia `comunicacion` y `visual`: el resto de `preferencias` (como
+  /// `ava`, que usa la interfaz) se conserva.
   Future<void> actualizarPreferencias(String estudianteId, Preferencias p) =>
-      _estudiantes.doc(estudianteId).update({'preferencias': p.toMap()});
+      _estudiantes.doc(estudianteId).update({
+        'preferencias.comunicacion': p.comunicacion.toMap(),
+        'preferencias.visual': p.visual.toMap(),
+      });
 
   /// HU-15: el tutor autoriza o no al estudiante a cambiar sus preferencias.
   Future<void> permitirCambiarPreferencias(String estudianteId, bool permitir) =>

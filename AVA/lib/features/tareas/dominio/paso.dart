@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Documento `tareas/{tareaId}/pasos/{pasoId}` (RF-15).
+/// Documento `tareas/{tareaId}/pasos/{pasoId}` (HU-07).
 class Paso {
   final String id;
   final int orden;

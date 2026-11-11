@@ -50,9 +50,8 @@ flutter run -d chrome      # o en el móvil / emulador Android
 
 La conexión con Firebase ya va en el repositorio. **No hay que tocar nada de Firebase.**
 
-Para probar vuestra pantalla sin el login terminado: poned **temporalmente** en `main.dart`
-`home: const PantallaDesarrollo()` (import `dev/pantalla_desarrollo.dart`), entrad como admin
-o tutor y navegad desde ahí. **No subáis ese cambio de `main.dart`.**
+La app completa ya usa estos servicios: para probar, entrad desde la pantalla de inicio con
+las cuentas del punto 1 (botón «Profesorado» para tutores y administración).
 
 ### Las 5 reglas de oro
 
@@ -73,7 +72,7 @@ o tutor y navegad desde ahí. **No subáis ese cambio de `main.dart`.**
 | `base_datos.dart` | **Leer y guardar datos** (estudiantes, aulas, tareas, registros…) |
 | `autenticacion.dart` | **Entrar, salir y crear cuentas** (admin, tutores y alumnos) |
 | `almacenamiento.dart` | **Subir fotos** (perfil del alumno, imágenes de tareas) |
-| `arasaac.dart` | **Buscar pictogramas** de ARASAAC |
+| `servicio_arasaac.dart` | **Buscar pictogramas** de ARASAAC |
 
 ### Modelos (`lib/features/*/dominio/`) — un tipo de dato cada uno
 
@@ -102,7 +101,7 @@ o tutor y navegad desde ahí. **No subáis ese cambio de `main.dart`.**
 
 | Fichero | Qué es |
 |---|---|
-| `pantalla_desarrollo.dart` | Pantalla para probar sin login: entrar, cargar datos de prueba, abrir tareas y agenda |
+| `pantalla_desarrollo.dart` | Entrar como admin y cargar los datos de prueba |
 | `datos_prueba.dart` | Crea los tutores, aulas, alumnos y tareas de prueba |
 
 ---
@@ -120,7 +119,7 @@ o tutor y navegad desde ahí. **No subáis ese cambio de `main.dart`.**
 | HU-18 · Redirigir según el rol (T-18) | `quienSoy()` → `sesion.esAdmin / esTutor / esEstudiante` |
 | HU-09 · Tableta antes del login (T-19) | `prepararTableta()` (sesión anónima) y después `BaseDatos.aulas()` y `alumnosParaAcceso(aulaId)` |
 | HU-09 · Login del alumno (T-21 a T-23) | `entrarEstudiante(acceso, entrada)` — `entrada` es el PIN (`'1234'`), la lista de pictogramas (`['sol','perro','flor']`) o la contraseña |
-| HU-09 · Pictogramas de la clave (T-22) | `Autenticacion.pictogramasClave` (6 palabras; su imagen con `Arasaac().buscar(palabra, maximo: 1)`) |
+| HU-09 · Pictogramas de la clave (T-22) | `Autenticacion.pictogramasClave` (6 palabras; su pictograma está en `Pictogramas` de `core/constantes/pictogramas.dart`) |
 | HU-01 · Crear tutor (T-25) | `crearCuentaPersonal(nombre:, correo:, contrasena:, rol:, tipoTutor:)` |
 | HU-01 · Crear estudiante (T-26, T-31, T-32) | `crearCuentaEstudiante(estudiante, entrada)` |
 | HU-01 · Cuenta duplicada (T-30) | lanza `ErrorAcceso('Ya existe una cuenta…')` |
@@ -138,12 +137,12 @@ El administrador **no pierde su sesión** al crear cuentas.
 | HU-17 · Solo mis alumnos (T-44) | `estudiantesDeTutor(uid)` |
 | HU-19 · Perfil (T-48 a T-53) | `estudiante(id)`, `actualizarPerfil(e.copyWith(...))` |
 | HU-19 · Foto (T-51) | `Almacenamiento().subirFotoEstudiante(id, bytes)` y luego `actualizarPerfil` |
-| HU-15 · Preferencias (T-54 a T-62) | `actualizarPreferencias(id, p.copyWith(...))`, `permitirCambiarPreferencias(id, bool)` |
+| HU-15 · Preferencias (T-54 a T-62) | `actualizarPreferencias(id, p.copyWith(...))` (cambia `comunicacion` y `visual` y conserva el resto, como `preferencias.ava`), `permitirCambiarPreferencias(id, bool)` |
 | T-31 · Método de acceso | `cambiarMetodoLogin(id, metodo)` |
 | HU-04 a HU-08 · Tareas | `tareasDeEstudiante`, `crearTarea`, `actualizarTarea`, `eliminarTarea`, `pasosDe`, `tarea(id)` |
 | HU-08 · Encargo para un aula | `Tarea(aulaId: …)` y `tareasDeAula(aulaId)` |
-| HU-10 · Agenda (T-81 a T-88) | `tareasParaAgenda(estudiante)` (las suyas + las de su aula) y `tareasDelDia(lista, dia)` de `agenda_dia.dart` |
-| HU-11 · Siguiente tarea (T-95) | `siguienteTarea(deHoy, registros)` de `agenda_dia.dart` |
+| HU-10 · Agenda (T-81 a T-88) | `tareasParaAgenda(estudiante)` (las suyas + las de su aula) y `tarea.esParaDia(dia)` |
+| HU-11 · Siguiente tarea (T-95) | `CalculosAgenda` de `features/agenda/logica/calculos_agenda.dart` |
 | HU-12 · Inicio y fin (T-96) | `marcarInicio(estId, tareaId, dia)`, `marcarFin(...)`, `registrosDelDia(estId, dia)` |
 
 Los métodos que devuelven `Stream` se actualizan solos: con un `StreamBuilder`, la pantalla
@@ -171,7 +170,7 @@ try {
 
 ## 5. Cargar datos de prueba (una sola vez, ya hecho)
 
-1. `home: const PantallaDesarrollo()` temporalmente en `main.dart`.
+1. `home: const PantallaDesarrollo()` temporalmente en `main.dart` (import `dev/pantalla_desarrollo.dart`; no subáis ese cambio).
 2. `flutter run -d chrome`, entrar como **admin**.
 3. Pulsar **"Cargar datos de prueba"**. Crea las cuentas de la tabla del punto 1.
 

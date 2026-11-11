@@ -1,6 +1,6 @@
-import '../core/servicios/arasaac.dart';
 import '../core/servicios/autenticacion.dart';
 import '../core/servicios/base_datos.dart';
+import '../core/servicios/servicio_arasaac.dart';
 import '../features/autenticacion/dominio/usuario.dart';
 import '../features/perfil/dominio/estudiante.dart';
 import '../features/perfil/dominio/preferencias.dart';
@@ -16,13 +16,13 @@ import '../features/tareas/dominio/tarea.dart';
 Future<String> cargarDatosPrueba({required String adminUid}) async {
   final bd = BaseDatos();
   final auth = Autenticacion(bd: bd);
-  final arasaac = Arasaac();
+  final arasaac = ServicioArasaac();
 
   Future<String> picto(String palabra) async {
     try {
-      final r = await arasaac.buscar(palabra, maximo: 1);
-      return r.isEmpty ? '' : r.first;
-    } catch (_) {
+      final resultados = await arasaac.buscar(palabra);
+      return resultados.isEmpty ? '' : resultados.first.pictograma.url;
+    } on ErrorArasaac {
       return '';
     }
   }

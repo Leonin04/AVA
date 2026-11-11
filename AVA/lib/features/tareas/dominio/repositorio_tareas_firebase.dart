@@ -74,9 +74,12 @@ class RepositorioTareasFirebase implements RepositorioTareas {
         for (final r in await _bd.registrosDelDia(idEstudiante, dia).first)
           r.tareaId: r.estado,
       };
-      for (final doc in documentos.values) {
-        final base = bd.Tarea.fromDoc(doc);
-        if (!base.esParaDia(dia)) continue;
+      final delDia = [
+        for (final doc in documentos.values)
+          if (bd.Tarea.fromDoc(doc) case final base when base.esParaDia(dia))
+            (doc: doc, base: base),
+      ];
+      for (final (:doc, :base) in delDia) {
         final tarea = Tarea(
           id: '${base.id}$_separador${bd.Tarea.claveFecha(dia)}',
           idEstudiante: idEstudiante,
@@ -200,13 +203,11 @@ class RepositorioTareasFirebase implements RepositorioTareas {
       tarea.inicio.day,
     );
     final idBase = _idBase(idTarea);
-    switch (estado) {
-      case EstadoTarea.enCurso:
-        await _bd.marcarInicio(tarea.idEstudiante, idBase, dia);
-      case EstadoTarea.completada:
-        await _bd.marcarFin(tarea.idEstudiante, idBase, dia);
-      case EstadoTarea.pendiente:
-        break;
+    // Volver a «pendiente» no se registra: solo se guardan inicio y fin.
+    if (estado == EstadoTarea.enCurso) {
+      await _bd.marcarInicio(tarea.idEstudiante, idBase, dia);
+    } else if (estado == EstadoTarea.completada) {
+      await _bd.marcarFin(tarea.idEstudiante, idBase, dia);
     }
     final actualizada = tarea.copyWith(estado: estado);
     _cache[idTarea] = actualizada;

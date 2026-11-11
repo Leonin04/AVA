@@ -19,7 +19,9 @@ AVA/
 │   └── sonidos/                  # Refuerzos sonoros positivos y melodías
 │
 ├── lib/
-│   ├── main.dart                 # Punto de entrada de la aplicación Flutter
+│   ├── main.dart                 # Punto de entrada: arranca Firebase y la app
+│   ├── app/                      # Aplicación, rutas por rol y datos simulados de las pruebas
+│   ├── dev/                      # Solo desarrollo: carga los datos de prueba en Firebase
 │   │
 │   ├── core/                     # Elementos transversales compartidos por todas las features
 │   │   ├── constantes/           # Colores accesibles (WCAG AA), tamaños mínimos táctiles
@@ -56,12 +58,11 @@ AVA/
 │           └── presentacion/     # Vistas de administración de aulas
 │
 ├── test/                         # Pruebas unitarias, de widgets y accesibilidad
-│   ├── features/autenticacion/
-│   ├── features/agenda/
-│   └── features/tareas/
+│   ├── core/
+│   └── features/                 # autenticacion, agenda, perfil y tareas
 │
 ├── analysis_options.yaml         # Reglas de linting y calidad de código (flutter_lints)
-└── pubspec.yaml                  # Configuración de dependencias (Firebase, ARASAAC, Provider/BLoC)
+└── pubspec.yaml                  # Configuración de dependencias (Firebase, ARASAAC, Provider)
 ```
 
 ---
@@ -70,13 +71,15 @@ AVA/
 
 En la **Iteración 1** (comprometida con 37 puntos de historia según el documento MDA0) únicamente abordamos estas 5 funcionalidades:
 
+> Numeración del equipo (la misma de `database/README.md` y de la memoria): es la de `MDA0.md` con «editar cuentas» separada como HU-02, así que a partir de HU-02 cada historia de `MDA0.md` tiene un número más.
+
 | Módulo (`lib/features/`) | Historias de Usuario (Iteración 1) | Requisitos Funcionales (DGP0) | Alcance de la Iteración 1 |
 |---|---|---|---|
-| **`autenticacion/`** | **HU-01, HU-02, HU-08, HU-17** | RF-01, RF-02, RF-03, RF-04, RF-05 | Crear/editar cuentas, roles de acceso, login accesible para el estudiante (PIN/foto/color) y login para tutor/admin. |
-| **`perfil/`** | **HU-14, HU-18** | RF-06 al RF-12 | Configuración del perfil del estudiante, personalización de apoyos (ARASAAC, fotos propias, colores, tipografía). |
-| **`agenda/`** | **HU-09, HU-10, HU-11** | RF-23 al RF-28 | Consulta de agenda diaria o semanal, anticipación visual de la "siguiente tarea" y registro de inicio/fin de actividad. |
-| **`tareas/`** | **HU-03, HU-04, HU-05, HU-06, HU-07** | RF-13 al RF-22 | Crear/modificar tareas personales, horarios, apoyos accesibles (fotos/pictogramas), instrucciones/rutas y encargos del centro. |
-| **`aulas/`** | **HU-15, HU-16** | RF-01, RF-02 | Gestión de aulas, asignación de estudiantes a tutores y restricción de visibilidad a los alumnos asignados. |
+| **`autenticacion/`** | **HU-01, HU-02, HU-03, HU-09, HU-18** | RF-01, RF-02, RF-03, RF-04, RF-05 | Crear/editar cuentas, roles de acceso, login accesible para el estudiante (PIN/foto/color) y login para tutor/admin. |
+| **`perfil/`** | **HU-15, HU-19** | RF-06 al RF-12 | Configuración del perfil del estudiante, personalización de apoyos (ARASAAC, fotos propias, colores, tipografía). |
+| **`agenda/`** | **HU-10, HU-11, HU-12** | RF-23 al RF-28 | Consulta de agenda diaria o semanal, anticipación visual de la "siguiente tarea" y registro de inicio/fin de actividad. |
+| **`tareas/`** | **HU-04, HU-05, HU-06, HU-07, HU-08** | RF-13 al RF-22 | Crear/modificar tareas personales, horarios, apoyos accesibles (fotos/pictogramas), instrucciones/rutas y encargos del centro. |
+| **`aulas/`** | **HU-16, HU-17** | RF-01, RF-02 | Gestión de aulas, asignación de estudiantes a tutores y restricción de visibilidad a los alumnos asignados. |
 
 ---
 
@@ -89,19 +92,19 @@ Gracias al patrón **Feature-First**, el código de cada funcionalidad está com
 ### Plan de incorporación para futuros Sprints:
 
 1. **Iteración 2:**
-   - Crearemos la carpeta `lib/features/comedor/` (HU-22, HU-23, HU-24: registro de comensales, dietas y listado de cocina).
-   - Crearemos la carpeta `lib/features/seguimiento/` (HU-25, HU-26, HU-28: monitorización en tiempo real y alertas para tutores).
-   - Añadiremos los temporizadores visuales y avisos previos ampliando `lib/features/tareas/` (HU-13, HU-19, HU-20, HU-21, HU-27).
+   - Crearemos la carpeta `lib/features/comedor/` (HU-23, HU-24, HU-25: registro de comensales, dietas y listado de cocina).
+   - Crearemos la carpeta `lib/features/seguimiento/` (HU-26, HU-27, HU-29: monitorización en tiempo real y alertas para tutores).
+   - Añadiremos los temporizadores visuales y avisos previos ampliando `lib/features/tareas/` (HU-14, HU-20, HU-21, HU-22, HU-28).
    - *Ventaja:* Como son carpetas nuevas o extensiones de modelos existentes, **ningún mockup o código de la Iteración 1 se rompe**.
 
 2. **Iteración 3:**
-   - Si se aborda la coordinación del hogar o el chat condicionado, simplemente se crearán `lib/features/hogar/` (HU-30, HU-31) y `lib/features/chat/` (HU-29).
+   - Si se aborda la coordinación del hogar o el chat condicionado, simplemente se crearán `lib/features/hogar/` (HU-31, HU-32) y `lib/features/chat/` (HU-30).
 
 ---
 
 ## 🚀 Guía práctica para el equipo en la Iteración 1
 
-1. **Elegir ticket en Jira** correspondiente a la Iteración 1 (por ejemplo: `HU-09: Consultar agenda diaria`).
+1. **Elegir ticket en Jira** correspondiente a la Iteración 1 (por ejemplo: `HU-10: Consultar agenda diaria`).
 2. **Crear rama propia:**
    ```bash
    git checkout develop

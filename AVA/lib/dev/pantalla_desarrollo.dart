@@ -3,15 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../core/servicios/base_datos.dart';
-import '../features/agenda/presentacion/pantalla_agenda_dia.dart';
 import '../features/autenticacion/dominio/usuario.dart';
 import '../features/perfil/dominio/estudiante.dart';
-import '../features/tareas/presentacion/pantalla_tareas_estudiante.dart';
 import 'datos_prueba.dart';
 
-/// PANTALLA SOLO PARA DESARROLLO.
-/// Permite probar Tareas y Agenda mientras no exista el login real:
-/// entra como admin o tutor, elige un estudiante y abre sus tareas o su agenda.
+/// PANTALLA SOLO PARA DESARROLLO, no forma parte de la app.
+/// Entra como admin o tutor, lista sus estudiantes y, como admin, carga los
+/// datos de prueba en Firebase. Las tareas y la agenda se prueban en la app.
 class PantallaDesarrollo extends StatefulWidget {
   const PantallaDesarrollo({super.key});
 
@@ -168,30 +166,6 @@ class _PantallaDesarrolloState extends State<PantallaDesarrollo> {
                   child: ListTile(
                     title: Text(e.nombre),
                     subtitle: Text(e.id),
-                    trailing: Wrap(
-                      spacing: 8,
-                      children: [
-                        OutlinedButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  PantallaTareasEstudiante(usuario: u, estudiante: e),
-                            ),
-                          ),
-                          child: const Text('Tareas'),
-                        ),
-                        FilledButton(
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => PantallaAgendaDia(estudiante: e),
-                            ),
-                          ),
-                          child: const Text('Agenda de hoy'),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
             ],

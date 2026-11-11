@@ -395,8 +395,8 @@ double anchoPalabraMasLarga(
 ) {
   final escala = MediaQuery.textScalerOf(context);
   var maximo = 0.0;
-  for (final palabra in texto.split(RegExp(r'\s+'))) {
-    if (palabra.isEmpty) continue;
+  final palabras = texto.split(RegExp(r'\s+')).where((p) => p.isNotEmpty);
+  for (final palabra in palabras) {
     final medida = TextPainter(
       text: TextSpan(text: palabra, style: estilo),
       textDirection: TextDirection.ltr,

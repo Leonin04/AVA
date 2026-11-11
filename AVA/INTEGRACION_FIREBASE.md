@@ -39,10 +39,8 @@ interfaz usa un valor por defecto.
 | `estudiantes/{id}.preferencias.ava` | `color`, `modoOscuro`, `botonEscuchar`, `filtroAntitemblor`, `vistasAgenda` | Preferencias de accesibilidad que no tenía el esquema (HU-15) |
 | `tareas/{id}` | `categoria` | Tipo de tarea con su color: clase, personal, ocio, casa o encargo |
 
-**Ojo:** si otra pantalla guarda las preferencias con
-`BaseDatos.actualizarPreferencias`, se perderá `preferencias.ava`, porque ese
-método escribe el mapa completo. La interfaz las guarda conservando lo que ya
-hubiera.
+`BaseDatos.actualizarPreferencias` solo cambia `comunicacion` y `visual`, así
+que no borra `preferencias.ava`.
 
 ## Correspondencias
 
