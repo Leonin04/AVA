@@ -19,7 +19,7 @@ enum PictogramaClave {
   const PictogramaClave(this.nombre, this.pictograma, this.color);
 
   final String nombre;
-  final PictogramaArasaac pictograma;
+  final RecursoVisual pictograma;
   final ColorPastel color;
 
   static PictogramaClave porNombre(String nombre) =>

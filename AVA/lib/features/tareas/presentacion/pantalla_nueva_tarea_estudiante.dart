@@ -58,14 +58,21 @@ class _PantallaNuevaTareaEstudianteState
 
   Future<void> _guardar() async {
     final ajustes = AjustesInterfaz.of(context);
-    final tarea = await _controlador.guardar();
-    if (tarea == null || !mounted) return;
-    if (ajustes.leerEnVoz) await ajustes.voz.decir('Tarea guardada.');
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Tarea guardada en tu agenda.')),
-    );
-    Navigator.of(context).pop(tarea);
+    try {
+      final tarea = await _controlador.guardar();
+      if (tarea == null || !mounted) return;
+      if (ajustes.leerEnVoz) await ajustes.voz.decir('Tarea guardada.');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Tarea guardada en tu agenda.')),
+      );
+      Navigator.of(context).pop(tarea);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al guardar: $error')),
+      );
+    }
   }
 
   String _pregunta(PasoAsistente paso) => switch (paso) {

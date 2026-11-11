@@ -1,272 +1,300 @@
-# Base de datos de AVA (iteración 1)
+# Base de datos de AVA (Iteración 1 — Esquema v2)
 
 La app guarda sus datos en **Firebase** (Google), proyecto **`proyecto-ava-54b58`**, plan Blaze:
 - **Authentication**: cuentas (admin, tutores, estudiantes) y la sesión anónima de la tableta.
-- **Cloud Firestore**: todos los datos (perfiles, aulas, tareas, registros…), en Europa.
-- **Cloud Storage**: fotos de estudiantes e imágenes de tareas.
+- **Cloud Firestore**: todos los datos (perfiles, aulas, tareas, registros…), en la región multirregión europea (`eur3`).
+- **Cloud Storage**: fotos de perfil de estudiantes e imágenes de apoyo para tareas.
 
-Cubre las historias HU-01 a HU-12 y HU-15 a HU-19.
+Cubre las **17 historias de usuario** de la Iteración 1 (**HU-01 a HU-12 y HU-15 a HU-19**, con 37 SP completados).
 
 ---
 
-## 1. Qué está montado
+## 1. Qué está montado y operativo
 
-| Qué | Estado |
-|---|---|
-| Authentication: correo/contraseña y **anónimo** | ✅ |
-| Firestore (Europa), reglas e índices | ✅ |
-| Cloud Storage y sus reglas | ✅ |
-| Cuenta de administrador | ✅ |
-| Datos de prueba (tutores, aulas, alumnos, tareas) | ✅ Se cargan con un botón (ver punto 5) |
-
-> **Firestore no tiene tablas como SQL.** Cada colección aparece la primera vez que se guarda
-> algo en ella. El "esquema" lo marcan nuestros **modelos en Dart**: la app siempre guarda los
-> datos con esos campos.
-
-### Cuentas para probar
-
-| Rol | Usuario | Contraseña |
+| Componente | Estado | Descripción |
 |---|---|---|
-| Administrador | `admin.ava@gmail.com` | Mensaje fijado del grupo de WhatsApp |
-| Tutora del centro | `tutora.ava@ava-pruebas.test` | `AVAtutor` |
-| Familiar | `familia.ava@ava-pruebas.test` | `AVAfamilia` |
-| Alumno Pablo (1º A) | PIN | `1234` |
-| Alumna Marta (1º A) | pictogramas | sol → perro → flor |
-| Alumna Lucía (1º B) | contraseña | `lucia123` |
-| Alumno Javier (1º B) | PIN | `4321` |
+| **Authentication** | ✅ Completado | Correo/contraseña (admin y tutores) y sesión anónima de la tableta para acceso accesible. |
+| **Cloud Firestore** | ✅ Completado | Reglas de seguridad (`firestore.rules`) e índices compuestos (`firestore.indexes.json`) desplegados. |
+| **Cloud Storage** | ✅ Completado | Reglas de seguridad (`storage.rules`) para fotos de estudiantes y pasos. |
+| **Cuenta de administrador** | ✅ Operativa | Acceso de administración global (`admin.ava@gmail.com`). |
+| **Datos de prueba** | ✅ Cargados | Cuentas de tutor, aulas, alumnos con diversos métodos de acceso y tareas de ejemplo. |
 
-(Las de prueba son inventadas; la del admin no se escribe aquí porque da acceso a todo.)
+> **Firestore no tiene tablas relacionales como SQL.** Cada colección se crea la primera vez que se almacena
+> un documento en ella. La estructura la marcan nuestros **modelos en Dart** y repositorios: la app siempre guarda los
+> datos con esos campos tipados e inmutables.
+>
+> **Nota sobre el modelo ER:** La entidad relacional «Asignación» de los diagramas conceptuales no existe como colección separada en Firestore: se resuelve de forma eficiente y no bloqueante mediante la lista `estudiantes` (HU-04) y el campo `aulaId` (HU-08) embebidos dentro de cada documento `tareas/{id}`.
+
+### Cuentas para probar (Entorno de desarrollo)
+
+| Rol | Usuario | Contraseña / Método de acceso |
+|---|---|---|
+| **Administrador** | `admin.ava@gmail.com` | `AVAadmin` |
+| **Tutora del centro** | `tutora.ava@ava-pruebas.test` | `AVAtutor` |
+| **Tutor familiar** | `familia.ava@ava-pruebas.test` | `AVAfamilia` |
+| **Alumno Pablo (1º A)** | Selección de tarjeta | PIN: `1234` |
+| **Alumna Marta (1º A)** | Selección de tarjeta | Pictogramas: Sol ☀️ $\rightarrow$ Perro 🐶 $\rightarrow$ Flor 🌸 |
+| **Alumna Lucía (1º B)** | Selección de tarjeta | Contraseña: `lucia123` |
+| **Alumno Javier (1º B)** | Selección de tarjeta | PIN: `4321` |
 
 ---
 
-## 2. Qué tengo que hacer para programar mi parte
+## 2. Qué tengo que hacer para programar y probar
 
 ```bash
 git pull
 cd AVA
 flutter pub get
-flutter run -d chrome      # o en el móvil / emulador Android
+flutter run -d chrome      # Ejecución en navegador Web (o en tableta/emulador Android/iOS)
 ```
 
-La conexión con Firebase ya va en el repositorio. **No hay que tocar nada de Firebase.**
+La conexión con Firebase ya va configurada en el repositorio (`lib/firebase_options.dart`). **No hay que tocar nada de Firebase.**
 
-La app completa ya usa estos servicios: para probar, entrad desde la pantalla de inicio con
-las cuentas del punto 1 (botón «Profesorado» para tutores y administración).
+La aplicación utiliza la arquitectura de repositorios: para probar, acceded desde la pantalla de inicio con
+las credenciales anteriores (pulsando el botón «Profesorado» para tutores y administración).
 
 ### Las 5 reglas de oro
 
-1. **Usad siempre los servicios** (`BaseDatos`, `Autenticacion`, `Almacenamiento`). Nunca `FirebaseFirestore.instance` ni `FirebaseAuth.instance` directamente en una pantalla.
-2. **Un tutor carga a sus estudiantes con `estudiantesDeTutor(uid)`.** Si pide todos, Firebase lo rechaza a propósito (HU-17).
-3. **Los nombres de los campos no se cambian** sin avisar: si uno guarda `nombre` y otro lee `name`, no funciona.
-4. Si necesitáis un campo o una consulta nueva, **avisad a Daniel**: hay que tocar modelo, reglas e índices a la vez.
-5. Si sale `permission-denied`, no es un fallo vuestro de código: es que **ese rol no puede hacer eso**. Revisad con qué cuenta habéis entrado.
+1. **Usad siempre los servicios y repositorios** (`BaseDatos`, `Autenticacion`, `Almacenamiento` o las implementaciones `Repositorio*Firebase`). Nunca llaméis a `FirebaseFirestore.instance` ni a `FirebaseAuth.instance` directamente desde una vista o widget.
+2. **Un tutor carga a sus estudiantes con `estudiantesDeTutor(uid)`.** Si solicita todos los estudiantes del colegio, las reglas de Firestore lo rechazan por diseño de seguridad (HU-17).
+3. **Los nombres de los campos son estrictos**: coinciden exactamente con los modelos en Dart.
+4. **Coordinación de cambios:** Cualquier campo nuevo o consulta requiere actualizar modelo, reglas e índices a la vez.
+5. **Permisos:** Si recibís un error `permission-denied`, indica que las reglas de seguridad están impidiendo la operación para ese rol. Verificad con qué cuenta habéis iniciado sesión.
 
 ---
 
 ## 3. Qué hace cada fichero
 
-### Servicios (`lib/core/servicios/`) — lo que usáis desde las pantallas
+### Servicios (`lib/core/servicios/`) — capa base de datos y red
 
 | Fichero | Para qué |
 |---|---|
-| `base_datos.dart` | **Leer y guardar datos** (estudiantes, aulas, tareas, registros…) |
-| `autenticacion.dart` | **Entrar, salir y crear cuentas** (admin, tutores y alumnos) |
-| `almacenamiento.dart` | **Subir fotos** (perfil del alumno, imágenes de tareas) |
-| `servicio_arasaac.dart` | **Buscar pictogramas** de ARASAAC |
+| `base_datos.dart` | **Leer y guardar datos** (estudiantes, aulas, tareas, registros de inicio/fin…) |
+| `autenticacion.dart` | **Gestión de sesiones y credenciales** (admin, tutores y alumnos) |
+| `almacenamiento.dart` | **Subir imágenes a Cloud Storage** (foto de perfil del alumno, fotos de tareas) |
+| `servicio_arasaac.dart` | **Búsqueda y descarga de pictogramas** de la API de ARASAAC |
 
-### Modelos (`lib/features/*/dominio/`) — un tipo de dato cada uno
+### Repositorios (`lib/features/*/dominio/`) — abstracción desacoplada
 
-| Fichero | Qué representa | Colección |
+| Fichero | Responsabilidad |
+|---|---|
+| `autenticacion/dominio/repositorio_autenticacion_firebase.dart` | Inicio de sesión, recuperación y cierre de sesión |
+| `autenticacion/dominio/repositorio_cuentas_firebase.dart` | Creación y listado de usuarios de Firebase Auth y Firestore |
+| `perfil/dominio/repositorio_estudiantes_firebase.dart` | Lectura, edición de perfil y preferencias de accesibilidad |
+| `aulas/dominio/repositorio_aulas_firebase.dart` | Gestión de aulas y asignaciones escolares |
+| `tareas/dominio/repositorio_tareas_firebase.dart` | CRUD de tareas, gestión de pasos y registros de actividad (HU-12) |
+| `perfil/dominio/conversion_firestore.dart` | Mapeo bidireccional entre documentos Firestore y entidades Dart |
+
+### Modelos de dominio (`lib/features/*/dominio/`)
+
+| Fichero | Qué representa | Colección / Documento |
 |---|---|---|
-| `autenticacion/dominio/usuario.dart` | Admin o tutor (rol, centro/familiar) | `usuarios` |
-| `autenticacion/dominio/acceso.dart` | Ficha mínima del alumno para la pantalla "¿quién eres?" | `acceso` |
-| `perfil/dominio/estudiante.dart` | Estudiante con su perfil completo | `estudiantes` |
-| `perfil/dominio/preferencias.dart` | Preferencias de comunicación y visuales | dentro de `estudiantes` |
-| `aulas/dominio/aula.dart` | Aula y su tutor responsable | `aulas` |
-| `tareas/dominio/tarea.dart` | Tarea: nombre, pictograma, horario, días o fecha, a quién va | `tareas` |
-| `tareas/dominio/paso.dart` | Un paso de una tarea | `tareas/{id}/pasos` |
-| `agenda/dominio/registro.dart` | Cuándo empezó y terminó el alumno una tarea | `estudiantes/{id}/registros` |
+| `autenticacion/dominio/usuario.dart` | Admin o tutor (rol, tipo: centro/familiar) | `usuarios/{uid}` |
+| `autenticacion/dominio/acceso.dart` | Ficha mínima del alumno para la pantalla de selección de la tableta | `acceso/{uid}` |
+| `perfil/dominio/estudiante.dart` | Estudiante con perfil completo y apoyos | `estudiantes/{uid}` |
+| `perfil/dominio/preferencias.dart` | Preferencias de accesibilidad (comunicación, visual, AVA) | campo `preferencias` en `estudiantes/{uid}` |
+| `aulas/dominio/aula.dart` | Aula y tutor responsable | `aulas/{id}` |
+| `tareas/dominio/tarea.dart` | Tarea: nombre, pictograma, horario, días/fecha, destinatarios, categoría | `tareas/{id}` |
+| `tareas/dominio/paso.dart` | Paso individual secuencial de una tarea | `tareas/{id}/pasos/{pasoId}` |
+| `agenda/dominio/registro.dart` | Registro de inicio y finalización de tarea | `estudiantes/{uid}/registros/{fecha_tareaId}` |
 
-### Configuración (en `AVA/`)
-
-| Fichero | Qué es |
-|---|---|
-| `firestore.rules` | Reglas de seguridad de la base de datos |
-| `storage.rules` | Reglas de seguridad de las fotos |
-| `firestore.indexes.json` | Índices que necesitan las consultas |
-| `firebase.json`, `.firebaserc` | Configuración del proyecto para la herramienta `firebase` |
-| `lib/firebase_options.dart` | Conexión de la app con el proyecto (generado) |
-
-### Desarrollo (`lib/dev/`) — no forma parte de la app
+### Configuración (en la raíz de `AVA/`)
 
 | Fichero | Qué es |
 |---|---|
-| `pantalla_desarrollo.dart` | Entrar como admin y cargar los datos de prueba |
-| `datos_prueba.dart` | Crea los tutores, aulas, alumnos y tareas de prueba |
+| `firestore.rules` | Reglas de seguridad de la base de datos Firestore |
+| `storage.rules` | Reglas de seguridad de almacenamiento de fotos |
+| `firestore.indexes.json` | Índices compuestos requeridos para las consultas de la app |
+| `firebase.json`, `.firebaserc` | Configuración del proyecto de Firebase CLI |
+| `lib/firebase_options.dart` | Configuración de inicialización de Firebase multiplataforma |
+
+### Herramientas de Desarrollo (`lib/dev/`)
+
+| Fichero | Qué es |
+|---|---|
+| `pantalla_desarrollo.dart` | Vista para entrar como administrador y poblar la base de datos |
+| `datos_prueba.dart` | Creación de cuentas, aulas, estudiantes y tareas de prueba |
 
 ---
 
-## 4. Qué método usar para cada historia
+## 4. Qué método usar para cada historia de usuario
 
-### Cuentas e inicio de sesión — `Autenticacion`
+### Cuentas e inicio de sesión — `Autenticacion` / Repositorios
 
-| HU / tarea | Método |
+| HU / Requisito | Método |
 |---|---|
-| HU-18 · Login de tutor/admin (T-14) | `entrarPersonal(correo, contraseña)` → devuelve `Sesion` |
-| HU-18 · Error claro (T-15) | los métodos lanzan `ErrorAcceso` con el `mensaje` para enseñar |
-| HU-18 · Recuperar contraseña (T-16) | `recuperarContrasena(correo)` |
-| HU-18 · Cerrar sesión (T-17) | `salir()` |
-| HU-18 · Redirigir según el rol (T-18) | `quienSoy()` → `sesion.esAdmin / esTutor / esEstudiante` |
-| HU-09 · Tableta antes del login (T-19) | `prepararTableta()` (sesión anónima) y después `BaseDatos.aulas()` y `alumnosParaAcceso(aulaId)` |
-| HU-09 · Login del alumno (T-21 a T-23) | `entrarEstudiante(acceso, entrada)` — `entrada` es el PIN (`'1234'`), la lista de pictogramas (`['sol','perro','flor']`) o la contraseña |
-| HU-09 · Pictogramas de la clave (T-22) | `Autenticacion.pictogramasClave` (6 palabras; su pictograma está en `Pictogramas` de `core/constantes/pictogramas.dart`) |
-| HU-01 · Crear tutor (T-25) | `crearCuentaPersonal(nombre:, correo:, contrasena:, rol:, tipoTutor:)` |
-| HU-01 · Crear estudiante (T-26, T-31, T-32) | `crearCuentaEstudiante(estudiante, entrada)` |
-| HU-01 · Cuenta duplicada (T-30) | lanza `ErrorAcceso('Ya existe una cuenta…')` |
+| **HU-18** · Login de tutor/admin | `entrarPersonal(correo, contraseña)` $\rightarrow$ devuelve `Sesion` |
+| **HU-18** · Mensajes de error claros | Lanza `ErrorAcceso` con mensaje legible en pantalla |
+| **HU-18** · Recuperar contraseña | `recuperarContrasena(correo)` |
+| **HU-18** · Cerrar sesión | `salir()` |
+| **HU-18** · Redirigir según el rol | `quienSoy()` $\rightarrow$ `sesion.esAdmin / esTutor / esEstudiante` |
+| **HU-09** · Tableta antes del login | `prepararTableta()` (sesión anónima) y lectura de `aulas()` y `alumnosParaAcceso(aulaId)` |
+| **HU-09** · Login adaptado del alumno | `entrarEstudiante(acceso, entrada)` — `entrada` es PIN (`'1234'`), lista de 3 pictogramas o contraseña |
+| **HU-09** · Pictogramas de clave | `Autenticacion.pictogramasClave` (sol, perro, flor, estrella, manzana, luna) |
+| **HU-01** · Crear tutor | `crearCuentaPersonal(nombre:, correo:, contrasena:, rol:, tipoTutor:)` |
+| **HU-01** · Crear estudiante | `crearCuentaEstudiante(estudiante, entrada)` (asigna correo interno `@alumnos.ava.test`) |
+| **HU-01** · Detección de duplicados | Lanza `ErrorAcceso('Ya existe una cuenta…')` |
 
-El administrador **no pierde su sesión** al crear cuentas.
+### Datos y Operaciones — `BaseDatos` / Repositorios
 
-### Datos — `BaseDatos`
-
-| HU / tarea | Método |
+| HU / Requisito | Método |
 |---|---|
-| HU-01/02 · Listar y editar cuentas (T-24, T-27) | `usuarios()`, `guardarUsuario(u)`, `todosLosEstudiantes()`, `actualizarPerfil(e)` |
-| HU-03 · Rol (T-29) | `guardarUsuario(u)` con otro `rol` |
-| HU-16 · Aulas (T-37 a T-43) | `aulas()`, `crearAula`, `actualizarAula`, `eliminarAula`, `cambiarAula(estId, aulaId)`, `estudiantesDeAula` |
-| HU-16 · Tutores de un alumno (T-33 a T-36) | `asignarTutor`, `desasignarTutor`, `tutores()` |
-| HU-17 · Solo mis alumnos (T-44) | `estudiantesDeTutor(uid)` |
-| HU-19 · Perfil (T-48 a T-53) | `estudiante(id)`, `actualizarPerfil(e.copyWith(...))` |
-| HU-19 · Foto (T-51) | `Almacenamiento().subirFotoEstudiante(id, bytes)` y luego `actualizarPerfil` |
-| HU-15 · Preferencias (T-54 a T-62) | `actualizarPreferencias(id, p.copyWith(...))` (cambia `comunicacion` y `visual` y conserva el resto, como `preferencias.ava`), `permitirCambiarPreferencias(id, bool)` |
-| T-31 · Método de acceso | `cambiarMetodoLogin(id, metodo)` |
-| HU-04 a HU-08 · Tareas | `tareasDeEstudiante`, `crearTarea`, `actualizarTarea`, `eliminarTarea`, `pasosDe`, `tarea(id)` |
-| HU-08 · Encargo para un aula | `Tarea(aulaId: …)` y `tareasDeAula(aulaId)` |
-| HU-10 · Agenda (T-81 a T-88) | `tareasParaAgenda(estudiante)` (las suyas + las de su aula) y `tarea.esParaDia(dia)` |
-| HU-11 · Siguiente tarea (T-95) | `CalculosAgenda` de `features/agenda/logica/calculos_agenda.dart` |
-| HU-12 · Inicio y fin (T-96) | `marcarInicio(estId, tareaId, dia)`, `marcarFin(...)`, `registrosDelDia(estId, dia)` |
+| **HU-01 / HU-02** · Listar y editar cuentas | `usuarios()`, `guardarUsuario(u)`, `todosLosEstudiantes()`, `actualizarPerfil(e)` |
+| **HU-03** · Asignación de roles | `guardarUsuario(u)` modificando el campo `rol` (`admin` o `tutor`) |
+| **HU-16** · Gestión de aulas | `aulas()`, `crearAula`, `actualizarAula`, `eliminarAula`, `cambiarAula(estId, aulaId)` |
+| **HU-16** · Asignación de tutores | `asignarTutor`, `desasignarTutor`, `tutores()` |
+| **HU-17** · Filtro estricto por tutor | `estudiantesDeTutor(uid)` (garantizado por reglas de Firestore) |
+| **HU-19** · Perfil del estudiante | `estudiante(id)`, `actualizarPerfil(e.copyWith(...))` |
+| **HU-19** · Foto de perfil | `Almacenamiento().subirFotoEstudiante(id, bytes)` y posterior guardado en perfil |
+| **HU-15** · Preferencias de accesibilidad | `actualizarPreferencias(id, p.copyWith(...))`, `permitirCambiarPreferencias(id, bool)` |
+| **HU-04 / HU-05** · Tareas personales | `tareasDeEstudiante(uid)`, `crearTarea`, `actualizarTarea`, `eliminarTarea`, `tarea(id)` |
+| **HU-06 / HU-07** · Horarios y pasos | Formulario de tarea con `horaInicio`, `horaFin`, `diasSemana` o `fecha`, y `pasosDe(tareaId)` |
+| **HU-08** · Encargos de aula o compartidos | `Tarea(aulaId: …)` y lectura con `tareasDeAula(aulaId)` |
+| **HU-10** · Consulta de agenda diaria/semanal | `tareasParaAgenda(estudiante)` (tareas propias + tareas de aula) y filtro `tarea.esParaDia(dia)` |
+| **HU-11** · Siguiente tarea («Ahora/Después») | Clase de dominio `CalculosAgenda.determinar(tareas, ahora)` |
+| **HU-12** · Registro de inicio y fin | `marcarInicio(estId, tareaId, dia)`, `marcarFin(...)`, `registrosDelDia(estId, dia)` |
 
-Los métodos que devuelven `Stream` se actualizan solos: con un `StreamBuilder`, la pantalla
-cambia en cuanto cambian los datos (T-88).
+---
 
-### Ejemplo: pantalla de login del alumno (HU-09)
+## 5. Carga de datos de prueba (Población inicial)
 
-```dart
-final auth = Autenticacion();
-final bd = BaseDatos();
+Los datos de prueba ya se encuentran inicializados en el proyecto Firebase. Si fuera necesario repoblarlos desde cero:
+1. Configurar temporalmente `home: const PantallaDesarrollo()` en `lib/main.dart`.
+2. Ejecutar `flutter run -d chrome`.
+3. Iniciar sesión con la cuenta de administrador (`admin.ava@gmail.com` / `AVAadmin`).
+4. Pulsar el botón **"Cargar datos de prueba"**. (Se crearán las cuentas, aulas, alumnos y tareas descritas en el punto 1).
+5. Restaurar `lib/main.dart` a su estado original.
 
-await auth.prepararTableta();                 // al abrir la pantalla
-// 1) StreamBuilder con bd.aulas()                       → botones de aulas
-// 2) StreamBuilder con bd.alumnosParaAcceso(aula.id)    → avatares (acceso.fotoUrl, acceso.nombre)
-// 3) según acceso.metodoLogin, pedir PIN / pictogramas / contraseña
-try {
-  final sesion = await auth.entrarEstudiante(acceso, '1234');
-  // sesion.estudiante → abrir su agenda
-} on ErrorAcceso catch (e) {
-  // enseñar e.mensaje
+---
+
+## 6. Esquema detallado de Cloud Firestore (v2)
+
+### Colección `usuarios/{uid}` — Administradores y Tutores
+| Campo | Tipo | Ejemplo | Descripción |
+|---|---|---|---|
+| `nombre` | string | "Laura Martín" | Nombre completo del tutor o administrador |
+| `email` | string | "tutora.ava@ava-pruebas.test" | Correo de inicio de sesión |
+| `rol` | string | `admin` \| `tutor` | Rol en el sistema |
+| `tipoTutor` | string \| null | `centro` \| `familiar` | Ámbito del tutor (null si es administrador) |
+
+### Colección `estudiantes/{uid}` — Estudiante y perfil completo
+El `uid` corresponde a su identificador de cuenta en Firebase Authentication (con correo interno `<usuario>@alumnos.ava.test`).
+
+| Campo | Tipo | Ejemplo / Valores | Descripción |
+|---|---|---|---|
+| `nombre` | string | "Pablo R." | Nombre de pila o representativo |
+| `usuario` | string | "pablo" | Identificador único de usuario |
+| `lugarResidencia` | string | "Granada" | Datos informativos del entorno |
+| `fotoUrl` | string | URL de Cloud Storage o ARASAAC | Imagen de perfil |
+| `color` | string \| null | "azul", "verde", "amarillo" | Color personal de su tarjeta |
+| `queLeCalma` | string | "Escuchar música clásica" | Apoyo emocional documentado (HU-19) |
+| `queNecesita` | string | "Apoyo en transiciones" | Pautas de asistencia para el tutor |
+| `intereses` | array de string | `["fútbol", "música"]` | Gustos y motivaciones del alumno |
+| `observaciones` | string \| null | "Muy participativo hoy" | Notas pedagógicas de seguimiento (HU-19) |
+| `metodoLogin` | string | `pin` \| `pictograma` \| `contrasena` | Modalidad de acceso a la tableta |
+| `aulaId` | string \| null | `id` del documento del aula | Aula a la que pertenece |
+| `tutores` | array de string | `[uid_tutora, uid_familiar]` | Lista de UIDs de tutores asignados |
+| `puedeCambiarPreferencias` | bool | `false` | Autorización para modificar sus ajustes |
+| `puedeGestionarTareas` | bool | `true` | Autorización para crear/borrar sus tareas (HU-04) |
+| `preferencias` | map | (Ver desglose inferior) | Ajustes sensoriales y de comunicación |
+
+#### Estructura del mapa `preferencias`:
+```text
+comunicacion: {
+  pictogramas: bool,
+  imagenes: bool,
+  texto: bool,
+  sonido: bool,
+  voz: bool,
+  botonesGrandes: bool
+}
+visual: {
+  colores: "alto_contraste" | "claro" | "oscuro",
+  tipografia: string,
+  tamanoLetra: "normal" | "grande" | "muy_grande",
+  posicionMenus: "arriba" | "abajo",
+  posicionBotones: "izquierda" | "derecha"
+}
+ava: {
+  color: string,
+  modoOscuro: bool,
+  botonEscuchar: bool,
+  filtroAntitemblor: bool,
+  vistasAgenda: array de string
 }
 ```
 
+### Subcolección `estudiantes/{uid}/registros/{fecha_tareaId}` — Registro de inicio y fin (HU-12)
+| Campo | Tipo | Ejemplo | Descripción |
+|---|---|---|---|
+| `tareaId` | string | "tarea_123" | Identificador de la tarea |
+| `fecha` | string | "2026-11-11" | Fecha en formato ISO (`yyyy-MM-dd`) |
+| `estado` | string | `pendiente` \| `iniciada` \| `terminada` | Estado del alumno en la actividad |
+| `inicio` | timestamp \| null | `2026-11-11 09:05:00` | Momento en el que pulsa «Empezar» |
+| `fin` | timestamp \| null | `2026-11-11 09:45:00` | Momento en el que pulsa «He terminado» |
+
+### Colección `acceso/{uid}` — Ficha mínima para la tableta (HU-09)
+Contiene `nombre`, `fotoUrl`, `aulaId`, `metodoLogin` y `usuario`. Es generada automáticamente por los repositorios al crear o editar el estudiante. Es la única colección que la tableta lee de forma anónima antes del inicio de sesión del estudiante.
+
+### Colección `aulas/{id}` — Agrupaciones escolares (HU-16)
+| Campo | Tipo | Ejemplo | Descripción |
+|---|---|---|---|
+| `nombre` | string | "Aula PTVAL 1º A" | Denominación del aula |
+| `tutorResponsable` | string (uid) | UID de la tutora | Tutor principal del aula |
+| `color` | string \| null | "verde" | Color temático para la interfaz |
+| `pictograma` | string \| null | URL o nombre del pictograma | Icono representativo del aula |
+
+### Colección `tareas/{id}` y Subcolección `tareas/{id}/pasos/{id}`
+| Campo | Tipo | Ejemplo / Valores | Descripción |
+|---|---|---|---|
+| `nombre` | string | "Poner la mesa del comedor" | Título breve de la actividad |
+| `descripcion` | string | "Colocar bandejas y cubiertos" | Detalle de la tarea |
+| `pictogramaUrl` | string | URL de ARASAAC o Storage | Apoyo visual principal |
+| `tipo` | string | `colegio` \| `personal` | Ámbito de la tarea |
+| `categoria` | string \| null | `clase` \| `personal` \| `ocio` \| `casa` \| `encargo` | Clasificación con color distintivo |
+| `horaInicio` | string | "09:00" | Hora de inicio en formato `HH:mm` |
+| `horaFin` | string | "09:45" | Hora de conclusión en formato `HH:mm` |
+| `diasSemana` | array de int | `[1, 2, 3, 4, 5]` | Días lectivos (1 = lunes ... 7 = domingo) |
+| `fecha` | string \| null | "2026-11-12" | Fecha específica si es tarea puntual de un solo día |
+| `creadaPor` | string (uid) | UID del creador | Docente o alumno creador |
+| `estudiantes` | array de uid | `[uid1, uid2]` | Lista de estudiantes a los que aplica |
+| `aulaId` | string \| null | `id_aula` | Identificador de aula para encargos de grupo (HU-08) |
+
+**Subcolección `pasos/{pasoId}`:**
+- `orden` (int): Posición secuencial del paso (1, 2, 3...).
+- `texto` (string): Instrucción en lectura fácil.
+- `imagenUrl` (string): Fotografía o pictograma del paso.
+
 ---
 
-## 5. Cargar datos de prueba (una sola vez, ya hecho)
+## 7. Matriz de Seguridad y Reglas de Firestore
 
-1. `home: const PantallaDesarrollo()` temporalmente en `main.dart` (import `dev/pantalla_desarrollo.dart`; no subáis ese cambio).
-2. `flutter run -d chrome`, entrar como **admin**.
-3. Pulsar **"Cargar datos de prueba"**. Crea las cuentas de la tabla del punto 1.
-
-Si se pulsa otra vez, falla con "Ya existe una cuenta…": es normal.
-
----
-
-## 6. Esquema detallado
-
-### `usuarios/{uid}` — admin y tutores
-| Campo | Tipo | Ejemplo |
-|---|---|---|
-| nombre | string | "Laura Martín" |
-| email | string | "tutora.ava@ava-pruebas.test" |
-| rol | string | `admin` \| `tutor` |
-| tipoTutor | string \| null | `centro` \| `familiar` (null si es admin) |
-
-### `estudiantes/{uid}` — estudiante y perfil
-El id es el uid de su cuenta (correo interno `<usuario>@alumnos.ava.test`).
-
-| Campo | Tipo | Ejemplo |
-|---|---|---|
-| nombre | string | "Pablo R." |
-| usuario | string | "pablo" |
-| lugarResidencia | string | "Granada" |
-| fotoUrl | string | URL de Storage o de ARASAAC |
-| queLeCalma, queNecesita | string | |
-| intereses | array de string | ["fútbol", "música"] |
-| metodoLogin | string | `pin` \| `pictograma` \| `contrasena` |
-| aulaId | string \| null | id del aula |
-| tutores | array de uid | [tutora, familiar] |
-| puedeCambiarPreferencias | bool | false |
-| preferencias | map | ver abajo |
-
-`preferencias`:
-```
-comunicacion: { pictogramas, imagenes, texto, sonido, voz, botonesGrandes }   // booleanos
-visual: { colores: "alto_contraste"|"claro"|"oscuro", tipografia, tamanoLetra,
-          posicionMenus: "arriba"|"abajo", posicionBotones: "izquierda"|"derecha" }
-```
-
-### `estudiantes/{uid}/registros/{fecha_tareaId}` — inicio y fin (HU-12)
-| Campo | Tipo |
-|---|---|
-| tareaId | string |
-| fecha | string "yyyy-MM-dd" |
-| estado | `pendiente` \| `iniciada` \| `terminada` |
-| inicio, fin | timestamp |
-
-### `acceso/{uid}` — ficha mínima para la tableta (HU-09)
-`nombre` (de pila), `fotoUrl`, `aulaId`, `metodoLogin`, `usuario`. Se rellena sola al crear o
-editar el estudiante. Es lo único (junto a `aulas`) que ve la tableta antes de que entre un alumno.
-
-### `aulas/{id}`
-`nombre`, `tutorResponsable` (uid).
-
-### `tareas/{id}` y `tareas/{id}/pasos/{id}`
-| Campo | Tipo | Notas |
-|---|---|---|
-| nombre, descripcion | string | |
-| pictogramaUrl | string | ARASAAC o Storage |
-| tipo | string | `colegio` \| `personal` |
-| horaInicio, horaFin | string "HH:mm" | |
-| diasSemana | array de int | 1 = lunes … 7 = domingo; vacío si es de un solo día |
-| fecha | string "yyyy-MM-dd" \| null | día concreto si no se repite |
-| creadaPor | uid | |
-| estudiantes | array de uid | a quién va |
-| aulaId | string \| null | encargo para toda un aula (HU-08) |
-
-Pasos: `orden` (int), `texto`, `imagenUrl`.
-
-### Quién puede hacer qué (resumen de las reglas)
-
-| | Admin | Tutor | Estudiante | Tableta (anónima) |
+| Colección / Recurso | Administrador | Tutor | Estudiante | Tableta (Sesión Anónima) |
 |---|---|---|---|---|
-| Cuentas y aulas | todo | ver aulas | — | ver aulas |
-| Estudiantes | todo | sus alumnos: ver, perfil y preferencias | ver su ficha; preferencias si está autorizado | ficha `acceso` |
-| Tareas | todo | crear; editar/borrar las suyas | ver las suyas y las de su aula; crear personales | — |
-| Registros | ver | ver los de sus alumnos | crear/actualizar los suyos | — |
-| Fotos | todo | de sus alumnos | — | ver |
+| **`usuarios`** | Lectura y escritura total | Lectura de su propio perfil | Sin acceso | Sin acceso |
+| **`aulas`** | Lectura y escritura total | Lectura de aulas | Sin acceso | Lectura de aulas públicas |
+| **`acceso`** | Lectura y escritura total | Lectura total | Lectura | Lectura (para selector de alumnos) |
+| **`estudiantes`** | Lectura y escritura total | Lectura y edición de **sus alumnos asignados** | Lectura de su perfil; edición de preferencias si está autorizado | Sin acceso |
+| **`tareas`** | Lectura y escritura total | Crear; editar y borrar las que ha creado | Ver sus tareas asignadas y las de su aula; crear personales si tiene permiso | Sin acceso |
+| **`registros`** | Lectura total | Ver registros de sus alumnos | Crear y actualizar sus propios registros (HU-12) | Sin acceso |
+| **Cloud Storage** | Lectura y subida total | Subir fotos para sus alumnos y tareas | Sin permisos de subida | Lectura de recursos públicos |
 
 ---
 
-## 7. Limitaciones conocidas
+## 8. Limitaciones conocidas y próximos pasos (Iteración 2)
 
-- **Cambiar el PIN o la clave de un alumno, o borrar su cuenta de acceso,** no se puede hacer desde
-  la app sin un servidor (Cloud Functions). Por ahora: borrar sus datos y crear la cuenta de nuevo,
-  o borrarla a mano en la consola (Authentication). Queda para la iteración 2.
-- **Desactivar cuentas** (HU-13) es de la iteración 2.
+- **Gestión avanzada de credenciales sin servidor:** La modificación del PIN/clave o la eliminación física de la cuenta de Firebase Auth requiere Cloud Functions o la consola de Firebase. Queda planificada para la Iteración 2.
+- **Desactivación temporal de cuentas (HU-13):** Mecanismo de deshabilitación sin borrado físico de datos planificado para el siguiente sprint.
+- **Repetición semanal y recurrencia avanzada (HU-14):** Ampliación del motor de periodicidad de tareas.
+- **Módulo de Comedor (HU-23 a HU-25) y Seguimiento en tiempo real (HU-26, HU-27, HU-29):** Próximas funcionalidades a conectar con la base de datos en la Iteración 2.
 
 ---
 
-## 8. Mantenimiento (Daniel)
+## 9. Mantenimiento y despliegue de reglas (Daniel)
+
+Para desplegar actualizaciones en las reglas de seguridad o índices compuestos de Firestore:
 
 ```bash
-conda activate nodejs
 cd AVA
 firebase deploy --only firestore:rules,firestore:indexes,storage
 ```

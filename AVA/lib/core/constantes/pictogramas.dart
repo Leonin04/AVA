@@ -91,7 +91,7 @@ abstract final class Pictogramas {
   static const cine = PictogramaArasaac(4602);
 
   // Claves de acceso con pictogramas.
-  static const sol = PictogramaArasaac(2798);
+  static const sol = FotoPropia('assets/iconos/sol.png');
   static const pelota = PictogramaArasaac(3241);
   static const mariposa = PictogramaArasaac(2465);
   static const manzana = PictogramaArasaac(2462);

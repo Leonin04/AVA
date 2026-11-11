@@ -59,14 +59,23 @@ class Pictograma extends StatelessWidget {
                 excludeFromSemantics: true,
                 errorBuilder: (_, __, ___) => respaldo,
               )
-            : Image.network(
-                url,
-                width: tamano,
-                height: tamano,
-                fit: BoxFit.cover,
-                excludeFromSemantics: true,
-                errorBuilder: (_, __, ___) => respaldo,
-              ),
+            : url.startsWith('assets/')
+                ? Image.asset(
+                    url,
+                    width: tamano,
+                    height: tamano,
+                    fit: BoxFit.contain,
+                    excludeFromSemantics: true,
+                    errorBuilder: (_, __, ___) => respaldo,
+                  )
+                : Image.network(
+                    url,
+                    width: tamano,
+                    height: tamano,
+                    fit: BoxFit.cover,
+                    excludeFromSemantics: true,
+                    errorBuilder: (_, __, ___) => respaldo,
+                  ),
       ),
     };
 

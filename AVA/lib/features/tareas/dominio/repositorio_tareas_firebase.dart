@@ -108,8 +108,13 @@ class RepositorioTareasFirebase implements RepositorioTareas {
   @override
   Future<void> guardar(Tarea tarea) async {
     final idBase = _idBase(tarea.id);
-    final doc = await _tareas.doc(idBase).get();
-    final anterior = doc.exists ? bd.Tarea.fromDoc(doc) : null;
+    bd.Tarea? anterior;
+    try {
+      final doc = await _tareas.doc(idBase).get();
+      if (doc.exists) anterior = bd.Tarea.fromDoc(doc);
+    } catch (_) {
+      anterior = null;
+    }
 
     final definicion = bd.Tarea(
       id: idBase,
