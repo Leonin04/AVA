@@ -2,7 +2,7 @@ import 'voz_plataforma_nativa.dart'
     if (dart.library.js_interop) 'voz_plataforma_web.dart'
     as plataforma;
 
-/// Lectura en voz alta de textos (RF-08, personas Álex y Samuel).
+/// Lectura en voz alta de textos (HU-15, personas Álex y Samuel).
 abstract interface class ServicioVoz {
   /// Lee [texto] en voz alta. Devuelve `false` si el dispositivo no tiene
   /// ninguna voz disponible, para poder avisar en pantalla.

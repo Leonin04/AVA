@@ -17,10 +17,10 @@ import '../dominio/tarea_agenda.dart';
 import '../logica/detalle_tarea_controlador.dart';
 import 'widgets/dialogo_celebracion.dart';
 
-/// Detalle de una tarea (HU-05, HU-06): a la izquierda el pictograma, la
+/// Detalle de una tarea (HU-06, HU-07): a la izquierda el pictograma, la
 /// hora y el estado; a la derecha la explicación, de una en una (primero
 /// qué hay que hacer y después cada paso), con botones para pasar.
-/// Abajo, el botón para empezar o terminar (HU-11).
+/// Abajo, el botón para empezar o terminar (HU-12).
 class PantallaDetalleTarea extends StatefulWidget {
   const PantallaDetalleTarea({
     super.key,

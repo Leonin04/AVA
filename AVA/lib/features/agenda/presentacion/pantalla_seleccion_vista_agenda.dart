@@ -11,7 +11,7 @@ import '../../perfil/logica/preferencias_controlador.dart';
 import '../dominio/vista_agenda.dart';
 
 /// Elección de cómo ver la agenda: semana, hoy o «ahora y después». Solo
-/// aparecen las vistas que el tutor ha habilitado (HU-09).
+/// aparecen las vistas que el tutor ha habilitado (HU-10).
 class PantallaSeleccionVistaAgenda extends StatelessWidget {
   const PantallaSeleccionVistaAgenda({super.key, required this.estudiante});
 

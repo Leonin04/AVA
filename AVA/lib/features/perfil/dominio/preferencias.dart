@@ -1,4 +1,4 @@
-/// Preferencias de comunicación del estudiante (RF-08).
+/// Preferencias de comunicación del estudiante (HU-15).
 class PreferenciasComunicacion {
   final bool pictogramas;
   final bool imagenes;

@@ -53,7 +53,7 @@ class RepositorioTareasFirebase implements RepositorioTareas {
     final estudiante = await _bd.obtenerEstudiante(idEstudiante);
     if (estudiante == null) return const [];
 
-    // Las suyas y los encargos de su aula (HU-07), sin repetir.
+    // Las suyas y los encargos de su aula (HU-08), sin repetir.
     final consultas = [
       _tareas.where('estudiantes', arrayContains: idEstudiante).get(),
       if (estudiante.aulaId != null)

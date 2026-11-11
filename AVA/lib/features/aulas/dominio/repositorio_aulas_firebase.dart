@@ -75,7 +75,7 @@ class RepositorioAulasFirebase implements RepositorioAulas {
     }, SetOptions(merge: true));
 
     // Los alumnos del aula pasan a tener como tutor al responsable, para
-    // que pueda verlos y gestionarlos (HU-15, HU-16).
+    // que pueda verlos y gestionarlos (HU-16, HU-17).
     final tutor = aula.idTutor;
     if (tutor == null) return;
     final alumnos = await _db

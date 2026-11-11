@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/constantes/dimensiones.dart';
 import '../../../../core/utilidades/formato_fecha.dart';
 
-/// Fecha, hora de inicio y hora de fin de una tarea (HU-04).
+/// Fecha, hora de inicio y hora de fin de una tarea (HU-05).
 class SelectorHorario extends StatelessWidget {
   const SelectorHorario({
     super.key,

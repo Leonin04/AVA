@@ -23,7 +23,7 @@ import 'widgets/selector_horario.dart';
 enum _Destino { aula, alumnos }
 
 /// Creación de un encargo del centro (reprografía, comedor, recados...) y
-/// su asignación a un aula o a varios alumnos para una fecha (HU-07).
+/// su asignación a un aula o a varios alumnos para una fecha (HU-08).
 class PantallaEncargos extends StatefulWidget {
   const PantallaEncargos({super.key, required this.cuenta});
 

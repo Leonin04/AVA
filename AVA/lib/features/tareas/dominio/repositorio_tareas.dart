@@ -13,10 +13,10 @@ abstract interface class RepositorioTareas {
     required DateTime hasta,
   });
 
-  /// Crea o actualiza una tarea (HU-03 a HU-06).
+  /// Crea o actualiza una tarea (HU-04 a HU-07).
   Future<void> guardar(Tarea tarea);
 
-  /// Crea un encargo del centro (HU-07) a partir de [plantilla] para
+  /// Crea un encargo del centro (HU-08) a partir de [plantilla] para
   /// [idsEstudiantes] o, si se indica, para toda el aula [idAula].
   Future<void> crearEncargo(
     Tarea plantilla, {

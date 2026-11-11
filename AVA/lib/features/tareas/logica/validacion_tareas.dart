@@ -1,4 +1,4 @@
-/// Validaciones comunes de tareas y encargos (HU-03 a HU-07).
+/// Validaciones comunes de tareas y encargos (HU-04 a HU-08).
 abstract final class ValidacionTareas {
   static const longitudMaximaTitulo = 40;
 
@@ -11,7 +11,7 @@ abstract final class ValidacionTareas {
     return null;
   }
 
-  /// La hora de fin debe ser posterior a la de inicio (HU-04).
+  /// La hora de fin debe ser posterior a la de inicio (HU-05).
   static String? horario(DateTime inicio, DateTime fin) => fin.isAfter(inicio)
       ? null
       : 'La hora de fin debe ser después del inicio.';

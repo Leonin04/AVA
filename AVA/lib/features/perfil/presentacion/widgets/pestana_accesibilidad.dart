@@ -7,7 +7,7 @@ import '../../dominio/preferencias_accesibilidad.dart';
 import '../../logica/ficha_estudiante_controlador.dart';
 import '../opciones_preferencias.dart';
 
-/// Preferencias de accesibilidad y permisos del alumno (HU-14, HU-09).
+/// Preferencias de accesibilidad y permisos del alumno (HU-15, HU-10).
 ///
 /// Usa las mismas opciones que ve el alumno en su perfil.
 class PestanaAccesibilidad extends StatefulWidget {
@@ -77,7 +77,7 @@ class _PestanaAccesibilidadState extends State<PestanaAccesibilidad> {
           ),
           const TituloSeccion(
             'Comunicación',
-            descripcion: 'Pictogramas, palabras y voz (RF-08).',
+            descripcion: 'Pictogramas, palabras y voz (HU-15).',
           ),
           _chips(opciones.where((o) => es(o, 'Ver ') || es(o, 'voz'))),
           const TituloSeccion('Manejo'),

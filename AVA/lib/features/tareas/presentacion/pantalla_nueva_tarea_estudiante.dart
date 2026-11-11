@@ -17,7 +17,7 @@ import '../dominio/tarea_agenda.dart';
 import '../logica/tarea_estudiante_controlador.dart';
 
 /// Asistente para que el estudiante cree o cambie una tarea personal
-/// (HU-03), con una sola pregunta por pantalla: qué, cuándo y confirmar.
+/// (HU-04), con una sola pregunta por pantalla: qué, cuándo y confirmar.
 class PantallaNuevaTareaEstudiante extends StatefulWidget {
   const PantallaNuevaTareaEstudiante({
     super.key,

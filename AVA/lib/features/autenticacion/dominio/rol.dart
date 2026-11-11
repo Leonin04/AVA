@@ -1,4 +1,4 @@
-/// Rol de una cuenta, que limita las funciones a las que accede (HU-02).
+/// Rol de una cuenta, que limita las funciones a las que accede (HU-03).
 enum Rol {
   administrador('Administrador'),
   tutor('Tutor'),

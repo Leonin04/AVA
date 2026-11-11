@@ -1,7 +1,7 @@
 import '../../../core/constantes/paleta.dart';
 import '../../../core/modelos/recurso_visual.dart';
 
-/// Estado de realización de una tarea (HU-11).
+/// Estado de realización de una tarea (HU-12).
 enum EstadoTarea {
   pendiente('Por hacer'),
   enCurso('Haciendo'),
@@ -47,23 +47,23 @@ class Tarea {
   final String idEstudiante;
   final String titulo;
 
-  /// Descripción breve en lectura fácil (HU-05).
+  /// Descripción breve en lectura fácil (HU-06).
   final String descripcion;
   final DateTime inicio;
   final DateTime fin;
 
-  /// Instrucciones ordenadas para realizar la tarea (HU-06).
+  /// Instrucciones ordenadas para realizar la tarea (HU-07).
   final List<String> pasos;
   final TipoTarea tipo;
   final EstadoTarea estado;
 
-  /// Pictograma o foto de apoyo (HU-05).
+  /// Pictograma o foto de apoyo (HU-06).
   final RecursoVisual? pictograma;
 
   /// Cuenta que creó la tarea.
   final String? creadaPor;
 
-  /// Si la tarea viene de un encargo del centro, su identificador (HU-07).
+  /// Si la tarea viene de un encargo del centro, su identificador (HU-08).
   final String? idEncargo;
 
   /// Indica si [instante] cae dentro del horario de la tarea.

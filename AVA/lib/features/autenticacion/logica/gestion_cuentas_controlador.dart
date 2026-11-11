@@ -8,7 +8,7 @@ import '../dominio/repositorio_autenticacion.dart';
 import '../dominio/repositorio_cuentas.dart';
 import '../dominio/rol.dart';
 
-/// Creación y edición de cuentas y roles (HU-01, HU-02).
+/// Creación y edición de cuentas y roles (HU-01 a HU-03).
 class GestionCuentasControlador extends ControladorCarga<List<Cuenta>> {
   GestionCuentasControlador({
     required RepositorioCuentas cuentas,

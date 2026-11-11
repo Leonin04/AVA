@@ -4,7 +4,7 @@ import '../../../../core/constantes/dimensiones.dart';
 import '../../../../core/constantes/paleta.dart';
 import '../../../../core/tema/ajustes_interfaz.dart';
 
-/// Aviso claro y tranquilo cuando algo no es correcto (HU-08): sin rojo
+/// Aviso claro y tranquilo cuando algo no es correcto (HU-09): sin rojo
 /// intenso ni sonidos de error (persona Álex), con icono y texto.
 /// Los lectores de pantalla lo anuncian al aparecer.
 class AvisoError extends StatelessWidget {

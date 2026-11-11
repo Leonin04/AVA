@@ -32,7 +32,7 @@ class ArgumentosFormularioTarea {
   final Tarea? tarea;
 }
 
-/// Formulario de tarea del tutor (HU-03 a HU-06): nombre, tipo, pictograma
+/// Formulario de tarea del tutor (HU-04 a HU-07): nombre, tipo, pictograma
 /// o foto, descripción breve, horario y pasos.
 class PantallaFormularioTarea extends StatefulWidget {
   const PantallaFormularioTarea({
@@ -175,7 +175,7 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
             ),
             const TituloSeccion(
               'Pictograma o foto',
-              descripcion: 'Ayuda a entender la tarea sin leer (HU-05).',
+              descripcion: 'Ayuda a entender la tarea sin leer (HU-06).',
             ),
             SelectorRecursoVisual(
               recurso: _pictograma,

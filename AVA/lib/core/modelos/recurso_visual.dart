@@ -1,4 +1,4 @@
-/// Imagen de apoyo de una tarea, un aula o un perfil (RF-13, HU-05).
+/// Imagen de apoyo de una tarea, un aula o un perfil (HU-06).
 ///
 /// Puede ser un pictograma de ARASAAC o una fotografía propia.
 sealed class RecursoVisual {

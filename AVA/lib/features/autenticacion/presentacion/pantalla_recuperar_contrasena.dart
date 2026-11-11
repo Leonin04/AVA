@@ -8,7 +8,7 @@ import '../dominio/repositorio_autenticacion.dart';
 import '../logica/recuperacion_controlador.dart';
 import 'widgets/aviso_error.dart';
 
-/// Recuperación de la contraseña de tutores y administradores (HU-17).
+/// Recuperación de la contraseña de tutores y administradores (HU-18).
 class PantallaRecuperarContrasena extends StatefulWidget {
   const PantallaRecuperarContrasena({super.key});
 

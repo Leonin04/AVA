@@ -16,7 +16,7 @@ String? validarPreferencias(PreferenciasAccesibilidad preferencias) {
   return null;
 }
 
-/// Preferencias de accesibilidad activas en la aplicación (HU-14).
+/// Preferencias de accesibilidad activas en la aplicación (HU-15).
 ///
 /// Es único para toda la app: al cambiar, el tema se reconstruye y afecta a
 /// todas las pantallas. Los cambios se guardan en el perfil del estudiante.

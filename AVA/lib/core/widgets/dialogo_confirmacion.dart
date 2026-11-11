@@ -7,7 +7,7 @@ import '../tema/ajustes_interfaz.dart';
 import 'boton_accesible.dart';
 import 'pictograma.dart';
 
-/// Pide una confirmación clara antes de una acción (HU-11).
+/// Pide una confirmación clara antes de una acción (HU-12).
 ///
 /// Muestra la pregunta con pictograma y dos botones grandes y de colores
 /// distintos: «No» a la izquierda y «Sí» a la derecha. Si la voz está

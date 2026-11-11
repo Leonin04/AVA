@@ -7,7 +7,7 @@ import '../../../../core/tema/ajustes_interfaz.dart';
 import '../../../../core/widgets/boton_accesible.dart';
 import '../../../../core/widgets/pictograma.dart';
 
-/// Refuerzo positivo al terminar una tarea (RF-28, persona Álex): un
+/// Refuerzo positivo al terminar una tarea (persona Álex): un
 /// mensaje tranquilo con pictograma y, si la voz está activada, dicho en
 /// voz alta. Sin sonidos bruscos ni animaciones (RNF-11).
 Future<void> mostrarCelebracion(BuildContext context) {

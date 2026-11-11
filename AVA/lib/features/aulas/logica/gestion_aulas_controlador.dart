@@ -14,7 +14,7 @@ typedef DatosAulas = ({
   List<Estudiante> estudiantes,
 });
 
-/// Creación de aulas y asignación de alumnos y tutor responsable (HU-15).
+/// Creación de aulas y asignación de alumnos y tutor responsable (HU-16).
 class GestionAulasControlador extends ControladorCarga<DatosAulas> {
   GestionAulasControlador({
     required RepositorioAulas aulas,

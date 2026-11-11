@@ -7,7 +7,7 @@ import '../../dominio/metodo_acceso.dart';
 import '../../dominio/pictograma_clave.dart';
 
 /// Configuración del método de acceso de un estudiante y de su clave
-/// (HU-01, HU-08): contraseña, número de 4 cifras o de 3 a 6 pictogramas.
+/// (HU-01, HU-09): contraseña, número de 4 cifras o de 3 a 6 pictogramas.
 ///
 /// Avisa con [alCambiar] de la clave válida, o de `null` si aún no lo es.
 class EditorClave extends StatefulWidget {

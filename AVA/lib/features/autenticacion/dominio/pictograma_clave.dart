@@ -2,7 +2,7 @@ import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 
-/// Pictogramas disponibles para el inicio de sesión con imágenes (RF-03).
+/// Pictogramas disponibles para el inicio de sesión con imágenes (HU-09).
 ///
 /// Son las mismas palabras que guarda la base de datos
 /// (`Autenticacion.pictogramasClave`): el nombre de cada valor es la palabra.

@@ -18,7 +18,7 @@ import '../dominio/repositorio_aulas.dart';
 import '../logica/gestion_aulas_controlador.dart';
 
 /// Gestión de aulas: crearlas, asignarles alumnos y un tutor responsable
-/// (HU-15). Solo para la administración.
+/// (HU-16). Solo para la administración.
 class PantallaGestionAulas extends StatefulWidget {
   const PantallaGestionAulas({super.key});
 

@@ -8,7 +8,7 @@ import '../../../../core/widgets/pantalla_gestion.dart';
 import '../../../../core/widgets/selector_recurso_visual.dart';
 import '../../logica/ficha_estudiante_controlador.dart';
 
-/// Datos del perfil del alumno (HU-18, RI01): foto, color, intereses,
+/// Datos del perfil del alumno (HU-19, RI01): foto, color, intereses,
 /// necesidades, elementos que le calman y notas de progreso.
 class PestanaDatos extends StatefulWidget {
   const PestanaDatos({super.key, required this.controlador});

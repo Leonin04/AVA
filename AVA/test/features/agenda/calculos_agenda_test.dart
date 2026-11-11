@@ -51,7 +51,7 @@ void main() {
     expect(delDia.map((t) => t.id), ['manana', 'tarde']);
   });
 
-  group('Tarea actual y siguiente (HU-10)', () {
+  group('Tarea actual y siguiente (HU-11)', () {
     final asamblea = _tarea('asamblea', DateTime(2026, 11, 11, 9));
     final taller = _tarea('taller', DateTime(2026, 11, 11, 9, 30), minutos: 90);
     final recreo = _tarea('recreo', DateTime(2026, 11, 11, 11));

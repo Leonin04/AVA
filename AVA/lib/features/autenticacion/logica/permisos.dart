@@ -3,8 +3,8 @@ import '../../perfil/dominio/perfil_estudiante.dart';
 import '../dominio/cuenta.dart';
 import '../dominio/rol.dart';
 
-/// Reglas de acceso según el rol (HU-02) y la asignación de alumnos a
-/// tutores (HU-16).
+/// Reglas de acceso según el rol (HU-03) y la asignación de alumnos a
+/// tutores (HU-17).
 ///
 /// Son funciones puras para poder probarlas sin interfaz. Con Firebase,
 /// estas mismas reglas se repetirán en las reglas de seguridad de Firestore.
@@ -12,17 +12,17 @@ abstract final class Permisos {
   static bool esAdministrador(Cuenta? cuenta) =>
       cuenta?.rol == Rol.administrador;
 
-  /// Crear y editar cuentas y roles (HU-01, HU-02).
+  /// Crear y editar cuentas y roles (HU-01 a HU-03).
   static bool puedeGestionarCuentas(Cuenta? cuenta) => esAdministrador(cuenta);
 
-  /// Crear aulas y asignar alumnos y tutores (HU-15).
+  /// Crear aulas y asignar alumnos y tutores (HU-16).
   static bool puedeGestionarAulas(Cuenta? cuenta) => esAdministrador(cuenta);
 
-  /// Crear encargos del centro (HU-07).
+  /// Crear encargos del centro (HU-08).
   static bool puedeCrearEncargos(Cuenta? cuenta) => cuenta?.esGestion ?? false;
 
   /// Si [cuenta] puede ver y gestionar el perfil y las tareas de
-  /// [estudiante] (HU-16).
+  /// [estudiante] (HU-17).
   static bool puedeGestionarEstudiante(
     Cuenta? cuenta,
     Estudiante estudiante,

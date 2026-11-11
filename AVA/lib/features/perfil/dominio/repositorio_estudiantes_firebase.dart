@@ -63,7 +63,7 @@ class RepositorioEstudiantesFirebase implements RepositorioEstudiantes {
       ];
     }
 
-    // Un tutor solo puede pedir sus estudiantes (HU-16); el administrador,
+    // Un tutor solo puede pedir sus estudiantes (HU-17); el administrador,
     // todos.
     final sesion = await _auth.quienSoy();
     final consulta = sesion.esAdmin
@@ -150,7 +150,7 @@ class RepositorioEstudiantesFirebase implements RepositorioEstudiantes {
     if (anterior.idAula != nuevo.idAula) {
       await _bd.cambiarAula(nuevo.id, nuevo.idAula);
       // El tutor responsable del aula pasa a ser tutor del alumno, para
-      // que pueda verlo (HU-15, HU-16).
+      // que pueda verlo (HU-16, HU-17).
       final idAula = nuevo.idAula;
       if (idAula != null) {
         final aula = await _db.collection('aulas').doc(idAula).get();

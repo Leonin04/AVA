@@ -3,7 +3,7 @@ import '../dominio/repositorio_tareas.dart';
 import '../dominio/tarea_agenda.dart';
 
 /// Tareas de un estudiante en un día, para que el tutor las gestione
-/// (HU-03 a HU-06).
+/// (HU-04 a HU-07).
 class TareasDiaControlador extends ControladorCarga<List<Tarea>> {
   TareasDiaControlador({
     required RepositorioTareas repositorio,

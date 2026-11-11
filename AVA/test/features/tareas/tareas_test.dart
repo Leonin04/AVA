@@ -52,7 +52,7 @@ void main() {
     expect(semana.any((t) => t.tipo == TipoTarea.encargoCentro), isTrue);
   });
 
-  group('HU-03 a HU-06: tareas creadas por el tutor', () {
+  group('HU-04 a HU-07: tareas creadas por el tutor', () {
     test(
       'crea una tarea con horario, pictograma, descripción y pasos',
       () async {
@@ -98,7 +98,7 @@ void main() {
       },
     );
 
-    test('la hora de fin debe ser posterior a la de inicio (HU-04)', () {
+    test('la hora de fin debe ser posterior a la de inicio (HU-05)', () {
       expect(
         () => formulario.guardar(
           idEstudiante: 'e01',
@@ -111,7 +111,7 @@ void main() {
       );
     });
 
-    test('un tutor no puede crear tareas a alumnos de otra aula (HU-16)', () {
+    test('un tutor no puede crear tareas a alumnos de otra aula (HU-17)', () {
       expect(
         () => formulario.guardar(
           idEstudiante: 'e10',
@@ -125,7 +125,7 @@ void main() {
     });
   });
 
-  group('HU-07: encargos del centro', () {
+  group('HU-08: encargos del centro', () {
     test('aparece en la agenda de cada alumno asignado en la fecha', () async {
       final creados = await EncargosControlador(tareas).crear(
         titulo: 'Repartir folletos',
@@ -167,7 +167,7 @@ void main() {
     });
   });
 
-  group('HU-03: tareas personales creadas por el estudiante', () {
+  group('HU-04: tareas personales creadas por el estudiante', () {
     test('el asistente crea la tarea en el día y la hora elegidos', () async {
       final asistente =
           TareaEstudianteControlador(
@@ -230,7 +230,7 @@ void main() {
     });
   });
 
-  group('HU-11: inicio y fin de una tarea', () {
+  group('HU-12: inicio y fin de una tarea', () {
     test('empezar y terminar se guarda', () async {
       final tarea = (await delDia('e01', lunes)).first;
       final detalle = DetalleTareaControlador(

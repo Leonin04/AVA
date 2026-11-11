@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// Rol de una cuenta de la colección `usuarios`.
 enum Rol { admin, tutor }
 
-/// Tipo de tutor (RF-04).
+/// Tipo de tutor (HU-01).
 enum TipoTutor { centro, familiar }
 
 /// Administrador o tutor. Documento `usuarios/{uid}` (RF-01, RF-02).

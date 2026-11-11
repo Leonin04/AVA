@@ -17,10 +17,10 @@ import 'widgets/pestana_datos.dart';
 import 'widgets/pestana_tareas.dart';
 
 /// Ficha de un alumno para su tutor, en cuatro pestañas: datos del perfil
-/// (HU-18), accesibilidad (HU-14), acceso (HU-08) y tareas (HU-03 a HU-06).
+/// (HU-19), accesibilidad (HU-15), acceso (HU-09) y tareas (HU-04 a HU-07).
 ///
 /// Si la cuenta no tiene asignado al alumno, se muestra un aviso y no se
-/// carga nada (HU-16).
+/// carga nada (HU-17).
 class PantallaFichaEstudiante extends StatefulWidget {
   const PantallaFichaEstudiante({
     super.key,

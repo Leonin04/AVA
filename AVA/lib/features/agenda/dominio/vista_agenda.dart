@@ -2,7 +2,7 @@ import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/modelos/recurso_visual.dart';
 
-/// Formas de consultar la agenda (HU-09 y HU-10).
+/// Formas de consultar la agenda (HU-10 y HU-11).
 enum VistaAgenda {
   semanal('Semana', Pictogramas.semana, ColorPastel.cielo),
   diaria('Hoy', Pictogramas.dia, ColorPastel.menta),

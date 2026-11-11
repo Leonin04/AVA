@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 import '../modelos/recurso_visual.dart';
 
-/// Acceso a la API pública de ARASAAC (RF-13).
+/// Acceso a la API pública de ARASAAC (HU-06).
 ///
 /// Documentación: https://api.arasaac.org/developers
 class ServicioArasaac {

@@ -15,7 +15,7 @@ import '../logica/calculos_agenda.dart';
 import 'widgets/boton_tarea.dart';
 import 'widgets/estado_agenda_mixin.dart';
 
-/// Agenda de la semana (HU-09): una columna por día, de lunes a domingo,
+/// Agenda de la semana (HU-10): una columna por día, de lunes a domingo,
 /// cada día con su color. Se ven todas las tareas de la semana a la vez:
 /// cada día reparte su alto entre sus tareas. Nunca hay que desplazarse.
 class PantallaAgendaSemanal extends StatefulWidget {

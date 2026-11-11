@@ -15,7 +15,7 @@ import '../logica/preferencias_controlador.dart';
 import 'opciones_preferencias.dart';
 
 /// Perfil del estudiante: su foto, su nombre y botones con pictogramas para
-/// cambiar el aspecto de toda la app (HU-14). Solo puede cambiarlos si su
+/// cambiar el aspecto de toda la app (HU-15). Solo puede cambiarlos si su
 /// tutor se lo permite.
 class PantallaPerfil extends StatelessWidget {
   const PantallaPerfil({super.key, required this.estudiante});

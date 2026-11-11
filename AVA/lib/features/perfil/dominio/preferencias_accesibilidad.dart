@@ -13,7 +13,7 @@ enum TamanoTexto {
   final double escala;
 }
 
-/// Preferencias visuales y de comunicación del estudiante (HU-14, RF-08,
+/// Preferencias visuales y de comunicación del estudiante (HU-15,
 /// RNF-05). Cambian el aspecto de toda la aplicación.
 class PreferenciasAccesibilidad {
   const PreferenciasAccesibilidad({
@@ -57,7 +57,7 @@ class PreferenciasAccesibilidad {
   /// Ignora pulsaciones repetidas (temblores o espasmos).
   final bool filtroAntitemblor;
 
-  /// Vistas de la agenda habilitadas para el estudiante (HU-09).
+  /// Vistas de la agenda habilitadas para el estudiante (HU-10).
   final Set<VistaAgenda> vistasAgenda;
 
   PreferenciasAccesibilidad copyWith({

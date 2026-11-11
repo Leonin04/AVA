@@ -18,7 +18,7 @@ import '../logica/gestion_cuentas_controlador.dart';
 import 'widgets/aviso_error.dart';
 import 'widgets/editor_clave.dart';
 
-/// Lista de cuentas con su rol, para crearlas y editarlas (HU-01, HU-02).
+/// Lista de cuentas con su rol, para crearlas y editarlas (HU-01 a HU-03).
 /// Solo para la administración.
 class PantallaCuentas extends StatefulWidget {
   const PantallaCuentas({super.key});

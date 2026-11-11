@@ -1,4 +1,4 @@
-/// Forma en la que un estudiante inicia sesión (HU-08, RF-03).
+/// Forma en la que un estudiante inicia sesión (HU-09).
 ///
 /// La clave en sí no forma parte del modelo: solo la conoce el repositorio de
 /// autenticación, que es quien la comprueba.

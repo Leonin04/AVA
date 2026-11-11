@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../ayudas_prueba.dart';
 
-/// HU-08: inicio de sesión accesible del estudiante.
+/// HU-09: inicio de sesión accesible del estudiante.
 void main() {
   final almacen = almacenDePrueba();
   final autenticacion = RepositorioAutenticacionSimulado(almacen);

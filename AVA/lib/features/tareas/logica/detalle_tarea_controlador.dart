@@ -5,8 +5,8 @@ import '../dominio/tarea_agenda.dart';
 
 /// Detalle de una tarea para el estudiante.
 ///
-/// Registra el inicio y el fin (HU-11) y permite borrar las tareas
-/// personales que ha creado él mismo (HU-03). La confirmación previa la pide
+/// Registra el inicio y el fin (HU-12) y permite borrar las tareas
+/// personales que ha creado él mismo (HU-04). La confirmación previa la pide
 /// la pantalla; este controlador solo guarda el cambio ya confirmado.
 class DetalleTareaControlador extends ChangeNotifier {
   DetalleTareaControlador({

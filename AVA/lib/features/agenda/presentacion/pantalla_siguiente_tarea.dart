@@ -15,7 +15,7 @@ import '../../tareas/dominio/tarea_agenda.dart';
 import 'widgets/boton_tarea.dart';
 import 'widgets/estado_agenda_mixin.dart';
 
-/// Anticipación (HU-10) con el formato «ahora / después», muy usado en
+/// Anticipación (HU-11) con el formato «ahora / después», muy usado en
 /// agendas visuales: a la izquierda lo que toca ahora y a la derecha lo
 /// siguiente, grande y destacado (personas Álex y Diego).
 class PantallaSiguienteTarea extends StatefulWidget {

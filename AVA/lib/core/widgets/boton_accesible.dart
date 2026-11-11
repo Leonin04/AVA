@@ -23,7 +23,7 @@ enum DisposicionBoton {
 /// - Tamaño grande y borde visible; borde más grueso con el foco o
 ///   seleccionado (WCAG 2.4.7 y 1.4.11).
 /// - Pictograma y texto juntos, respetando las preferencias de mostrar uno,
-///   otro o ambos (RF-08).
+///   otro o ambos (HU-15).
 /// - Filtro antitemblor: ignora pulsaciones repetidas (persona Carlos).
 /// - Lectura en voz alta del texto al pulsar (persona Álex).
 /// - Manejo con teclado o pulsador adaptado: se activa con Intro o Espacio

@@ -1,7 +1,7 @@
 import 'clave_acceso.dart';
 import 'cuenta.dart';
 
-/// Gestión de las cuentas de usuario (HU-01, HU-02).
+/// Gestión de las cuentas de usuario (HU-01 a HU-03).
 ///
 /// Implementaciones: `RepositorioCuentasSimulado` (pruebas) y
 /// `RepositorioCuentasFirebase`.

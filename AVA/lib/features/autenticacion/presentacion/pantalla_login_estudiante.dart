@@ -20,7 +20,7 @@ import 'widgets/huecos_clave.dart';
 import 'widgets/teclado_numerico.dart';
 import 'widgets/teclado_pictogramas.dart';
 
-/// Login accesible del estudiante (HU-08). A la izquierda su foto, la
+/// Login accesible del estudiante (HU-09). A la izquierda su foto, la
 /// instrucción y los huecos de la clave; a la derecha el teclado del método
 /// que tiene configurado: pictogramas, número o contraseña.
 class PantallaLoginEstudiante extends StatefulWidget {

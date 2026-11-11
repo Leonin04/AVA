@@ -17,7 +17,7 @@ import '../../../tareas/presentacion/pantalla_editar_tarea.dart';
 import '../../dominio/perfil_estudiante.dart';
 
 /// Tareas del alumno día a día, para crearlas, cambiarlas o borrarlas
-/// (HU-03 a HU-06).
+/// (HU-04 a HU-07).
 class PestanaTareas extends StatefulWidget {
   const PestanaTareas({
     super.key,

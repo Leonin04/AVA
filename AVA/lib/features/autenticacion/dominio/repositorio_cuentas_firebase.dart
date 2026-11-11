@@ -82,7 +82,7 @@ class RepositorioCuentasFirebase implements RepositorioCuentas {
         );
       }
 
-      // El tutor responsable del aula pasa a ser tutor del alumno (HU-15).
+      // El tutor responsable del aula pasa a ser tutor del alumno (HU-16).
       final tutor = idAula == null
           ? null
           : (await _db.collection('aulas').doc(idAula).get())

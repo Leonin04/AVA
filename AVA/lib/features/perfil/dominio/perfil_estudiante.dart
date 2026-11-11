@@ -3,7 +3,7 @@ import '../../../core/modelos/recurso_visual.dart';
 import '../../autenticacion/dominio/metodo_acceso.dart';
 import 'preferencias_accesibilidad.dart';
 
-/// Perfil de un estudiante tal como lo usa la interfaz (HU-18, RI01).
+/// Perfil de un estudiante tal como lo usa la interfaz (HU-19, RI01).
 ///
 /// En Firebase se guarda en el documento `estudiantes/{id}` con el esquema
 /// de `estudiante.dart`; la conversión está en
@@ -55,15 +55,15 @@ class Estudiante {
   final String observaciones;
 
   /// Cuentas de sus tutores (del centro y familiares), para los permisos
-  /// (HU-16).
+  /// (HU-17).
   final List<String> tutores;
 
   final PreferenciasAccesibilidad preferencias;
 
-  /// El tutor permite que el estudiante cambie sus preferencias (HU-14).
+  /// El tutor permite que el estudiante cambie sus preferencias (HU-15).
   final bool puedeModificarPreferencias;
 
-  /// El tutor permite que el estudiante cree y borre sus tareas (HU-03).
+  /// El tutor permite que el estudiante cree y borre sus tareas (HU-04).
   final bool puedeGestionarTareas;
 
   Estudiante copyWith({

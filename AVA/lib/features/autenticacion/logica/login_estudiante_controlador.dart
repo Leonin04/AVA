@@ -7,7 +7,7 @@ import '../dominio/metodo_acceso.dart';
 import '../dominio/pictograma_clave.dart';
 import '../dominio/repositorio_autenticacion.dart';
 
-/// Lógica del inicio de sesión accesible del estudiante (HU-08) con
+/// Lógica del inicio de sesión accesible del estudiante (HU-09) con
 /// contraseña, número (PIN) o pictogramas.
 class LoginEstudianteControlador extends ChangeNotifier {
   LoginEstudianteControlador({

@@ -13,7 +13,7 @@ import '../logica/permisos.dart';
 import 'widgets/boton_cerrar_sesion.dart';
 
 /// Pantalla principal de tutores y administración. Muestra solo las
-/// funciones permitidas para el rol de la cuenta (HU-02).
+/// funciones permitidas para el rol de la cuenta (HU-03).
 class PantallaPanelGestion extends StatelessWidget {
   const PantallaPanelGestion({super.key, required this.cuenta});
 

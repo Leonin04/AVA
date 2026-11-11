@@ -10,10 +10,10 @@ import '../dominio/preferencias_accesibilidad.dart';
 import '../dominio/repositorio_estudiantes.dart';
 import 'preferencias_controlador.dart';
 
-/// Ficha de un estudiante para su tutor: perfil (HU-18), preferencias
-/// (HU-14) y método de acceso (HU-08).
+/// Ficha de un estudiante para su tutor: perfil (HU-19), preferencias
+/// (HU-15) y método de acceso (HU-09).
 ///
-/// Solo carga si la cuenta tiene permiso sobre el estudiante (HU-16).
+/// Solo carga si la cuenta tiene permiso sobre el estudiante (HU-17).
 class FichaEstudianteControlador extends ControladorCarga<Estudiante> {
   FichaEstudianteControlador({
     required RepositorioEstudiantes estudiantes,

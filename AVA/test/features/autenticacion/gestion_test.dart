@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../ayudas_prueba.dart';
 
 void main() {
-  group('HU-17: login de tutores y administración', () {
+  group('HU-18: login de tutores y administración', () {
     test('entra con credenciales válidas y rechaza las inválidas', () async {
       final login = LoginGestionControlador(
         RepositorioAutenticacionSimulado(almacenDePrueba()),
@@ -60,7 +60,7 @@ void main() {
     });
   });
 
-  group('HU-01 y HU-02: cuentas y roles', () {
+  group('HU-01 a HU-03: cuentas y roles', () {
     late GestionCuentasControlador gestion;
     late RepositorioAutenticacionSimulado autenticacion;
     late RepositorioEstudiantesSimulado estudiantes;

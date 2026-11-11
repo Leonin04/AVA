@@ -10,7 +10,7 @@ import '../dominio/repositorio_estudiantes.dart';
 typedef AlumnoConAula = ({Estudiante estudiante, Aula? aula});
 
 /// Alumnos que la cuenta puede gestionar: todos para la administración y
-/// solo los de sus aulas para un tutor (HU-16).
+/// solo los de sus aulas para un tutor (HU-17).
 class ListaAlumnosControlador extends ControladorCarga<List<AlumnoConAula>> {
   ListaAlumnosControlador({
     required RepositorioEstudiantes estudiantes,

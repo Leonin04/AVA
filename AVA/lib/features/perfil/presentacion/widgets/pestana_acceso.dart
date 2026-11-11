@@ -7,7 +7,7 @@ import '../../../autenticacion/dominio/clave_acceso.dart';
 import '../../../autenticacion/presentacion/widgets/editor_clave.dart';
 import '../../logica/ficha_estudiante_controlador.dart';
 
-/// Método de acceso del alumno y su clave (HU-08, RF-03).
+/// Método de acceso del alumno y su clave (HU-09).
 class PestanaAcceso extends StatefulWidget {
   const PestanaAcceso({super.key, required this.controlador});
 

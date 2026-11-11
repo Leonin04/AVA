@@ -11,7 +11,7 @@ import 'atribucion_arasaac.dart';
 import 'pictograma.dart';
 
 /// Elección de la imagen de apoyo: un pictograma de ARASAAC o una foto
-/// propia (RF-13, HU-05, HU-14, HU-18).
+/// propia (HU-06, HU-15, HU-19).
 class SelectorRecursoVisual extends StatelessWidget {
   const SelectorRecursoVisual({
     super.key,

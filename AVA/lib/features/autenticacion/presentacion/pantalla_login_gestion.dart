@@ -12,7 +12,7 @@ import '../logica/login_gestion_controlador.dart';
 import '../logica/sesion_controlador.dart';
 import 'widgets/aviso_error.dart';
 
-/// Inicio de sesión de tutores y administración (HU-17): usuario,
+/// Inicio de sesión de tutores y administración (HU-18): usuario,
 /// contraseña, una flecha para entrar y el enlace para recuperar la
 /// contraseña.
 class PantallaLoginGestion extends StatefulWidget {

@@ -53,7 +53,7 @@ abstract final class CalculosAgenda {
             .firstOrNull;
   }
 
-  /// Siguiente tarea pendiente después de la actual (HU-10).
+  /// Siguiente tarea pendiente después de la actual (HU-11).
   ///
   /// Se ignoran las tareas terminadas y las que ya han pasado. Devuelve
   /// `null` si no queda ninguna actividad programada.

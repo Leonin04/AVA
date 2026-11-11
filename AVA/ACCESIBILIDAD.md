@@ -38,7 +38,7 @@ comprobado con pruebas automáticas (`flutter test`).
   mantienen aunque un botón no aparezca, para que nada cambie de sitio.
 - **Ayuda permanente** (personas Álex y Diego): pantalla tranquila que pide
   levantar la mano, con pictograma y voz.
-- **Ahora / después** (HU-10): formato habitual en agendas visuales, con la
+- **Ahora / después** (HU-11): formato habitual en agendas visuales, con la
   parte del día en pictograma para quien no lee el reloj (persona Álex).
 - **Pasos de uno en uno** en el detalle de la tarea (persona Diego).
 - **Filtro antitemblor** (persona Carlos): ignora pulsaciones repetidas.
@@ -51,7 +51,7 @@ comprobado con pruebas automáticas (`flutter test`).
 - **Errores sin castigo**: avisos en tono tranquilo («No es correcto. Prueba
   otra vez.»), sin rojo intenso ni pitidos.
 
-## Preferencias configurables (HU-14, RF-08, RNF-05)
+## Preferencias configurables (HU-15, RNF-05)
 
 Tamaño de letra (normal, grande, muy grande), letra clara, alto contraste,
 modo oscuro, color principal, ver pictogramas, ver palabras, leer en voz
@@ -60,24 +60,30 @@ habilitadas. El alumno solo las cambia si su tutor se lo permite.
 
 ## Cobertura de las historias de usuario
 
+Se usa la numeración del equipo (`database/README.md` y la memoria), que es
+la de `MDA0.md` con «editar cuentas» separada como HU-02: a partir de ahí,
+cada HU de `MDA0.md` tiene un número más. HU-13 (desactivar cuentas) y
+HU-14 (repetición semanal) son de la iteración 2.
+
 | HU | Dónde | Prueba |
 |---|---|---|
-| HU-01 Crear y editar cuentas | Panel › Cuentas | `gestion_test.dart` |
-| HU-02 Roles | `Permisos` y rutas protegidas por rol | `gestion_test.dart`, `widget_test.dart` |
-| HU-03 Tareas personales | Ficha › Tareas (tutor) y «Crear tarea» (alumno, si está autorizado) | `tareas_test.dart` |
-| HU-04 Horario | Formulario de tarea (fin posterior al inicio) | `tareas_test.dart` |
-| HU-05 Información accesible | Pictograma de ARASAAC o foto propia y descripción | `tareas_test.dart` |
-| HU-06 Instrucciones | Pasos ordenados, reordenables sin arrastrar | `tareas_test.dart` |
-| HU-07 Encargos del centro | Panel › Encargos (a un aula o a varios alumnos) | `tareas_test.dart` |
-| HU-08 Login accesible | Pictogramas, número o contraseña | `login_estudiante_controlador_test.dart`, `widget_test.dart` |
-| HU-09 Agenda diaria o semanal | Semana (7 días) y Hoy | `calculos_agenda_test.dart`, `widget_test.dart` |
-| HU-10 Siguiente tarea | «Ahora y después» y etiquetas AHORA/DESPUÉS | `calculos_agenda_test.dart` |
-| HU-11 Inicio y fin | Detalle › Empezar / He terminado, con confirmación y refuerzo | `tareas_test.dart` |
-| HU-14 Preferencias | Mi perfil (alumno) y Ficha › Accesibilidad (tutor) | `perfil_test.dart`, `widget_test.dart` |
-| HU-15 Aulas y tutores | Panel › Aulas | `perfil_test.dart` |
-| HU-16 Solo alumnos asignados | Lista y ficha filtradas; acceso denegado con aviso | `perfil_test.dart`, `tareas_test.dart`, `widget_test.dart` |
-| HU-17 Login de tutores y recuperación | Profesorado › Entrar / ¿Has olvidado la contraseña? | `gestion_test.dart`, `widget_test.dart` |
-| HU-18 Perfil del estudiante | Ficha › Perfil (foto, intereses, necesidades, calma, progreso) | `perfil_test.dart` |
+| HU-01 Crear cuentas | Panel › Cuentas › Nueva cuenta | `gestion_test.dart` |
+| HU-02 Editar cuentas | Panel › Cuentas › Editar | `gestion_test.dart` |
+| HU-03 Roles | `Permisos` y rutas protegidas por rol | `gestion_test.dart`, `widget_test.dart` |
+| HU-04 Tareas personales | Ficha › Tareas (tutor) y «Crear tarea» (alumno, si está autorizado) | `tareas_test.dart` |
+| HU-05 Horario | Formulario de tarea (fin posterior al inicio) | `tareas_test.dart` |
+| HU-06 Información accesible | Pictograma de ARASAAC o foto propia y descripción | `tareas_test.dart` |
+| HU-07 Instrucciones | Pasos ordenados, reordenables sin arrastrar | `tareas_test.dart` |
+| HU-08 Encargos del centro | Panel › Encargos (a un aula o a varios alumnos) | `tareas_test.dart` |
+| HU-09 Login accesible | Pictogramas, número o contraseña | `login_estudiante_controlador_test.dart`, `widget_test.dart` |
+| HU-10 Agenda diaria o semanal | Semana (7 días) y Hoy | `calculos_agenda_test.dart`, `widget_test.dart` |
+| HU-11 Siguiente tarea | «Ahora y después» y etiquetas AHORA/DESPUÉS | `calculos_agenda_test.dart` |
+| HU-12 Inicio y fin | Detalle › Empezar / He terminado, con confirmación y refuerzo | `tareas_test.dart` |
+| HU-15 Preferencias | Mi perfil (alumno) y Ficha › Accesibilidad (tutor) | `perfil_test.dart`, `widget_test.dart` |
+| HU-16 Aulas y tutores | Panel › Aulas | `perfil_test.dart` |
+| HU-17 Solo alumnos asignados | Lista y ficha filtradas; acceso denegado con aviso | `perfil_test.dart`, `tareas_test.dart`, `widget_test.dart` |
+| HU-18 Login de tutores y recuperación | Profesorado › Entrar / ¿Has olvidado la contraseña? | `gestion_test.dart`, `widget_test.dart` |
+| HU-19 Perfil del estudiante | Ficha › Perfil (foto, intereses, necesidades, calma, progreso) | `perfil_test.dart` |
 
 ## Pendiente para próximas iteraciones
 

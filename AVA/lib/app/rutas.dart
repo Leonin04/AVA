@@ -31,7 +31,7 @@ import '../features/tareas/presentacion/pantalla_nueva_tarea_estudiante.dart';
 /// Nombres de las rutas de la aplicación y construcción de cada pantalla.
 ///
 /// Centralizar la navegación evita que las pantallas dependan unas de otras
-/// y permite comprobar aquí el rol de quien entra (HU-02).
+/// y permite comprobar aquí el rol de quien entra (HU-03).
 abstract final class Rutas {
   // Estudiante.
   static const inicio = '/';
@@ -140,7 +140,7 @@ abstract final class Rutas {
   }
 
   /// Pantalla para tutores y administradores. Si la cuenta no tiene el rol
-  /// necesario, se muestra el inicio (HU-02).
+  /// necesario, se muestra el inicio (HU-03).
   static WidgetBuilder _paraGestion(
     Widget Function(Cuenta cuenta) constructor, {
     bool Function(Cuenta? cuenta)? permitido,

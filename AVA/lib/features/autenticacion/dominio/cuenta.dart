@@ -19,13 +19,13 @@ class Cuenta {
   final Rol rol;
 
   /// Correo con el que entran tutores y administradores, y al que se envía
-  /// la recuperación de la contraseña (HU-17).
+  /// la recuperación de la contraseña (HU-18).
   final String? email;
 
   /// Nombre corto con el que se crea la cuenta de un estudiante.
   final String? usuario;
 
-  /// Tutor familiar en lugar de tutor del centro (RF-04).
+  /// Tutor familiar en lugar de tutor del centro (HU-01).
   final bool esFamiliar;
 
   bool get esGestion => rol == Rol.administrador || rol == Rol.tutor;

@@ -4,7 +4,7 @@ import '../../tareas/dominio/tarea_agenda.dart';
 import 'calculos_agenda.dart';
 
 /// Carga las tareas de una semana del estudiante y las organiza para las
-/// distintas vistas de la agenda (HU-09 y HU-10).
+/// distintas vistas de la agenda (HU-10 y HU-11).
 class AgendaControlador extends ControladorCarga<List<Tarea>> {
   AgendaControlador({
     required RepositorioTareas repositorio,

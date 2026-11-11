@@ -4,7 +4,7 @@ import '../../../core/utilidades/controlador_carga.dart';
 import '../dominio/cuenta.dart';
 import '../dominio/repositorio_autenticacion.dart';
 
-/// Lógica del inicio de sesión de tutores y administradores (HU-17).
+/// Lógica del inicio de sesión de tutores y administradores (HU-18).
 class LoginGestionControlador extends ChangeNotifier {
   LoginGestionControlador(this._repositorio);
 

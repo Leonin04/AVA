@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../dominio/repositorio_autenticacion.dart';
 
-/// Recuperación de la contraseña de tutores y administradores (HU-17).
+/// Recuperación de la contraseña de tutores y administradores (HU-18).
 class RecuperacionControlador extends ChangeNotifier {
   RecuperacionControlador(this._repositorio);
 

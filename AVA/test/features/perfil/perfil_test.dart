@@ -33,7 +33,7 @@ void main() {
     );
   }
 
-  group('HU-16: el tutor solo gestiona a sus alumnos', () {
+  group('HU-17: el tutor solo gestiona a sus alumnos', () {
     test('puede abrir la ficha de un alumno de su aula', () async {
       final ficha = fichaDe('e01'); // Diego, 1ºA, tutor Javier.
       await ficha.cargar();
@@ -48,7 +48,7 @@ void main() {
     });
   });
 
-  group('HU-18: perfil del estudiante', () {
+  group('HU-19: perfil del estudiante', () {
     test('guarda foto, intereses, necesidades y autorregulación', () async {
       final ficha = fichaDe('e01');
       await ficha.cargar();
@@ -97,7 +97,7 @@ void main() {
     );
   });
 
-  group('HU-14: preferencias de accesibilidad', () {
+  group('HU-15: preferencias de accesibilidad', () {
     test('no se puede ocultar a la vez el texto y los pictogramas', () {
       const p = PreferenciasAccesibilidad(
         mostrarTexto: false,
@@ -156,7 +156,7 @@ void main() {
     });
   });
 
-  group('HU-15: aulas y tutores', () {
+  group('HU-16: aulas y tutores', () {
     test('crea un aula, le asigna alumnos y un tutor', () async {
       final almacen = almacenDePrueba();
       final estudiantes = RepositorioEstudiantesSimulado(almacen);

@@ -4,7 +4,7 @@ import '../dominio/tarea_agenda.dart';
 import 'validacion_tareas.dart';
 
 /// Creación de encargos del centro para varios estudiantes o un aula
-/// (HU-07).
+/// (HU-08).
 class EncargosControlador {
   EncargosControlador(this._repositorio);
 

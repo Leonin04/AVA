@@ -33,7 +33,7 @@ class ActividadPersonal {
 enum PasoAsistente { que, cuando, confirmar }
 
 /// Asistente accesible para que el estudiante cree o cambie sus tareas
-/// personales (HU-03): elige qué, después cuándo y por último confirma.
+/// personales (HU-04): elige qué, después cuándo y por último confirma.
 class TareaEstudianteControlador extends ChangeNotifier {
   TareaEstudianteControlador({
     required RepositorioTareas repositorio,

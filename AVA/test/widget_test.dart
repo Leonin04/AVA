@@ -85,7 +85,7 @@ void main() {
       expect(voz.dichos.last, contains('Hola, Diego'));
     });
 
-    testWidgets('cambiar una preferencia cambia toda la app (HU-14)', (
+    testWidgets('cambiar una preferencia cambia toda la app (HU-15)', (
       tester,
     ) async {
       await arrancarApp(tester);
@@ -255,7 +255,7 @@ void main() {
     });
   });
 
-  group('Profesorado (HU-02, HU-16, HU-17)', () {
+  group('Profesorado (HU-03, HU-17, HU-18)', () {
     testWidgets('un tutor solo ve sus funciones y sus alumnos', (tester) async {
       await arrancarApp(tester);
       await entrarComoGestion(tester, 'javier', 'tutor1234');

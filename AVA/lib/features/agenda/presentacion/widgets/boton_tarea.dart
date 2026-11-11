@@ -4,7 +4,7 @@ import '../../../../core/utilidades/formato_fecha.dart';
 import '../../../../core/widgets/boton_accesible.dart';
 import '../../../tareas/dominio/tarea_agenda.dart';
 
-/// Marca visual para distinguir la tarea actual y la siguiente (HU-10).
+/// Marca visual para distinguir la tarea actual y la siguiente (HU-11).
 enum DestacadoTarea {
   ninguno(null),
   ahora('AHORA'),

@@ -1,7 +1,7 @@
 import '../../../core/constantes/paleta.dart';
 import '../../../core/modelos/recurso_visual.dart';
 
-/// Grupo o clase del centro (HU-15).
+/// Grupo o clase del centro (HU-16).
 class Aula {
   const Aula({
     required this.id,
