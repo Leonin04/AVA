@@ -39,9 +39,9 @@ class Usuario {
   }
 
   Map<String, dynamic> toMap() => {
-        'nombre': nombre,
-        'email': email,
-        'rol': rol.name,
-        'tipoTutor': tipoTutor?.name,
-      };
+    'nombre': nombre,
+    'email': email,
+    'rol': rol.name,
+    'tipoTutor': tipoTutor?.name,
+  };
 }

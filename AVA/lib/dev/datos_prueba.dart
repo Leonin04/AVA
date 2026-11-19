@@ -55,7 +55,8 @@ Future<String> cargarDatosPrueba({required String adminUid}) async {
       usuario: 'pablo',
       lugarResidencia: 'Granada',
       fotoUrl: await picto('niño'),
-      queLeCalma: 'Escuchar música con cascos y que le avisen antes de los cambios.',
+      queLeCalma:
+          'Escuchar música con cascos y que le avisen antes de los cambios.',
       queNecesita: 'Instrucciones cortas, de una en una, con pictograma.',
       intereses: const ['fútbol', 'música'],
       metodoLogin: MetodoLogin.pin,
@@ -79,7 +80,10 @@ Future<String> cargarDatosPrueba({required String adminUid}) async {
       tutores: [tutora],
       puedeCambiarPreferencias: true,
       preferencias: const Preferencias(
-        visual: PreferenciasVisual(tamanoLetra: 28, colores: EsquemaColores.claro),
+        visual: PreferenciasVisual(
+          tamanoLetra: 28,
+          colores: EsquemaColores.claro,
+        ),
       ),
     ),
     const ['sol', 'perro', 'flor'],
@@ -115,12 +119,17 @@ Future<String> cargarDatosPrueba({required String adminUid}) async {
 
   // ---------- Tareas ----------
   final todosLosDias = [1, 2, 3, 4, 5];
-  Future<void> tarea(String nombre, String palabraPicto, String inicio, String fin,
-      List<String> pasos,
-      {List<String> estudiantes = const [],
-      String? aula,
-      TipoTarea tipo = TipoTarea.colegio,
-      List<int>? dias}) async {
+  Future<void> tarea(
+    String nombre,
+    String palabraPicto,
+    String inicio,
+    String fin,
+    List<String> pasos, {
+    List<String> estudiantes = const [],
+    String? aula,
+    TipoTarea tipo = TipoTarea.colegio,
+    List<int>? dias,
+  }) async {
     await bd.crearTarea(
       Tarea(
         id: '',
@@ -131,34 +140,59 @@ Future<String> cargarDatosPrueba({required String adminUid}) async {
         horaInicio: inicio,
         horaFin: fin,
         diasSemana: dias ?? todosLosDias,
-        creadaPor: adminUid, // las reglas exigen que lo cree quien está conectado
+        creadaPor:
+            adminUid, // las reglas exigen que lo cree quien está conectado
         estudiantes: estudiantes,
         aulaId: aula,
       ),
-      [for (var i = 0; i < pasos.length; i++) Paso(id: '', orden: i + 1, texto: pasos[i])],
+      [
+        for (var i = 0; i < pasos.length; i++)
+          Paso(id: '', orden: i + 1, texto: pasos[i]),
+      ],
     );
   }
 
-  await tarea('Saludar al llegar', 'saludar', '09:00', '09:10',
-      ['Entrar en clase', 'Decir buenos días', 'Colgar la mochila'],
-      aula: aulaA);
-  await tarea('Llevar fotocopias a reprografía', 'fotocopiadora', '10:00', '10:20', [
-    'Coger las fotocopias de la mesa de la profesora',
-    'Bajar a la planta baja',
-    'Entregar las fotocopias en reprografía',
-    'Volver al aula',
-  ], estudiantes: [pablo], dias: [1, 3]);
-  await tarea('Poner la mesa del comedor', 'poner la mesa', '13:30', '13:45',
-      ['Coger los platos', 'Poner un vaso en cada sitio', 'Poner los cubiertos'],
-      estudiantes: [pablo, marta]);
-  await tarea('Recoger los materiales', 'recoger', '14:00', '14:10',
-      ['Guardar los lápices', 'Guardar los cuadernos'],
-      aula: aulaB);
-  await tarea('Preparar la mochila', 'mochila', '20:00', '20:15',
-      ['Mirar la agenda de mañana', 'Meter los libros', 'Cerrar la mochila'],
-      estudiantes: [pablo],
-      tipo: TipoTarea.personal,
-      dias: [1, 2, 3, 4, 7]);
+  await tarea('Saludar al llegar', 'saludar', '09:00', '09:10', [
+    'Entrar en clase',
+    'Decir buenos días',
+    'Colgar la mochila',
+  ], aula: aulaA);
+  await tarea(
+    'Llevar fotocopias a reprografía',
+    'fotocopiadora',
+    '10:00',
+    '10:20',
+    [
+      'Coger las fotocopias de la mesa de la profesora',
+      'Bajar a la planta baja',
+      'Entregar las fotocopias en reprografía',
+      'Volver al aula',
+    ],
+    estudiantes: [pablo],
+    dias: [1, 3],
+  );
+  await tarea(
+    'Poner la mesa del comedor',
+    'poner la mesa',
+    '13:30',
+    '13:45',
+    ['Coger los platos', 'Poner un vaso en cada sitio', 'Poner los cubiertos'],
+    estudiantes: [pablo, marta],
+  );
+  await tarea('Recoger los materiales', 'recoger', '14:00', '14:10', [
+    'Guardar los lápices',
+    'Guardar los cuadernos',
+  ], aula: aulaB);
+  await tarea(
+    'Preparar la mochila',
+    'mochila',
+    '20:00',
+    '20:15',
+    ['Mirar la agenda de mañana', 'Meter los libros', 'Cerrar la mochila'],
+    estudiantes: [pablo],
+    tipo: TipoTarea.personal,
+    dias: [1, 2, 3, 4, 7],
+  );
 
   return '''
 Datos de prueba cargados.

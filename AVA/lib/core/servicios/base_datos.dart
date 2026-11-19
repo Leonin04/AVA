@@ -51,13 +51,15 @@ class BaseDatos {
   }
 
   /// Todas las cuentas de admin y tutores (solo admin).
-  Stream<List<Usuario>> usuarios() => _usuarios.snapshots().map((s) =>
-      s.docs.map(Usuario.fromDoc).toList()
-        ..sort((a, b) => a.nombre.compareTo(b.nombre)));
+  Stream<List<Usuario>> usuarios() => _usuarios.snapshots().map(
+    (s) =>
+        s.docs.map(Usuario.fromDoc).toList()
+          ..sort((a, b) => a.nombre.compareTo(b.nombre)),
+  );
 
   /// Solo los tutores (solo admin).
-  Stream<List<Usuario>> tutores() => usuarios()
-      .map((l) => l.where((u) => u.rol == Rol.tutor).toList());
+  Stream<List<Usuario>> tutores() =>
+      usuarios().map((l) => l.where((u) => u.rol == Rol.tutor).toList());
 
   /// Crea o actualiza el documento de un admin o tutor (HU-02, HU-03).
   /// La cuenta de Authentication la crea `Autenticacion.crearCuentaPersonal`.
@@ -137,10 +139,12 @@ class BaseDatos {
       });
 
   /// HU-15: el tutor autoriza o no al estudiante a cambiar sus preferencias.
-  Future<void> permitirCambiarPreferencias(String estudianteId, bool permitir) =>
-      _estudiantes
-          .doc(estudianteId)
-          .update({'puedeCambiarPreferencias': permitir});
+  Future<void> permitirCambiarPreferencias(
+    String estudianteId,
+    bool permitir,
+  ) => _estudiantes.doc(estudianteId).update({
+    'puedeCambiarPreferencias': permitir,
+  });
 
   /// T-31: método de acceso del estudiante (admin o tutor).
   /// Ojo: la clave en sí está en Authentication; si cambia el método hay que
@@ -362,7 +366,9 @@ class BaseDatos {
 
   /// Une dos streams de tareas en uno, sin duplicados y ordenado por hora.
   static Stream<List<Tarea>> _unir(
-      Stream<List<Tarea>> a, Stream<List<Tarea>> b) {
+    Stream<List<Tarea>> a,
+    Stream<List<Tarea>> b,
+  ) {
     late StreamController<List<Tarea>> ctrl;
     StreamSubscription<List<Tarea>>? sa;
     StreamSubscription<List<Tarea>>? sb;
@@ -371,9 +377,13 @@ class BaseDatos {
 
     void emitir() {
       if (ua == null || ub == null) return;
-      final porId = <String, Tarea>{for (final t in [...ua!, ...ub!]) t.id: t};
-      ctrl.add(porId.values.toList()
-        ..sort((x, y) => x.horaInicio.compareTo(y.horaInicio)));
+      final porId = <String, Tarea>{
+        for (final t in [...ua!, ...ub!]) t.id: t,
+      };
+      ctrl.add(
+        porId.values.toList()
+          ..sort((x, y) => x.horaInicio.compareTo(y.horaInicio)),
+      );
     }
 
     ctrl = StreamController<List<Tarea>>(

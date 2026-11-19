@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../app/rutas.dart';
+import '../../../core/constantes/dimensiones.dart';
 import '../../../core/constantes/paleta.dart';
 import '../../../core/constantes/pictogramas.dart';
 import '../../../core/utilidades/formato_fecha.dart';
+import '../../../core/utilidades/medida_texto.dart';
 import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
 import '../../../core/widgets/vista_carga.dart';
@@ -29,8 +31,58 @@ class PantallaAgendaSemanal extends StatefulWidget {
 
 class _PantallaAgendaSemanalState extends State<PantallaAgendaSemanal>
     with EstadoAgendaMixin {
+  static const _separacionDias = 8.0;
+
   @override
   String get idEstudiante => widget.estudiante.id;
+
+  /// Letra común a todas las tarjetas de la semana: la mayor con la que
+  /// caben todas. Así ninguna se ve más pequeña que las demás por tener un
+  /// nombre más largo; el pictograma usa el espacio que sobre.
+  double _tamanoTextoComun(
+    BuildContext context, {
+    required double ancho,
+    required double alto,
+    required String? idActual,
+    required String? idSiguiente,
+  }) {
+    final escala = MediaQuery.textScalerOf(context);
+    final estilo = Theme.of(context).textTheme.titleLarge ?? const TextStyle();
+    final maximo = estilo.fontSize ?? 22;
+    const relleno = 2 * Dimensiones.rellenoCompacto;
+    final anchoTarjeta = (ancho - _separacionDias * 6) / 7 - relleno;
+
+    var tamano = maximo;
+    for (final dia in agenda.diasSemana) {
+      final tareas = agenda.tareasDelDia(dia);
+      if (tareas.isNotEmpty) {
+        final altoTarjeta =
+            _ColumnaDia.altoTarjeta(alto, tareas.length, escala.scale(1)) -
+            relleno;
+        final tamanoDia = MedidaTexto.tamanoComun(
+          tarjetas: [
+            for (final tarea in tareas)
+              BotonTarea.textos(
+                tarea,
+                destacado: _ColumnaDia.destacadoDe(
+                  tarea,
+                  idActual,
+                  idSiguiente,
+                ),
+                compacta: true,
+              ),
+          ],
+          estilo: estilo,
+          escala: escala,
+          ancho: anchoTarjeta,
+          alto: altoTarjeta,
+          maximo: maximo,
+        );
+        tamano = math.min(tamano, tamanoDia);
+      }
+    }
+    return tamano;
+  }
 
   Future<void> _abrirDia(DateTime dia) async {
     await Navigator.pushNamed(context, Rutas.agendaDiaria, arguments: dia);
@@ -46,30 +98,41 @@ class _PantallaAgendaSemanalState extends State<PantallaAgendaSemanal>
       textoVoz: 'Mi semana. Toca un día para ver sus tareas.',
       cuerpo: VistaCarga<List<Tarea>>(
         controlador: agenda,
-        constructor: (context, _) {
-          final siguiente = agenda.siguienteTarea;
-          final actual = agenda.tareaActual;
+        constructor: (context, _) => LayoutBuilder(
+          builder: (context, restricciones) {
+            final idActual = agenda.tareaActual?.id;
+            final idSiguiente = agenda.siguienteTarea?.id;
+            final tamanoTexto = _tamanoTextoComun(
+              context,
+              ancho: restricciones.maxWidth,
+              alto: restricciones.maxHeight,
+              idActual: idActual,
+              idSiguiente: idSiguiente,
+            );
 
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final (indice, dia) in agenda.diasSemana.indexed) ...[
-                if (indice > 0) const SizedBox(width: 8),
-                Expanded(
-                  child: _ColumnaDia(
-                    dia: dia,
-                    esHoy: CalculosAgenda.esMismoDia(dia, agenda.ahora),
-                    tareas: agenda.tareasDelDia(dia),
-                    idActual: actual?.id,
-                    idSiguiente: siguiente?.id,
-                    alPulsarDia: () => _abrirDia(dia),
-                    alPulsarTarea: abrirTarea,
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final (indice, dia) in agenda.diasSemana.indexed) ...[
+                  if (indice > 0) const SizedBox(width: _separacionDias),
+                  Expanded(
+                    child: _ColumnaDia(
+                      dia: dia,
+                      esHoy: CalculosAgenda.esMismoDia(dia, agenda.ahora),
+                      tareas: agenda.tareasDelDia(dia),
+                      idActual: idActual,
+                      idSiguiente: idSiguiente,
+                      tamanoTexto: tamanoTexto,
+                      altoColumna: restricciones.maxHeight,
+                      alPulsarDia: () => _abrirDia(dia),
+                      alPulsarTarea: abrirTarea,
+                    ),
                   ),
-                ),
+                ],
               ],
-            ],
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -82,6 +145,8 @@ class _ColumnaDia extends StatelessWidget {
     required this.tareas,
     required this.idActual,
     required this.idSiguiente,
+    required this.tamanoTexto,
+    required this.altoColumna,
     required this.alPulsarDia,
     required this.alPulsarTarea,
   });
@@ -95,12 +160,38 @@ class _ColumnaDia extends StatelessWidget {
   final List<Tarea> tareas;
   final String? idActual;
   final String? idSiguiente;
+  final double tamanoTexto;
+  final double altoColumna;
   final VoidCallback alPulsarDia;
   final void Function(Tarea tarea) alPulsarTarea;
 
+  /// Alto de cada tarea cuando [cantidad] tareas se reparten una columna de
+  /// [altoColumna], para verlas todas a la vez sin desplazarse.
+  static double altoTarjeta(
+    double altoColumna,
+    int cantidad,
+    double escalaTexto,
+  ) {
+    final disponible = altoColumna - _altoCabecera - _separacion * cantidad;
+    return math.min(
+      disponible / cantidad,
+      _altoMaximoTarea * escalaTexto.clamp(1.0, 2.0),
+    );
+  }
+
+  static DestacadoTarea destacadoDe(
+    Tarea tarea,
+    String? idActual,
+    String? idSiguiente,
+  ) => tarea.id == idActual
+      ? DestacadoTarea.ahora
+      : tarea.id == idSiguiente
+      ? DestacadoTarea.despues
+      : DestacadoTarea.ninguno;
+
   @override
   Widget build(BuildContext context) {
-    final escala = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 2.0);
+    final escala = MediaQuery.textScalerOf(context).scale(1);
     final color = ColorPastel.paraIndice(dia.weekday - 1);
 
     return Column(
@@ -119,51 +210,31 @@ class _ColumnaDia extends StatelessWidget {
           ),
         ),
         const SizedBox(height: _separacion),
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, restricciones) {
-              if (tareas.isEmpty) {
-                return Center(
-                  child: Text(
-                    'Sin tareas',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                );
-              }
-
-              // Todas las tareas del día se reparten el alto disponible, para
-              // verlas todas a la vez sin desplazarse.
-              final alto = math.min(
-                (restricciones.maxHeight - _separacion * (tareas.length - 1)) /
-                    tareas.length,
-                _altoMaximoTarea * escala,
-              );
-
-              return Column(
-                children: [
-                  for (var i = 0; i < tareas.length; i++) ...[
-                    if (i > 0) const SizedBox(height: _separacion),
-                    SizedBox(
-                      height: alto,
-                      child: BotonTarea(
-                        tarea: tareas[i],
-                        compacta: true,
-                        disposicion: DisposicionBoton.vertical,
-                        destacado: tareas[i].id == idActual
-                            ? DestacadoTarea.ahora
-                            : tareas[i].id == idSiguiente
-                            ? DestacadoTarea.despues
-                            : DestacadoTarea.ninguno,
-                        alPulsar: () => alPulsarTarea(tareas[i]),
-                      ),
-                    ),
-                  ],
-                ],
-              );
-            },
-          ),
-        ),
+        if (tareas.isEmpty)
+          Expanded(
+            child: Center(
+              child: Text(
+                'Sin tareas',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          )
+        else
+          for (final (indice, tarea) in tareas.indexed) ...[
+            if (indice > 0) const SizedBox(height: _separacion),
+            SizedBox(
+              height: altoTarjeta(altoColumna, tareas.length, escala),
+              child: BotonTarea(
+                tarea: tarea,
+                compacta: true,
+                tamanoTexto: tamanoTexto,
+                disposicion: DisposicionBoton.vertical,
+                destacado: destacadoDe(tarea, idActual, idSiguiente),
+                alPulsar: () => alPulsarTarea(tarea),
+              ),
+            ),
+          ],
       ],
     );
   }

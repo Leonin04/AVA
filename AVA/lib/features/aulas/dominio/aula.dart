@@ -22,7 +22,7 @@ class Aula {
   }
 
   Map<String, dynamic> toMap() => {
-        'nombre': nombre,
-        'tutorResponsable': tutorResponsable,
-      };
+    'nombre': nombre,
+    'tutorResponsable': tutorResponsable,
+  };
 }

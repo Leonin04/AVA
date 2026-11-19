@@ -11,6 +11,10 @@ abstract final class Dimensiones {
 
   static const double espaciado = 24;
   static const double espaciadoPequeno = 12;
+
+  /// Relleno de los botones pequeños con letra común (vista semanal). Es
+  /// mayor que el borde de foco (6), para que no tape el texto.
+  static const double rellenoCompacto = 8;
   static const double radioBorde = 24;
   static const double radioBordePequeno = 16;
 

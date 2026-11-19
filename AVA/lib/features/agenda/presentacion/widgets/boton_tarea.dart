@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/utilidades/formato_fecha.dart';
+import '../../../../core/utilidades/medida_texto.dart';
 import '../../../../core/widgets/boton_accesible.dart';
 import '../../../tareas/dominio/tarea_agenda.dart';
 
@@ -26,6 +27,7 @@ class BotonTarea extends StatelessWidget {
     this.destacado = DestacadoTarea.ninguno,
     this.disposicion = DisposicionBoton.horizontal,
     this.compacta = false,
+    this.tamanoTexto,
   });
 
   final Tarea tarea;
@@ -36,9 +38,15 @@ class BotonTarea extends StatelessWidget {
   /// Versión reducida (solo la hora de inicio) para la vista semanal.
   final bool compacta;
 
-  @override
-  Widget build(BuildContext context) {
-    final terminada = tarea.estado == EstadoTarea.completada;
+  /// Letra común a varias tarjetas (ver [BotonAccesible.tamanoTexto]).
+  final double? tamanoTexto;
+
+  /// Textos que muestra la tarjeta, para medirlos antes de pintarla.
+  static TextosTarjeta textos(
+    Tarea tarea, {
+    DestacadoTarea destacado = DestacadoTarea.ninguno,
+    bool compacta = false,
+  }) {
     final hora = compacta
         ? FormatoFecha.hora(tarea.inicio)
         : FormatoFecha.intervalo(tarea.inicio, tarea.fin);
@@ -47,13 +55,35 @@ class BotonTarea extends StatelessWidget {
       EstadoTarea.enCurso => ' · Haciendo',
       EstadoTarea.completada => ' · ✓ Terminada',
     };
+    final terminada = tarea.estado == EstadoTarea.completada;
+    final marca = destacado.etiqueta;
+    // En la versión compacta la marca va en la línea de la hora: una
+    // etiqueta aparte quitaría tanto alto que toda la semana tendría que
+    // usar letra más pequeña.
+    final String secundario;
+    if (!compacta) {
+      secundario = '$hora$estado';
+    } else if (marca != null) {
+      secundario = '${marca[0]}${marca.substring(1).toLowerCase()} · $hora';
+    } else {
+      secundario = terminada ? '✓ $hora' : hora;
+    }
+    return (
+      etiqueta: compacta ? null : marca,
+      texto: tarea.titulo,
+      secundario: secundario,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final contenido = textos(tarea, destacado: destacado, compacta: compacta);
 
     return BotonAccesible(
-      texto: tarea.titulo,
-      textoSecundario: compacta
-          ? (terminada ? '✓ $hora' : hora)
-          : '$hora$estado',
-      etiqueta: destacado.etiqueta,
+      texto: contenido.texto,
+      textoSecundario: contenido.secundario,
+      etiqueta: contenido.etiqueta,
+      tamanoTexto: tamanoTexto,
       pictograma: tarea.pictograma,
       icono: Icons.event_rounded,
       color: tarea.tipo.color,

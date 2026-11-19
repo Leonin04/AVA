@@ -58,7 +58,8 @@ class _PantallaDesarrolloState extends State<PantallaDesarrollo> {
     try {
       resumen = await cargarDatosPrueba(adminUid: _usuario!.id);
     } catch (e) {
-      resumen = 'Error: $e\n(Si dice que la cuenta ya existe, los datos ya estaban cargados.)';
+      resumen =
+          'Error: $e\n(Si dice que la cuenta ya existe, los datos ya estaban cargados.)';
     }
     if (!mounted) return;
     setState(() => _cargando = false);
@@ -67,7 +68,12 @@ class _PantallaDesarrolloState extends State<PantallaDesarrollo> {
       builder: (ctx) => AlertDialog(
         title: const Text('Datos de prueba'),
         content: SelectableText(resumen),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Vale'))],
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Vale'),
+          ),
+        ],
       ),
     );
   }
@@ -76,12 +82,14 @@ class _PantallaDesarrolloState extends State<PantallaDesarrollo> {
   Future<void> _crearEstudiantePrueba() async {
     final id = FirebaseFirestore.instance.collection('estudiantes').doc().id;
     final n = DateTime.now().millisecondsSinceEpoch % 1000;
-    await _bd.crearEstudiante(Estudiante(
-      id: id,
-      nombre: 'Estudiante prueba $n',
-      usuario: 'prueba$n',
-      tutores: [_usuario!.id],
-    ));
+    await _bd.crearEstudiante(
+      Estudiante(
+        id: id,
+        nombre: 'Estudiante prueba $n',
+        usuario: 'prueba$n',
+        tutores: [_usuario!.id],
+      ),
+    );
   }
 
   @override
@@ -113,63 +121,70 @@ class _PantallaDesarrolloState extends State<PantallaDesarrollo> {
   }
 
   Widget _login() => Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: _email,
-                  decoration: const InputDecoration(labelText: 'Correo (admin o tutor)'),
-                ),
-                TextField(
-                  controller: _pass,
-                  obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Contraseña'),
-                  onSubmitted: (_) => _entrar(),
-                ),
-                const SizedBox(height: 16),
-                FilledButton(onPressed: _entrar, child: const Text('Entrar')),
-                if (_error != null) ...[
-                  const SizedBox(height: 12),
-                  Text(_error!, style: const TextStyle(color: Colors.red)),
-                ],
-              ],
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 420),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _email,
+              decoration: const InputDecoration(
+                labelText: 'Correo (admin o tutor)',
+              ),
             ),
-          ),
+            TextField(
+              controller: _pass,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Contraseña'),
+              onSubmitted: (_) => _entrar(),
+            ),
+            const SizedBox(height: 16),
+            FilledButton(onPressed: _entrar, child: const Text('Entrar')),
+            if (_error != null) ...[
+              const SizedBox(height: 12),
+              Text(_error!, style: const TextStyle(color: Colors.red)),
+            ],
+          ],
         ),
-      );
+      ),
+    ),
+  );
 
   Widget _estudiantes(Usuario u) => StreamBuilder<List<Estudiante>>(
-        stream: u.esAdmin ? _bd.todosLosEstudiantes() : _bd.estudiantesDeTutor(u.id),
-        builder: (context, snap) {
-          if (snap.hasError) return Center(child: Text('Error: ${snap.error}'));
-          if (!snap.hasData) return const Center(child: CircularProgressIndicator());
-          final lista = snap.data!;
-          return ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              Text('Conectado como ${u.nombre} (${u.rol.name})'),
-              const SizedBox(height: 12),
-              if (u.esAdmin)
-                OutlinedButton.icon(
-                  onPressed: _cargando ? null : _cargarDatosPrueba,
-                  icon: const Icon(Icons.dataset),
-                  label: Text(_cargando ? 'Cargando…' : 'Cargar datos de prueba (solo una vez)'),
-                ),
-              const SizedBox(height: 12),
-              if (lista.isEmpty) const Text('Todavía no hay estudiantes.'),
-              for (final e in lista)
-                Card(
-                  child: ListTile(
-                    title: Text(e.nombre),
-                    subtitle: Text(e.id),
-                  ),
-                ),
-            ],
-          );
-        },
+    stream: u.esAdmin
+        ? _bd.todosLosEstudiantes()
+        : _bd.estudiantesDeTutor(u.id),
+    builder: (context, snap) {
+      if (snap.hasError) return Center(child: Text('Error: ${snap.error}'));
+      if (!snap.hasData) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final lista = snap.data!;
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text('Conectado como ${u.nombre} (${u.rol.name})'),
+          const SizedBox(height: 12),
+          if (u.esAdmin)
+            OutlinedButton.icon(
+              onPressed: _cargando ? null : _cargarDatosPrueba,
+              icon: const Icon(Icons.dataset),
+              label: Text(
+                _cargando
+                    ? 'Cargando…'
+                    : 'Cargar datos de prueba (solo una vez)',
+              ),
+            ),
+          const SizedBox(height: 12),
+          if (lista.isEmpty) const Text('Todavía no hay estudiantes.'),
+          for (final e in lista)
+            Card(
+              child: ListTile(title: Text(e.nombre), subtitle: Text(e.id)),
+            ),
+        ],
       );
+    },
+  );
 }

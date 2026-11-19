@@ -41,8 +41,8 @@ class ErrorAcceso implements Exception {
 ///   poder mostrar aulas y avatares ([prepararTableta]).
 class Autenticacion {
   Autenticacion({FirebaseAuth? auth, BaseDatos? bd})
-      : _auth = auth ?? FirebaseAuth.instance,
-        _bd = bd ?? BaseDatos();
+    : _auth = auth ?? FirebaseAuth.instance,
+      _bd = bd ?? BaseDatos();
 
   final FirebaseAuth _auth;
   final BaseDatos _bd;
@@ -52,7 +52,14 @@ class Autenticacion {
 
   /// Palabras de la clave de pictogramas (HU-09). La pantalla de acceso
   /// muestra el pictograma de ARASAAC de cada una y el alumno toca 3 en orden.
-  static const pictogramasClave = ['sol', 'casa', 'perro', 'coche', 'flor', 'pelota'];
+  static const pictogramasClave = [
+    'sol',
+    'casa',
+    'perro',
+    'coche',
+    'flor',
+    'pelota',
+  ];
 
   /// Correo interno de un estudiante a partir de su usuario.
   static String correoEstudiante(String usuario) =>
@@ -63,10 +70,10 @@ class Autenticacion {
   /// - pictogramas ["sol","perro","flor"] → "ava-pic-sol-perro-flor"
   /// - contraseña "miclave"            → "miclave" (mínimo 6 caracteres)
   static String claveDe(MetodoLogin metodo, Object entrada) => switch (metodo) {
-        MetodoLogin.pin => 'ava-pin-$entrada',
-        MetodoLogin.pictograma => 'ava-pic-${(entrada as List).join('-')}',
-        MetodoLogin.contrasena => entrada as String,
-      };
+    MetodoLogin.pin => 'ava-pin-$entrada',
+    MetodoLogin.pictograma => 'ava-pic-${(entrada as List).join('-')}',
+    MetodoLogin.contrasena => entrada as String,
+  };
 
   /// Cambios de sesión (para redirigir pantallas).
   Stream<User?> get cambiosDeSesion => _auth.authStateChanges();
@@ -91,14 +98,18 @@ class Autenticacion {
   Future<Sesion> entrarPersonal(String correo, String contrasena) async {
     try {
       await _auth.signInWithEmailAndPassword(
-          email: correo.trim(), password: contrasena);
+        email: correo.trim(),
+        password: contrasena,
+      );
     } on FirebaseAuthException catch (e) {
       throw ErrorAcceso(_mensaje(e));
     }
     final s = await quienSoy();
     if (s.usuario == null) {
       await salir();
-      throw const ErrorAcceso('Esta cuenta no es de un tutor ni de un administrador.');
+      throw const ErrorAcceso(
+        'Esta cuenta no es de un tutor ni de un administrador.',
+      );
     }
     return s;
   }
@@ -115,9 +126,11 @@ class Autenticacion {
     } on FirebaseAuthException catch (e) {
       // Volvemos a la sesión anónima para que la tableta siga funcionando.
       await prepararTableta();
-      throw ErrorAcceso(e.code == 'invalid-credential' || e.code == 'wrong-password'
-          ? 'Clave incorrecta. Prueba otra vez.'
-          : _mensaje(e));
+      throw ErrorAcceso(
+        e.code == 'invalid-credential' || e.code == 'wrong-password'
+            ? 'Clave incorrecta. Prueba otra vez.'
+            : _mensaje(e),
+      );
     }
     return quienSoy();
   }
@@ -157,13 +170,15 @@ class Autenticacion {
     TipoTutor? tipoTutor,
   }) async {
     final uid = await _crearCuenta(correo.trim(), contrasena);
-    await _bd.guardarUsuario(Usuario(
-      id: uid,
-      nombre: nombre,
-      email: correo.trim(),
-      rol: rol,
-      tipoTutor: rol == Rol.tutor ? tipoTutor : null,
-    ));
+    await _bd.guardarUsuario(
+      Usuario(
+        id: uid,
+        nombre: nombre,
+        email: correo.trim(),
+        rol: rol,
+        tipoTutor: rol == Rol.tutor ? tipoTutor : null,
+      ),
+    );
     return uid;
   }
 
@@ -175,21 +190,23 @@ class Autenticacion {
       correoEstudiante(datos.usuario),
       claveDe(datos.metodoLogin, entrada),
     );
-    await _bd.crearEstudiante(Estudiante(
-      id: uid,
-      nombre: datos.nombre,
-      usuario: datos.usuario.trim().toLowerCase(),
-      lugarResidencia: datos.lugarResidencia,
-      fotoUrl: datos.fotoUrl,
-      queLeCalma: datos.queLeCalma,
-      queNecesita: datos.queNecesita,
-      intereses: datos.intereses,
-      metodoLogin: datos.metodoLogin,
-      aulaId: datos.aulaId,
-      tutores: datos.tutores,
-      puedeCambiarPreferencias: datos.puedeCambiarPreferencias,
-      preferencias: datos.preferencias,
-    ));
+    await _bd.crearEstudiante(
+      Estudiante(
+        id: uid,
+        nombre: datos.nombre,
+        usuario: datos.usuario.trim().toLowerCase(),
+        lugarResidencia: datos.lugarResidencia,
+        fotoUrl: datos.fotoUrl,
+        queLeCalma: datos.queLeCalma,
+        queNecesita: datos.queNecesita,
+        intereses: datos.intereses,
+        metodoLogin: datos.metodoLogin,
+        aulaId: datos.aulaId,
+        tutores: datos.tutores,
+        puedeCambiarPreferencias: datos.puedeCambiarPreferencias,
+        preferencias: datos.preferencias,
+      ),
+    );
     return uid;
   }
 
@@ -208,7 +225,9 @@ class Autenticacion {
     final auth2 = FirebaseAuth.instanceFor(app: app);
     try {
       final cred = await auth2.createUserWithEmailAndPassword(
-          email: correo, password: contrasena);
+        email: correo,
+        password: contrasena,
+      );
       return cred.user!.uid;
     } on FirebaseAuthException catch (e) {
       throw ErrorAcceso(_mensaje(e));
@@ -218,15 +237,15 @@ class Autenticacion {
   }
 
   static String _mensaje(FirebaseAuthException e) => switch (e.code) {
-        'invalid-credential' ||
-        'wrong-password' ||
-        'user-not-found' =>
-          'El correo o la contraseña no son correctos.',
-        'invalid-email' => 'El correo no es válido.',
-        'email-already-in-use' => 'Ya existe una cuenta con ese correo o usuario.',
-        'weak-password' => 'La contraseña es demasiado corta (mínimo 6 caracteres).',
-        'too-many-requests' => 'Demasiados intentos. Espera un momento.',
-        'network-request-failed' => 'No hay conexión a Internet.',
-        _ => 'No se pudo completar (${e.code}).',
-      };
+    'invalid-credential' ||
+    'wrong-password' ||
+    'user-not-found' => 'El correo o la contraseña no son correctos.',
+    'invalid-email' => 'El correo no es válido.',
+    'email-already-in-use' => 'Ya existe una cuenta con ese correo o usuario.',
+    'weak-password' =>
+      'La contraseña es demasiado corta (mínimo 6 caracteres).',
+    'too-many-requests' => 'Demasiados intentos. Espera un momento.',
+    'network-request-failed' => 'No hay conexión a Internet.',
+    _ => 'No se pudo completar (${e.code}).',
+  };
 }

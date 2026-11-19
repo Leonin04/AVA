@@ -25,13 +25,13 @@ class Acceso {
   });
 
   factory Acceso.deEstudiante(Estudiante e) => Acceso(
-        id: e.id,
-        nombre: e.nombre.split(' ').first,
-        fotoUrl: e.fotoUrl,
-        aulaId: e.aulaId,
-        metodoLogin: e.metodoLogin,
-        usuario: e.usuario,
-      );
+    id: e.id,
+    nombre: e.nombre.split(' ').first,
+    fotoUrl: e.fotoUrl,
+    aulaId: e.aulaId,
+    metodoLogin: e.metodoLogin,
+    usuario: e.usuario,
+  );
 
   factory Acceso.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data() ?? {};
@@ -40,17 +40,18 @@ class Acceso {
       nombre: d['nombre'] as String? ?? '',
       fotoUrl: d['fotoUrl'] as String? ?? '',
       aulaId: d['aulaId'] as String?,
-      metodoLogin:
-          MetodoLogin.values.byName(d['metodoLogin'] as String? ?? 'pin'),
+      metodoLogin: MetodoLogin.values.byName(
+        d['metodoLogin'] as String? ?? 'pin',
+      ),
       usuario: d['usuario'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'nombre': nombre,
-        'fotoUrl': fotoUrl,
-        'aulaId': aulaId,
-        'metodoLogin': metodoLogin.name,
-        'usuario': usuario,
-      };
+    'nombre': nombre,
+    'fotoUrl': fotoUrl,
+    'aulaId': aulaId,
+    'metodoLogin': metodoLogin.name,
+    'usuario': usuario,
+  };
 }
