@@ -126,6 +126,8 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
       if (mounted) Navigator.of(context).pop(true);
     } on ErrorConMensaje catch (error) {
       if (mounted) setState(() => _error = error.mensaje);
+    } catch (error) {
+      if (mounted) setState(() => _error = 'Error al guardar: $error');
     } finally {
       if (mounted) setState(() => _guardando = false);
     }

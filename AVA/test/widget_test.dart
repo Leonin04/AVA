@@ -15,7 +15,10 @@ void main() {
       tester,
     ) async {
       await arrancarApp(tester);
-      expect(find.text('AVA'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel('AVA, Agenda Virtual Accesible'),
+        findsOneWidget,
+      );
       expect(find.text('1ºA'), findsOneWidget);
 
       await entrarComoDiego(tester);

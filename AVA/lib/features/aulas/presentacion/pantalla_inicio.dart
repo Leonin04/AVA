@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +14,6 @@ import '../../../core/widgets/boton_accesible.dart';
 import '../../../core/widgets/cuadricula_ajustada.dart';
 import '../../../core/widgets/mensaje_informativo.dart';
 import '../../../core/widgets/pantalla_estudiante.dart';
-import '../../../core/widgets/pictograma.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../dominio/ficha_aula.dart';
 import '../dominio/repositorio_aulas.dart';
@@ -58,7 +58,7 @@ class _PantallaInicioState extends State<PantallaInicio> {
                 child: Row(
                   children: [
                     _HuecoBoton(
-                      alineacion: MainAxisAlignment.start,
+                      alineacion: Alignment.centerLeft,
                       child: AjustesInterfaz.of(context).botonEscuchar
                           ? BotonAccesible(
                               texto: 'Escuchar',
@@ -72,15 +72,10 @@ class _PantallaInicioState extends State<PantallaInicio> {
                           : null,
                     ),
                     const SizedBox(width: Dimensiones.espaciado),
-                    const Flexible(
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: _Logotipo(),
-                      ),
-                    ),
+                    const _Logotipo(),
                     const SizedBox(width: Dimensiones.espaciado),
                     _HuecoBoton(
-                      alineacion: MainAxisAlignment.end,
+                      alineacion: Alignment.centerRight,
                       child: BotonAccesible(
                         texto: 'Profesorado',
                         etiquetaSemantica: 'Acceso para profesorado',
@@ -154,41 +149,16 @@ class _Logotipo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final estilo = AjustesInterfaz.of(context).estiloDe(ColorPastel.cielo);
-
     return Semantics(
       header: true,
       label: 'AVA, Agenda Virtual Accesible',
-      excludeSemantics: true,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-        decoration: BoxDecoration(
-          color: estilo.fondo,
-          borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
-          border: Border.all(
-            color: estilo.borde,
-            width: Dimensiones.grosorBorde,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Pictograma(
-              recurso: Pictogramas.agenda,
-              tamano: 60,
-              iconoRespaldo: Icons.calendar_month_rounded,
-              colorRespaldo: estilo.acento,
-            ),
-            const SizedBox(width: 16),
-            Text(
-              'AVA',
-              style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: estilo.texto,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 4,
-              ),
-            ),
-          ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
+        child: Image.asset(
+          'assets/iconos/logo_AVA.jpg',
+          height: Dimensiones.altoBarraNavegacion,
+          fit: BoxFit.contain,
+          semanticLabel: 'AVA, Agenda Virtual Accesible',
         ),
       ),
     );
@@ -197,29 +167,31 @@ class _Logotipo extends StatelessWidget {
 
 /// Hueco lateral de la barra superior. El botón mide como mucho 290 px y
 /// se estrecha si la pantalla no da para más; si no hay botón, el hueco se
-/// mantiene para que el logotipo no cambie de sitio.
+/// mantiene para que el logotipo quede exactamente centrado.
 class _HuecoBoton extends StatelessWidget {
   const _HuecoBoton({required this.alineacion, required this.child});
 
-  final MainAxisAlignment alineacion;
+  final Alignment alineacion;
   final Widget? child;
 
   @override
   Widget build(BuildContext context) {
     final boton = child;
     return Expanded(
-      child: Row(
-        mainAxisAlignment: alineacion,
-        children: [
-          if (boton != null)
-            Flexible(
-              child: SizedBox(
-                width: 290,
-                height: double.infinity,
-                child: boton,
-              ),
-            ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, restricciones) {
+          final ancho = math.min(290.0, restricciones.maxWidth);
+          return Align(
+            alignment: alineacion,
+            child: boton != null
+                ? SizedBox(
+                    width: ancho,
+                    height: double.infinity,
+                    child: boton,
+                  )
+                : const SizedBox.shrink(),
+          );
+        },
       ),
     );
   }
