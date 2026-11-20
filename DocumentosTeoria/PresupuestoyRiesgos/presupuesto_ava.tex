@@ -1,0 +1,516 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands]{babel}
+\usepackage[a4paper,left=2.6cm,right=2.6cm,top=2.6cm,bottom=2.6cm,headheight=22pt,headsep=18pt]{geometry}
+
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{tcolorbox}
+\usepackage{tocloft}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{eurosym}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{
+  compat=1.18,
+  /pgf/number format/use comma,
+  /pgf/number format/set thousands separator={.}
+}
+\usepackage[hidelinks]{hyperref}
+
+% Paleta corporativa de AVA (identica a los entregables de las iteraciones)
+\definecolor{avaprimary}{HTML}{17324D}
+\definecolor{avaaccent}{HTML}{158C8C}
+\definecolor{avamuted}{HTML}{536273}
+\definecolor{avabg}{HTML}{F1F6F8}
+\definecolor{avaborder}{HTML}{D6E0E6}
+\definecolor{avasoftteal}{HTML}{E3F2F2}
+
+\DeclareUnicodeCharacter{20AC}{\euro}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\renewcommand{\arraystretch}{1.24}
+
+% Estilo de secciones identico a Entregable 2
+\titleformat{\section}
+  {\Large\bfseries\color{avaprimary}}
+  {\thesection}
+  {0.8em}
+  {}
+  [\vspace{3pt}{\color{avaaccent}\titlerule[0.4pt]}]
+\titlespacing*{\section}{0pt}{16pt}{9pt}
+
+\titleformat{\subsection}
+  {\large\bfseries\color{avaaccent}}
+  {\thesubsection}
+  {0.7em}
+  {}
+\titlespacing*{\subsection}{0pt}{12pt}{5pt}
+
+% Estilo del indice
+\renewcommand{\contentsname}{Índice}
+\renewcommand{\cfttoctitlefont}{\Large\bfseries\color{avaprimary}}
+\renewcommand{\cftaftertoctitle}{\par\vspace{3pt}{\color{avaaccent}\hrule height 0.4pt}\par\vspace{10pt}}
+\renewcommand{\cftsecfont}{\bfseries\color{avaprimary}}
+\renewcommand{\cftsecpagefont}{\bfseries\color{black}}
+\renewcommand{\cftsubsecfont}{\color{avamuted}}
+\renewcommand{\cftsubsecpagefont}{\color{avamuted}}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftnodots}}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforesecskip}{7pt}
+\setlength{\cftbeforesubsecskip}{2pt}
+
+% Encabezado y pie de pagina
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{\small\color{avamuted}Presupuesto del Proyecto}
+\rhead{\small\color{avamuted}Proyecto AUTOVIDA -- AVA}
+\cfoot{\small\color{avamuted}\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{avaborder}\leaders\hrule height \headrulewidth\hfill}}
+\renewcommand{\footrulewidth}{0pt}
+
+\captionsetup{
+  font=small,
+  labelfont={bf,color=avaprimary},
+  textfont={color=avamuted},
+  skip=6pt
+}
+
+\setlist[itemize]{leftmargin=1.4em,itemsep=3pt,topsep=3pt}
+\setlist[enumerate]{leftmargin=1.6em,itemsep=3pt,topsep=3pt}
+
+\newtcolorbox{avabox}[1][]{
+  colback=avabg,
+  colframe=avaborder,
+  boxrule=0.5pt,
+  arc=4pt,
+  left=11pt,
+  right=11pt,
+  top=9pt,
+  bottom=9pt,
+  #1
+}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\hypersetup{
+  pdftitle={Presupuesto del Proyecto: AUTOVIDA (26-175) -- AVA},
+  pdfauthor={Equipo DGP1\_Jueves 8,30\_5},
+  pdfsubject={Dirección y Gestión de Proyectos -- Presupuesto}
+}
+
+\begin{document}
+
+% =========================================================================
+% PORTADA (mismo formato que Entregable 2 de DGP)
+% =========================================================================
+\begin{titlepage}
+  \thispagestyle{empty}
+  \vspace*{0.05cm}
+  {\color{avaaccent}\rule{\linewidth}{3pt}\par}
+  \vspace{0.55cm}
+
+  \begin{center}
+    \includegraphics[width=0.42\linewidth]{img/logo_ava.jpeg}\par
+    \vspace{0.2cm}
+    {\large\bfseries\color{avamuted} Dirección y Gestión de Proyectos\par}
+    \vspace{0.08cm}
+    {\normalsize\color{avamuted} Grado en Ingeniería Informática -- Universidad de Granada\par}
+  \end{center}
+
+  \vspace{0.65cm}
+  {\large\bfseries\color{avaaccent} DOCUMENTACIÓN DEL PROYECTO\par}
+  \vspace{0.18cm}
+  {\fontsize{24.88}{29}\selectfont\bfseries\color{avaprimary} Presupuesto del Proyecto\par}
+  \vspace{0.22cm}
+  {\Large\bfseries\color{avaaccent} Estimación de Costes por Partidas e Iteraciones\par}
+  \vspace{0.2cm}
+  {\Large\color{avamuted} Proyecto completo (24/09/2026 -- 12/01/2027)\par}
+
+  \vspace{0.55cm}
+  \begin{avabox}
+    Proyecto AUTOVIDA (26-175) -- AVA (Agenda Virtual Accesible), para el alumnado del PTVAL del Colegio de Educación Especial Fundación Purísima Concepción (Granada). Este documento recoge el presupuesto del proyecto desglosado por tipo de gasto (personal, inventariable prorrateado, fungible, software y complementarios) y por fases e iteraciones, incorporando los costes indirectos compartibles y los márgenes para futuras inversiones y beneficio.
+  \end{avabox}
+
+  \vfill
+
+  {\large\bfseries\color{avaprimary} Equipo (DGP1\_Jueves 8,30\_5)\par}
+  \vspace{0.22cm}
+  \begin{tabular}{@{}L{0.48\linewidth}L{0.48\linewidth}@{}}
+    David Bacas Posadas & Adam Ben Chacha \\
+    Paula Cobos González & Manuel José Fernández Poyatos \\
+    Alberto David Gómez Gijón & Daniel Viloria Prieto \\
+  \end{tabular}
+
+  \vspace{0.35cm}
+  \begin{tabularx}{\linewidth}{@{}l X@{}}
+    {\bfseries\color{avaprimary} Contenido} & Presupuesto del proyecto por tipo de gasto e iteraciones, justificación y fuentes \\
+    {\bfseries\color{avaprimary} Fecha} & 20 de noviembre de 2026 \\
+  \end{tabularx}
+
+  \vspace{0.4cm}
+  {\color{avaaccent}\rule{\linewidth}{1.5pt}\par}
+\end{titlepage}
+
+% =========================================================================
+% INDICE
+% =========================================================================
+\setcounter{page}{1}
+\tableofcontents
+\newpage
+
+% =========================================================================
+% 1. INTRODUCCION Y ALCANCE
+% =========================================================================
+\section{Introducción y alcance del presupuesto}
+
+Este documento presenta el presupuesto del proyecto \textbf{AUTOVIDA (26-175) -- AVA (Agenda Virtual Accesible)}, desarrollado por el equipo \textbf{DGP1\_Jueves 8,30\_5} (6 integrantes) para el alumnado del PTVAL del \textbf{Colegio de Educación Especial Fundación Purísima Concepción} (Granada). La aplicación se desarrolla en \textbf{Flutter} para tabletas Android e iOS, con \textbf{Firebase} (\textit{Authentication}, \textit{Cloud Firestore} en región UE, \textit{Cloud Storage} y \textit{Cloud Messaging}) y la \textbf{API de ARASAAC}.
+
+El presupuesto cubre el ciclo completo del proyecto desde el \textbf{24 de septiembre de 2026} hasta la presentación final el \textbf{12 de enero de 2027} (aproximadamente \textbf{4 meses} de duración), integrando las horas reales registradas hasta la fecha y las previstas hasta el cierre:
+
+\begin{table}[H]
+  \centering
+  \caption{Fases, fechas y esfuerzo del proyecto AVA.}
+  \label{tab:fases}
+  \begin{tabularx}{\linewidth}{@{}L{4.5cm} C{3.4cm} C{1.8cm} Y@{}}
+    \toprule
+    \textbf{Fase / Iteración} & \textbf{Periodo} & \textbf{Esfuerzo} & \textbf{Referencia} \\
+    \midrule
+    Fase 0: Inicio y especificación & 24/09 -- 22/10/2026 & 65 h & Real (\textit{DGP0}) \\
+    Iteración 1 (Sprint 1) & 22/10 -- 11/11/2026 & 60 h & Real (\textit{Entregable 1}) \\
+    Iteración 2 (Sprint 2) & 12/11 -- 03/12/2026 & 72 h & Prevista (\textit{Entregable 2}) \\
+    Iteración 3 (Sprint 3) & 03/12 -- 21/12/2026 & 72 h & Prevista (12 h/integrante) \\
+    Cierre y presentación final & 22/12 -- 12/01/2027 & 18 h & Prevista (3 h/integrante) \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total del proyecto} & \textbf{24/09/26 -- 12/01/27} & \textbf{287 h} & \textbf{125 h reales + 162 h previstas} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+Tal como se estableció en \textit{DGP0} (sección 3.5), quedan \textbf{fuera del alcance} de este presupuesto el suministro de tabletas para el alumnado del Colegio, el mantenimiento posterior a la entrega final y la integración con otros sistemas externos del centro.
+
+% =========================================================================
+% 2. GASTOS DE PERSONAL
+% =========================================================================
+\section{Gastos de personal}
+
+\subsection{Justificación salarial según nuestro rango}
+
+El equipo está formado por seis estudiantes de cuarto curso del Grado en Ingeniería Informática sin experiencia laboral previa consolidada (\textit{DGP0}, sección 2.2.2), lo que corresponde al perfil de \textbf{Desarrollador / Programador Junior}. Para justificar el coste horario de forma realista se toma como fuente oficial el \textbf{XIX Convenio Colectivo Estatal de Empresas de Consultoría, Tecnologías de la Información y Estudios de Mercado y de la Opinión Pública} (tablas salariales actualizadas para 2026):
+
+\begin{itemize}
+  \item \textbf{Categoría de referencia:} Área 3 (\textit{Desarrollo de software y programación}), \textbf{Grupo D, Nivel 1 (A3GDN1)} --- perfil junior de entrada.
+  \item \textbf{Salario bruto anual (2026):} \textbf{20.436,01 €} (18.758,93 € de salario base + 1.677,08 € de plus de convenio), repartidos en 14 pagas (lo que equivale a 1.703,00 €/mes con pagas extras prorrateadas).
+  \item \textbf{Jornada anual de convenio:} \textbf{1.800 horas} efectivas al año.
+  \item \textbf{Coste real para la empresa (cuota patronal):} Como se recoge en el material de \textit{Gestión de Costes} de la asignatura, al salario bruto la empresa debe sumar la cuota patronal de la Seguridad Social (en torno al 30--40 \% en España; concretamente un \textbf{32,15 \%} para empresas de programación informática en 2026). Con ello se obtiene el coste laboral horario:
+\end{itemize}
+
+\begin{avabox}
+  \[
+    \text{Coste anual empresa} = 20.436{,}01\text{ €} \times 1{,}3215 = 27.006{,}19\text{ €/año}
+  \]
+  \[
+    \text{Coste/hora directo} = \frac{27.006{,}19\text{ €}}{1.800\text{ h}} = 15{,}0034\text{ €/h} \approx \mathbf{15{,}00\text{ €/h}}
+  \]
+  Dado que todos los miembros tienen el mismo rango junior y rotan entre los bloques de diseño, documentación e implementación en cada iteración, se aplica una tarifa base uniforme de \textbf{15,00 €/h}.
+\end{avabox}
+
+\subsection{Desglose de horas y coste por integrante}
+
+\begin{table}[H]
+  \centering
+  \caption{Dedicación horaria y coste de personal por integrante y fase (a 15,00 €/h).}
+  \label{tab:personal}
+  \begin{tabularx}{\linewidth}{@{}Y C{0.8cm} C{0.85cm} C{0.85cm} C{0.85cm} C{1.1cm} C{1.4cm} R{2.1cm}@{}}
+    \toprule
+    \textbf{Integrante} & \textbf{F0} & \textbf{It.1} & \textbf{It.2} & \textbf{It.3} & \textbf{Cierre} & \textbf{Total h} & \textbf{Coste (€)} \\
+    \midrule
+    David Bacas Posadas & 12 & 10 & 12 & 12 & 3 & 49 & 735,00 \\
+    Adam Ben Chacha & 10 & 10 & 12 & 12 & 3 & 47 & 705,00 \\
+    Paula Cobos González & 13 & 11 & 12 & 12 & 3 & 51 & 765,00 \\
+    Manuel José Fernández Poyatos & 12 & 8 & 12 & 12 & 3 & 47 & 705,00 \\
+    Alberto David Gómez Gijón & 10 & 10 & 12 & 12 & 3 & 47 & 705,00 \\
+    Daniel Viloria Prieto & 8 & 11 & 12 & 12 & 3 & 46 & 690,00 \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total gastos de personal} & \textbf{65} & \textbf{60} & \textbf{72} & \textbf{72} & \textbf{18} & \textbf{287} & \textbf{4.305,00} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+% =========================================================================
+% 3. GASTOS DE EJECUCION Y COMPLEMENTARIOS
+% =========================================================================
+\section{Gastos de ejecución y complementarios}
+
+\subsection{Material inventariable (prorrateado)}
+
+Los equipos informáticos tienen una vida útil estimada de \textbf{4 años (48 meses)}, muy superior a la duración del proyecto. Por tanto, su coste se prorratea considerando el precio real actual de cada equipo, su vida útil y el tiempo efectivo de uso en el proyecto:
+\[
+  \text{Coste imputado} = N_{\text{uds}} \times \text{Precio actual} \times \frac{\text{Meses de uso en el proyecto}}{\text{Vida útil estimada (meses)}}
+\]
+
+Los portátiles se utilizan durante los \textbf{4 meses} del proyecto (finales de septiembre a mediados de enero), mientras que las dos tabletas físicas de pruebas se emplean durante \textbf{3 meses} (desde la Iteración 1 hasta la defensa final, para pruebas reales con TalkBack y VoiceOver).
+
+\begin{table}[H]
+  \centering
+  \caption{Material inventariable prorrateado por vida útil y tiempo de uso.}
+  \label{tab:inventariable}
+  \begin{tabularx}{\linewidth}{@{}Y C{0.8cm} R{1.7cm} C{1.4cm} C{1.3cm} R{1.9cm}@{}}
+    \toprule
+    \textbf{Equipo (modelo de referencia)} & \textbf{Uds.} & \textbf{Coste ud.} & \textbf{Vida útil} & \textbf{Uso} & \textbf{Imputado} \\
+    \midrule
+    Portátil de desarrollo (16 GB RAM, 512 GB SSD; ej.\ Lenovo IdeaPad / ThinkPad) & 6 & 850,00 € & 48 meses & 4 meses & 425,00 € \\
+    Tableta Android de pruebas (Samsung Galaxy Tab A9+ 11", 6/128 GB Wi-Fi) & 1 & 240,00 € & 48 meses & 3 meses & 15,00 € \\
+    Tableta iOS de pruebas (Apple iPad 11", 128 GB Wi-Fi) & 1 & 480,00 € & 48 meses & 3 meses & 30,00 € \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total material inventariable} & \textbf{8} & -- & -- & -- & \textbf{470,00 €} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\textit{Nota:} Las dos tabletas corresponden exclusivamente a dispositivos de pruebas del equipo de desarrollo; el suministro de tabletas para el alumnado del Colegio queda fuera del alcance del proyecto.
+
+\subsection{Material fungible}
+
+Comprende los consumibles que se agotan o utilizan íntegramente durante el proyecto (imputación al 100 \%):
+
+\begin{table}[H]
+  \centering
+  \caption{Desglose de material fungible.}
+  \label{tab:fungible}
+  \begin{tabularx}{\linewidth}{@{}Y R{2.4cm}@{}}
+    \toprule
+    \textbf{Concepto} & \textbf{Importe (€)} \\
+    \midrule
+    Papelería y prototipado en papel (cuadernos, folios, notas adhesivas para bocetos y sesiones ágiles, rotuladores) & 30,00 \\
+    Impresión y encuadernación de memorias, guías de uso para el Colegio y material de presentación final & 45,00 \\
+    Consumibles informáticos (cables USB-C de datos para depuración en tabletas, adaptadores y memorias USB) & 35,00 \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total material fungible} & \textbf{110,00} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Software, licencias y servicios en la nube}
+
+El desarrollo se apoya mayoritariamente en herramientas gratuitas y de código abierto (\textbf{Flutter y Dart}, \textbf{VS Code}, \textbf{Android Studio}, \textbf{API ARASAAC}, \textbf{GitHub}, \textbf{Jira}, \textbf{Figma} y \textbf{\LaTeX}, con coste \textbf{0,00 €}). Solo se presupuestan los servicios en la nube y licencias de publicación necesarios para el despliegue real y las notificaciones en segundo plano (\textit{HU-28} y \textit{HU-29}):
+
+\begin{table}[H]
+  \centering
+  \caption{Software, licencias de publicación y servicios cloud.}
+  \label{tab:software}
+  \begin{tabularx}{\linewidth}{@{}L{4.8cm} Y R{2.2cm}@{}}
+    \toprule
+    \textbf{Servicio / Licencia} & \textbf{Justificación en el proyecto} & \textbf{Coste (€)} \\
+    \midrule
+    Herramientas de desarrollo y diseño & Flutter, VS Code, Android Studio, ARASAAC, GitHub, Jira, Figma, \LaTeX & 0,00 \\
+    Firebase Plan Blaze (\texttt{proyecto-ava-54b58}) & Uso de Cloud Functions, FCM, Firestore UE y Storage (15 €/mes $\times$ 3 meses) & 45,00 \\
+    Google Play Console & Tasa única de cuenta de desarrollador Android (25 USD) & 23,00 \\
+    Apple Developer Program & Suscripción anual para publicación iOS / TestFlight (99 USD/año) & 92,00 \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total software y servicios cloud} & & \textbf{160,00} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Gastos complementarios y subcontratación}
+
+\begin{itemize}
+  \item \textbf{Desplazamientos al Colegio Fundación Purísima Concepción:} Conforme a las actas del proyecto, se contemplan 3 visitas presenciales en Granada: entrevista inicial (5 integrantes, 25/09), visita de observación (2 integrantes, 02/10) y defensa final (6 integrantes, 12/01). En total son \textbf{13 desplazamientos} ida y vuelta en transporte urbano (3,20 €/persona): $13 \times 3{,}20 = \mathbf{41{,}60\text{ €}}$.
+  \item \textbf{Subcontratación externa:} \textbf{0,00 €}, ya que el equipo cubre todas las tareas de diseño, desarrollo, pruebas y accesibilidad sin necesidad de contratar servicios externos.
+\end{itemize}
+
+% =========================================================================
+% 4. COSTES INDIRECTOS Y MARGENES DE REINVERSION Y BENEFICIO
+% =========================================================================
+\section{Costes indirectos, futuras inversiones y beneficio}
+
+\subsection{Costes indirectos (compartibles por más proyectos de la empresa)}
+
+Una empresa de desarrollo de software mantiene unos gastos generales de funcionamiento (oficina, luz, agua, fibra óptica, seguros y mantenimiento) que se comparten entre varios proyectos activos a la vez. Para un espacio de trabajo pequeño para 6 personas en Granada estimamos unos gastos mensuales de estructura de \textbf{1.500 €/mes} (900 € alquiler de oficina/coworking, 200 € luz y agua, 80 € internet empresarial y 320 € seguros, limpieza y gastos generales), lo que supone \textbf{6.000 € en los 4 meses} del proyecto.
+
+Dado que el equipo dedica 287 horas al proyecto AVA (una dedicación parcial compatible con otros proyectos simultáneos de la empresa), se imputa al proyecto una cuota compartida del \textbf{10 \%} de esos gastos generales:
+\[
+  \text{Costes indirectos imputados a AVA} = 6.000{,}00\text{ €} \times 10\ \% = \mathbf{600{,}00\text{ €}}
+\]
+Esta cifra equivale a un \textbf{11,80 \% sobre los costes directos} (5.086,60 €), un valor habitual y equilibrado en proyectos informáticos.
+
+\subsection{Incrementos para futuras inversiones y beneficio}
+
+Sobre el coste total de ejecución (costes directos + costes indirectos = \textbf{5.686,60 €}), se aplican dos incrementos claramente diferenciados para garantizar la sostenibilidad de la empresa:
+
+\begin{itemize}
+  \item \textbf{Fondo para futuras inversiones y equipamiento (+5 \% = 284,33 €):} Margen destinado a la futura renovación de ordenadores y dispositivos móviles de prueba, así como a la formación del equipo.
+  \item \textbf{Beneficio empresarial (+10 \% = 568,66 €):} Margen de beneficio estándar que permite la viabilidad económica del equipo.
+\end{itemize}
+
+Repercutiendo estos costes indirectos y márgenes sobre las 287 horas del proyecto, el precio medio resultante por hora trabajada es de \textbf{22,79 €/h} (sin IVA), una tarifa muy competitiva respecto al mercado actual de desarrollo de aplicaciones.
+
+\newpage
+% =========================================================================
+% 5. RESUMEN DEL PRESUPUESTO POR TIPO DE GASTO
+% =========================================================================
+\section{Resumen del presupuesto por tipo de gasto}
+
+La Tabla~\ref{tab:resumen} consolida todas las partidas del proyecto siguiendo la estructura por tipo de gasto (costes de personal, ejecución, complementarios, indirectos e incrementos).
+
+\begin{table}[H]
+  \centering
+  \caption{Presupuesto general consolidado del proyecto AUTOVIDA (26-175) -- AVA.}
+  \label{tab:resumen}
+  \begin{tabularx}{\linewidth}{@{}Y R{2.6cm} R{2.2cm}@{}}
+    \toprule
+    \textbf{Partida presupuestaria} & \textbf{Importe (€)} & \textbf{\% s/ Subtotal} \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textbf{\color{avaprimary}1. Gastos de personal}} \\
+    Equipo de desarrollo junior (287 h $\times$ 15,00 €/h) & 4.305,00 & 65,83 \% \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textbf{\color{avaprimary}2. Gastos de ejecución}} \\
+    Material inventariable (prorrateado por vida útil y uso) & 470,00 & 7,19 \% \\
+    Material fungible (papelería, impresión y consumibles) & 110,00 & 1,68 \% \\
+    Software, licencias y servicios cloud (Firebase, Google Play, Apple) & 160,00 & 2,45 \% \\
+    Subcontratación externa & 0,00 & 0,00 \% \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textbf{\color{avaprimary}3. Gastos complementarios}} \\
+    Desplazamientos al Colegio Fundación Purísima Concepción (13 viajes i/v) & 41,60 & 0,64 \% \\
+    \cmidrule(lr){1-3}
+    \textbf{Subtotal Costes Directos} & \textbf{5.086,60} & \textbf{77,78 \%} \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textbf{\color{avaprimary}4. Costes indirectos}} \\
+    Gastos generales de oficina compartibles entre proyectos (10 \% s/ 6.000 €) & 600,00 & 9,17 \% \\
+    \cmidrule(lr){1-3}
+    \rowcolor{avabg}
+    \textbf{Total Coste de Ejecución (Directos + Indirectos)} & \textbf{5.686,60} & \textbf{86,96 \%} \\
+    \midrule
+    \multicolumn{3}{@{}l}{\textbf{\color{avaprimary}5. Incrementos (reinversión y beneficio)}} \\
+    Fondo para futuras inversiones y equipamiento (5 \% s/ ejecución) & 284,33 & 4,35 \% \\
+    Beneficio empresarial (10 \% s/ ejecución) & 568,66 & 8,70 \% \\
+    \midrule
+    \rowcolor{avasoftteal}
+    \textbf{\color{avaprimary}TOTAL PRESUPUESTO (SIN IVA)} & \textbf{\color{avaprimary}6.539,59} & \textbf{\color{avaprimary}100,00 \%} \\
+    \midrule
+    IVA (21 \%) & 1.373,31 & -- \\
+    \midrule
+    \rowcolor{avaprimary}
+    \textbf{\color{white}TOTAL PRESUPUESTO (IVA INCLUIDO)} & \textbf{\color{white}7.912,90} & \textbf{\color{white}--} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      xbar,
+      width=0.76\linewidth,
+      height=6.2cm,
+      bar width=11pt,
+      xlabel={Porcentaje sobre el presupuesto sin IVA (\%)},
+      xlabel style={font=\small,color=avamuted},
+      ytick={1,2,3,4,5,6,7,8},
+      yticklabels={
+        {Complementarios},
+        {Material fungible},
+        {Software y Cloud},
+        {Reinversión (5\,\%)},
+        {Inventariable},
+        {Beneficio (10\,\%)},
+        {Costes indirectos},
+        {Personal}
+      },
+      yticklabel style={font=\small,color=avaprimary},
+      xticklabel style={font=\small,color=avamuted},
+      xmin=0,
+      xmax=79,
+      nodes near coords={\pgfmathprintnumber[fixed,fixed zerofill,precision=2]{\pgfplotspointmeta}\,\%},
+      nodes near coords align={horizontal},
+      every node near coord/.append style={font=\footnotesize\bfseries,color=avaprimary},
+      axis lines*=left,
+      major grid style={draw=avaborder,dashed},
+      xmajorgrids=true,
+      axis line style={color=avamuted},
+      enlarge y limits=0.10
+    ]
+      \addplot[fill=avaaccent,draw=avaprimary,line width=0.4pt] coordinates {
+        (0.64,1)
+        (1.68,2)
+        (2.45,3)
+        (4.35,4)
+        (7.19,5)
+        (8.70,6)
+        (9.17,7)
+        (65.83,8)
+      };
+    \end{axis}
+  \end{tikzpicture}
+  \caption{Reparto porcentual de las partidas sobre el presupuesto sin IVA (6.539,59 €).}
+  \label{fig:reparto}
+\end{figure}
+
+% =========================================================================
+% 6. DESGLOSE POR FASES E ITERACIONES
+% =========================================================================
+\section{Desglose presupuestario por fases e iteraciones}
+
+Como vista complementaria alineada con la planificación ágil del proyecto, la Tabla~\ref{tab:iteraciones} reparte exactamente el mismo presupuesto entre las cinco fases del proyecto. El personal y los costes indirectos se asignan proporcionalmente a las horas de cada fase, el inventariable según el tiempo de uso en cada periodo, las licencias de publicación en la Iteración 3 y los desplazamientos en Fase 0 y Cierre.
+
+\begin{table}[H]
+  \centering
+  \caption{Desglose presupuestario por fases e iteraciones (importes sin IVA en €).}
+  \label{tab:iteraciones}
+  \footnotesize
+  \setlength{\tabcolsep}{3.2pt}
+  \begin{tabularx}{\linewidth}{@{}Y C{0.7cm} R{1.35cm} R{1.15cm} R{1.1cm} R{1.15cm} R{1.05cm} R{1.15cm} R{1.45cm}@{}}
+    \toprule
+    \textbf{Fase / Iteración} & \textbf{h} & \textbf{Personal} & \textbf{Invent.} & \textbf{Fung.} & \textbf{Soft.} & \textbf{Compl.} & \textbf{Indir.} & \textbf{Total s/IVA} \\
+    \midrule
+    Fase 0: Inicio y espec. & 65 & 975,00 & 106,25 & 25,00 & 0,00 & 22,40 & 135,89 & 1.454,22 \\
+    Iteración 1 (Sprint 1) & 60 & 900,00 & 90,94 & 30,00 & 15,00 & 0,00 & 125,44 & 1.335,59 \\
+    Iteración 2 (Sprint 2) & 72 & 1.080,00 & 90,94 & 20,00 & 15,00 & 0,00 & 150,52 & 1.559,93 \\
+    Iteración 3 (Sprint 3) & 72 & 1.080,00 & 90,94 & 10,00 & 130,00 & 0,00 & 150,52 & 1.680,68 \\
+    Cierre y presentación & 18 & 270,00 & 90,93 & 25,00 & 0,00 & 19,20 & 37,63 & 509,17 \\
+    \midrule
+    \rowcolor{avabg}
+    \textbf{Total (sin IVA)} & \textbf{287} & \textbf{4.305,00} & \textbf{470,00} & \textbf{110,00} & \textbf{160,00} & \textbf{41,60} & \textbf{600,00} & \textbf{6.539,59} \\
+    \bottomrule
+  \end{tabularx}
+  \vspace{3pt}
+  {\footnotesize\color{avamuted}\textit{Nota:} La columna \textit{Total s/IVA} incluye el incremento del 15 \% (5 \% reinversión + 10 \% beneficio) sobre los costes directos e indirectos de cada fase. Con el 21 \% de IVA (1.373,31 €), el total final asciende a \textbf{7.912,90 €}.}
+\end{table}
+
+% =========================================================================
+% 7. FUENTES CONSULTADAS
+% =========================================================================
+\section{Fuentes consultadas}
+
+\begin{enumerate}
+  \item \textbf{XIX Convenio Colectivo Estatal de Empresas de Consultoría, Tecnologías de la Información y Estudios de Mercado y de la Opinión Pública} (BOE, tablas salariales 2026): referencia salarial del perfil \textit{Programador Junior} (Área 3, Grupo D, Nivel 1: 20.436,01 €/año, 1.800 horas anuales).
+  \item \textbf{Seguridad Social (España):} tipos de cotización empresariales vigentes en 2026 para actividades de programación informática (cuota patronal total del 32,15 \%).
+  \item \textbf{Material complementario de la asignatura DGP (UGR):} \textit{Gestión de Costes} (\texttt{Costes.pdf}), estructura de partidas, estimación del coste empresarial de personal y criterios presupuestarios.
+  \item \textbf{Precios actuales de mercado (noviembre 2026):} distribuidores habituales en España para portátiles de gama media (16 GB RAM, 512 GB SSD), Samsung Galaxy Tab A9+ 11", Apple iPad 11", tarifas oficiales de Google Firebase (Plan Blaze), Google Play Console (25 USD), Apple Developer Program (99 USD/año), licencia gratuita de ARASAAC y tarifas del transporte urbano de Granada.
+  \item \textbf{Documentación del proyecto AVA:} \textit{DGP0}, \textit{Entregable 1} y \textit{Entregable 2} (registro de horas, fases y actas de visitas al Colegio Fundación Purísima Concepción).
+\end{enumerate}
+
+\end{document}

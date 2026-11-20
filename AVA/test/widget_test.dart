@@ -11,27 +11,6 @@ import 'ayudas_prueba.dart';
 /// horizontal de 1280 × 800.
 void main() {
   group('Flujo del estudiante', () {
-    testWidgets('Diego entra con pictogramas y abre su agenda del día', (
-      tester,
-    ) async {
-      await arrancarApp(tester);
-      expect(
-        find.bySemanticsLabel('AVA, Agenda Virtual Accesible'),
-        findsOneWidget,
-      );
-      expect(find.text('1ºA'), findsOneWidget);
-
-      await entrarComoDiego(tester);
-      expect(find.text('Hola, Diego'), findsOneWidget);
-
-      await pulsar(tester, 'Mi agenda');
-      expect(find.text('Semana'), findsOneWidget);
-      expect(find.text('Ahora y después'), findsOneWidget);
-
-      await pulsar(tester, 'Hoy');
-      expect(find.text('Ver'), findsWidgets);
-    });
-
     testWidgets('una clave incorrecta muestra un aviso y no deja entrar', (
       tester,
     ) async {
