@@ -9,6 +9,15 @@ abstract final class Dimensiones {
   static const double altoBarraNavegacion = 96;
   static const double altoCabecera = 88;
 
+  /// Alto de la barra «Anterior / 1 de 3 / Siguiente» cuando el contenido
+  /// no cabe legible en una sola pantalla.
+  static const double altoBarraPaginas = 80;
+
+  /// Tamaño de letra mínimo (antes de aplicar la escala elegida por el
+  /// alumno) para considerar un texto legible. Si no se alcanza, se
+  /// reparte el contenido en páginas.
+  static const double letraMinimaLegible = 16;
+
   static const double espaciado = 24;
   static const double espaciadoPequeno = 12;
 

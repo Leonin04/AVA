@@ -58,6 +58,7 @@ class TareaEstudianteControlador extends ChangeNotifier {
       _dia = DateTime(tarea.inicio.year, tarea.inicio.month, tarea.inicio.day);
       _minutoInicio = tarea.inicio.hour * 60 + tarea.inicio.minute;
       _duracion = tarea.fin.difference(tarea.inicio).inMinutes;
+      _repetir = tarea.seRepite;
     }
   }
 
@@ -76,6 +77,7 @@ class TareaEstudianteControlador extends ChangeNotifier {
   late DateTime _dia = _hoy;
   int _minutoInicio = 17 * 60;
   int _duracion = 30;
+  bool _repetir = false;
   bool _guardando = false;
 
   PasoAsistente get paso => _paso;
@@ -84,6 +86,19 @@ class TareaEstudianteControlador extends ChangeNotifier {
   int get duracion => _duracion;
   bool get guardando => _guardando;
   bool get esEdicion => _existente != null;
+
+  /// La tarea se repite todas las semanas el mismo día de la semana que
+  /// [dia] (HU-14). Es lo más sencillo para el estudiante: «todos los
+  /// sábados»; si hacen falta varios días, los elige el tutor.
+  bool get repetir => _repetir;
+
+  /// Días de repetición que se guardan (1 = lunes … 7 = domingo).
+  List<int> get diasSemana => _repetir ? [_dia.weekday] : const [];
+
+  void cambiarRepeticion() {
+    _repetir = !_repetir;
+    notifyListeners();
+  }
 
   DateTime get inicio => DateTime(
     _dia.year,
@@ -120,21 +135,24 @@ class TareaEstudianteControlador extends ChangeNotifier {
   bool get puedeRetrasar => _minutoInicio + pasoMinutos <= _ultimoMinuto;
 
   void adelantarHora() {
-    if (!puedeAdelantar) return;
-    _minutoInicio -= pasoMinutos;
-    notifyListeners();
+    if (puedeAdelantar) {
+      _minutoInicio -= pasoMinutos;
+      notifyListeners();
+    }
   }
 
   void retrasarHora() {
-    if (!puedeRetrasar) return;
-    _minutoInicio += pasoMinutos;
-    notifyListeners();
+    if (puedeRetrasar) {
+      _minutoInicio += pasoMinutos;
+      notifyListeners();
+    }
   }
 
   void irAConfirmar() {
-    if (_actividad == null) return;
-    _paso = PasoAsistente.confirmar;
-    notifyListeners();
+    if (_actividad != null) {
+      _paso = PasoAsistente.confirmar;
+      notifyListeners();
+    }
   }
 
   void volver() {
@@ -161,6 +179,7 @@ class TareaEstudianteControlador extends ChangeNotifier {
               tipo: actividad.tipo,
               inicio: inicio,
               fin: fin,
+              diasSemana: diasSemana,
             )
           : Tarea(
               id: _repositorio.nuevoId('tarea'),
@@ -171,6 +190,7 @@ class TareaEstudianteControlador extends ChangeNotifier {
               inicio: inicio,
               fin: fin,
               creadaPor: idEstudiante,
+              diasSemana: diasSemana,
             );
       await _repositorio.guardar(tarea);
       return tarea;

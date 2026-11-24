@@ -22,7 +22,7 @@ class EncargosControlador {
     required String creadaPor,
     String? idAula,
     String descripcion = '',
-    List<String> pasos = const [],
+    List<PasoTarea> pasos = const [],
     RecursoVisual? pictograma,
   }) async {
     final error =

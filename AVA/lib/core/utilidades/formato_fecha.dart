@@ -64,6 +64,19 @@ abstract final class FormatoFecha {
   /// Ejemplo: `Lunes`.
   static String nombreDia(DateTime fecha) => _dias[fecha.weekday - 1];
 
+  /// Nombre del día de la semana [numero] (1 = lunes … 7 = domingo).
+  static String nombreDiaSemana(int numero) => _dias[numero - 1];
+
+  /// Ejemplo: `Todos los sábados` o `Todos los lunes` (HU-14).
+  static String cadaSemana(DateTime fecha) {
+    final dia = nombreDia(fecha).toLowerCase();
+    return 'Todos los ${dia.endsWith('s') ? dia : '${dia}s'}';
+  }
+
+  /// Inicial del día [numero], para botones pequeños (L, M, X, J, V, S, D).
+  static String inicialDia(int numero) =>
+      const ['L', 'M', 'X', 'J', 'V', 'S', 'D'][numero - 1];
+
   /// Ejemplo: `Lunes 9 de noviembre`.
   static String diaCompleto(DateTime fecha) =>
       '${nombreDia(fecha)} ${fecha.day} de ${_meses[fecha.month - 1]}';

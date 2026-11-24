@@ -61,6 +61,7 @@ abstract final class ConversionFirestore {
       puedeModificarPreferencias:
           d['puedeCambiarPreferencias'] as bool? ?? false,
       puedeGestionarTareas: d['puedeGestionarTareas'] as bool? ?? true,
+      activo: d['estado'] != 'desactivada',
     );
   }
 

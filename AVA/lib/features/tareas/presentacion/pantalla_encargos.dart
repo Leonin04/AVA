@@ -17,6 +17,7 @@ import '../../perfil/logica/lista_alumnos_controlador.dart';
 import '../dominio/repositorio_tareas.dart';
 import '../logica/encargos_controlador.dart';
 import '../logica/validacion_tareas.dart';
+import '../dominio/tarea_agenda.dart';
 import 'widgets/editor_pasos.dart';
 import 'widgets/selector_horario.dart';
 
@@ -41,7 +42,7 @@ class _PantallaEncargosState extends State<PantallaEncargos> {
   late final EncargosControlador _encargos;
 
   RecursoVisual? _pictograma;
-  List<String> _pasos = const [];
+  List<PasoTarea> _pasos = const [];
   DateTime _dia = DateTime.now();
   TimeOfDay _inicio = const TimeOfDay(hour: 11, minute: 30);
   TimeOfDay _fin = const TimeOfDay(hour: 12, minute: 0);

@@ -42,6 +42,30 @@ interfaz usa un valor por defecto.
 `BaseDatos.actualizarPreferencias` solo cambia `comunicacion` y `visual`, así
 que no borra `preferencias.ava`.
 
+## Iteración 2
+
+**Hay que publicar las reglas nuevas** (`firestore.rules`) con
+`firebase deploy --only firestore:rules`. Sin ellas, el tutor no puede
+confirmar tareas ni nombrar al encargado, y el comedor y las dietas dan
+`permission-denied`. Conviene probarlas antes con el emulador de Firebase.
+
+| Documento | Campo o colección | Para qué |
+|---|---|---|
+| `usuarios/{uid}` | `estado` (`activa` / `desactivada`), `desactivadaEn` | Cuentas desactivadas (HU-13), como pide el entregable |
+| `estudiantes/{id}` y `acceso/{id}` | `estado`, `desactivadaEn` | Lo mismo para los alumnos, que no están en `usuarios`; la tableta no muestra a los desactivados |
+| `tareas/{id}` | `diasSemana` (ya existía) | Ahora se puede elegir y cambiar al editar (HU-14) |
+| `tareas/{id}` | `temporizador`, `avisoMinutos` | Temporizador (HU-22) y antelación del aviso previo (HU-28) |
+| `tareas/{id}/pasos/{id}` | `imagenUrl` (ya existía) | Ahora se usa: pictograma o foto de cada paso (HU-20) |
+| `estudiantes/{id}/registros/{id}` | `estado`, `pasoActual` | Estado de cada día y paso por el que va (HU-21, HU-26) |
+| `estudiantes/{id}/registros/{id}/historial/{id}` | `estadoAnterior`, `estadoNuevo`, `fechaHora`, `actorUid`, `origen` | Historial de cambios, solo se añaden (HU-27), como pide el entregable |
+| `aulas/{id}` | `encargadoComedor` | Alumno que pasa la lista del comedor (HU-23) |
+| `comedor/{aulaId}_{yyyy-MM-dd}` | `aulaId`, `fecha`, `asistencia.{estudianteId}` | Quién come cada día (HU-23). **Colección nueva** |
+| `dietas/{estudianteId}` y `dietas/{id}/cambios/{id}` | `tipo`, `alergias`, `indicaciones` y cada cambio | Dietas protegidas (HU-24) y su registro (T-118). **Colección nueva** |
+
+El estado de los registros sigue usando los valores que ya había
+(`pendiente`, `iniciada`, `terminada`), no los del entregable (`pendiente`,
+`en curso`, `completada`), para no romper los datos guardados.
+
 ## Correspondencias
 
 - **Preferencias:** `comunicacion.pictogramas/texto/voz` ↔ ver dibujos,

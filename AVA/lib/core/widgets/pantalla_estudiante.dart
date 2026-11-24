@@ -27,6 +27,7 @@ class PantallaEstudiante extends StatelessWidget {
     this.icono,
     this.color = ColorPastel.cielo,
     this.textoVoz,
+    this.alSalir,
   });
 
   final String titulo;
@@ -38,12 +39,17 @@ class PantallaEstudiante extends StatelessWidget {
   /// Texto que se lee al pulsar «Escuchar». Si es `null`, se lee el título.
   final String? textoVoz;
 
+  /// Si se indica, la barra muestra «Salir» en el hueco de «Atrás» (menú
+  /// principal), con la misma forma que «Ayuda» y aparte de las opciones.
+  final VoidCallback? alSalir;
+
   @override
   Widget build(BuildContext context) {
     final ajustes = AjustesInterfaz.of(context);
     final barra = _BarraNavegacion(
       puedeVolver: Navigator.of(context).canPop(),
       esInicio: ModalRoute.of(context)?.isFirst ?? true,
+      alSalir: alSalir,
     );
 
     return Scaffold(
@@ -65,7 +71,9 @@ class PantallaEstudiante extends StatelessWidget {
                 textoVoz: textoVoz ?? titulo,
               ),
               const SizedBox(height: Dimensiones.espaciado),
-              Expanded(child: cuerpo),
+              // La clave conserva el estado del contenido (por ejemplo, la
+              // página que se está viendo) cuando la barra cambia de sitio.
+              Expanded(key: const ValueKey('cuerpo'), child: cuerpo),
               if (!ajustes.menuArriba) ...[
                 const SizedBox(height: Dimensiones.espaciado),
                 barra,
@@ -178,30 +186,49 @@ Future<void> escuchar(BuildContext context, String texto) async {
 }
 
 class _BarraNavegacion extends StatelessWidget {
-  const _BarraNavegacion({required this.puedeVolver, required this.esInicio});
+  const _BarraNavegacion({
+    required this.puedeVolver,
+    required this.esInicio,
+    required this.alSalir,
+  });
 
   final bool puedeVolver;
   final bool esInicio;
+  final VoidCallback? alSalir;
 
   @override
   Widget build(BuildContext context) {
+    final salir = alSalir;
+    final Widget primero;
+    if (salir != null) {
+      primero = BotonAccesible(
+        texto: 'Salir',
+        etiquetaSemantica: 'Salir de mi sesión',
+        pictograma: Pictogramas.salir,
+        icono: Icons.logout_rounded,
+        color: ColorPastel.melocoton,
+        disposicion: DisposicionBoton.horizontal,
+        alPulsar: salir,
+      );
+    } else if (puedeVolver) {
+      primero = BotonAccesible(
+        texto: 'Atrás',
+        icono: Icons.arrow_back_rounded,
+        color: ColorPastel.lavanda,
+        disposicion: DisposicionBoton.horizontal,
+        alPulsar: () => Navigator.of(context).maybePop(),
+      );
+    } else {
+      primero = const SizedBox.shrink();
+    }
+
     // Los tres huecos se mantienen aunque un botón no aparezca, para que
     // los demás no cambien de sitio.
     return SizedBox(
       height: Dimensiones.altoBarraNavegacion,
       child: Row(
         children: [
-          Expanded(
-            child: puedeVolver
-                ? BotonAccesible(
-                    texto: 'Atrás',
-                    icono: Icons.arrow_back_rounded,
-                    color: ColorPastel.lavanda,
-                    disposicion: DisposicionBoton.horizontal,
-                    alPulsar: () => Navigator.of(context).maybePop(),
-                  )
-                : const SizedBox.shrink(),
-          ),
+          Expanded(child: primero),
           const SizedBox(width: Dimensiones.espaciado),
           Expanded(
             child: esInicio

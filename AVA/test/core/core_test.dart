@@ -104,5 +104,21 @@ void main() {
       );
       expect(reparto.altoCelda, lessThanOrEqualTo(300));
     });
+
+    test('capacidad: celdas legibles que caben en una página', () {
+      int capacidad(double escala) => DistribucionCuadricula.capacidad(
+        ancho: 1000,
+        alto: 500,
+        espaciado: 12,
+        anchoMinimo: 180 * escala,
+        altoMinimo: 170 * escala,
+        maxColumnas: 5,
+      );
+      expect(capacidad(1), 10);
+      // Con letra muy grande caben menos: hay que pasar más páginas.
+      expect(capacidad(1.5), lessThan(capacidad(1)));
+      // Nunca menos de una celda, aunque no quepa entera.
+      expect(capacidad(10), 1);
+    });
   });
 }

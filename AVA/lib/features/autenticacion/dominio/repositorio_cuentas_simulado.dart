@@ -83,4 +83,24 @@ class RepositorioCuentasSimulado implements RepositorioCuentas {
     }
     _almacen.guardar(coleccion, cuenta.id, cuenta.toMap());
   }
+
+  @override
+  Future<void> cambiarActivacion(Cuenta cuenta, {required bool activa}) async {
+    final actualizada = cuenta.conActivacion(
+      activa: activa,
+      momento: DateTime.now(),
+    );
+    _almacen.guardar(coleccion, cuenta.id, actualizada.toMap());
+
+    final perfil = _almacen.obtener(
+      RepositorioEstudiantesSimulado.coleccion,
+      cuenta.id,
+    );
+    if (perfil != null) {
+      _almacen.guardar(RepositorioEstudiantesSimulado.coleccion, cuenta.id, {
+        ...perfil,
+        'activo': activa,
+      });
+    }
+  }
 }

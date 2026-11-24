@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../autenticacion/dominio/usuario.dart';
 import 'preferencias.dart';
 
 /// Forma de entrar del estudiante (HU-09).
@@ -22,6 +23,7 @@ class Estudiante {
   final List<String> tutores; // uids de sus tutores (centro y familiares)
   final bool puedeCambiarPreferencias; // HU-15
   final Preferencias preferencias;
+  final EstadoCuenta estado; // HU-13
 
   const Estudiante({
     required this.id,
@@ -37,7 +39,10 @@ class Estudiante {
     this.tutores = const [],
     this.puedeCambiarPreferencias = false,
     this.preferencias = const Preferencias(),
+    this.estado = EstadoCuenta.activa,
   });
+
+  bool get activo => estado == EstadoCuenta.activa;
 
   factory Estudiante.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data() ?? {};
@@ -59,6 +64,7 @@ class Estudiante {
       preferencias: Preferencias.fromMap(
         d['preferencias'] as Map<String, dynamic>?,
       ),
+      estado: EstadoCuenta.desde(d['estado']),
     );
   }
 

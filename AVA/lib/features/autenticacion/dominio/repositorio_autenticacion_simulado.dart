@@ -1,4 +1,5 @@
 import '../../../core/servicios/almacen_simulado.dart';
+import '../../../core/utilidades/controlador_carga.dart';
 import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes_simulado.dart';
 import 'clave_acceso.dart';
@@ -41,8 +42,12 @@ class RepositorioAutenticacionSimulado implements RepositorioAutenticacion {
     if (datos == null) return null;
 
     final cuenta = Cuenta.fromMap(id, datos);
-    if (!cuenta.esGestion) return null;
-    return _clave(id) == ClaveContrasena(contrasena) ? cuenta : null;
+    final claveCorrecta = _clave(id) == ClaveContrasena(contrasena);
+    // Solo se dice que está desactivada a quien conoce la clave.
+    if (cuenta.esGestion && claveCorrecta && !cuenta.activa) {
+      throw const ErrorConMensaje(Cuenta.mensajeDesactivada);
+    }
+    return cuenta.esGestion && claveCorrecta ? cuenta : null;
   }
 
   @override
@@ -50,12 +55,19 @@ class RepositorioAutenticacionSimulado implements RepositorioAutenticacion {
     required Estudiante estudiante,
     required ClaveAcceso clave,
   }) async {
-    if (_clave(estudiante.id) != clave) return null;
-    final datos = _almacen.obtener(
-      RepositorioEstudiantesSimulado.coleccion,
-      estudiante.id,
-    );
-    return datos == null ? null : Estudiante.fromMap(estudiante.id, datos);
+    final datos = _clave(estudiante.id) == clave
+        ? _almacen.obtener(
+            RepositorioEstudiantesSimulado.coleccion,
+            estudiante.id,
+          )
+        : null;
+    final perfil = datos == null
+        ? null
+        : Estudiante.fromMap(estudiante.id, datos);
+    if (perfil != null && !perfil.activo) {
+      throw const ErrorConMensaje(Cuenta.mensajeDesactivada);
+    }
+    return perfil;
   }
 
   @override

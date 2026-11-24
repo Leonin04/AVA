@@ -58,20 +58,20 @@ class _PantallaNuevaTareaEstudianteState
 
   Future<void> _guardar() async {
     final ajustes = AjustesInterfaz.of(context);
+    final avisos = ScaffoldMessenger.of(context);
+    final navegador = Navigator.of(context);
+    Tarea? tarea;
+    String? mensaje;
     try {
-      final tarea = await _controlador.guardar();
-      if (tarea == null || !mounted) return;
-      if (ajustes.leerEnVoz) await ajustes.voz.decir('Tarea guardada.');
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tarea guardada en tu agenda.')),
-      );
-      Navigator.of(context).pop(tarea);
-    } catch (error) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al guardar: $error')),
-      );
+      tarea = await _controlador.guardar();
+      if (tarea != null) mensaje = 'Tarea guardada en tu agenda.';
+    } on Exception {
+      mensaje = 'No se ha podido guardar la tarea. Prueba otra vez.';
+    }
+    if (mounted && mensaje != null) {
+      if (ajustes.leerEnVoz) await ajustes.voz.decir(mensaje);
+      avisos.showSnackBar(SnackBar(content: Text(mensaje)));
+      if (tarea != null) navegador.pop(tarea);
     }
   }
 
@@ -155,20 +155,49 @@ class _PasoCuando extends StatelessWidget {
       children: [
         Expanded(
           flex: 3,
-          child: CuadriculaAjustada<DateTime>(
-            elementos: controlador.diasDisponibles,
-            maxColumnas: 4,
-            anchoMinimoCelda: 130,
-            altoMinimoCelda: 130,
-            espaciado: Dimensiones.espaciadoPequeno,
-            constructor: (context, dia) => BotonAccesible(
-              texto: dia == hoy ? 'Hoy' : FormatoFecha.nombreDia(dia),
-              textoSecundario: '${dia.day}',
-              etiquetaSemantica: FormatoFecha.diaCompleto(dia),
-              color: ColorPastel.paraIndice(dia.weekday - 1),
-              seleccionado: dia == controlador.dia,
-              alPulsar: () => controlador.elegirDia(dia),
-            ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: CuadriculaAjustada<DateTime>(
+                  elementos: controlador.diasDisponibles,
+                  maxColumnas: 4,
+                  anchoMinimoCelda: 130,
+                  altoMinimoCelda: 130,
+                  espaciado: Dimensiones.espaciadoPequeno,
+                  constructor: (context, dia) => BotonAccesible(
+                    texto: dia == hoy ? 'Hoy' : FormatoFecha.nombreDia(dia),
+                    textoSecundario: '${dia.day}',
+                    etiquetaSemantica: FormatoFecha.diaCompleto(dia),
+                    color: ColorPastel.paraIndice(dia.weekday - 1),
+                    seleccionado: dia == controlador.dia,
+                    alPulsar: () => controlador.elegirDia(dia),
+                  ),
+                ),
+              ),
+              const SizedBox(height: Dimensiones.espaciadoPequeno),
+              // HU-14: repetir el mismo día de la semana.
+              SizedBox(
+                height: Dimensiones.objetivoTactilMinimo + 16,
+                child: BotonAccesible(
+                  texto: 'Todas las semanas',
+                  textoSecundario: controlador.repetir
+                      ? FormatoFecha.cadaSemana(controlador.dia)
+                      : 'Solo este día',
+                  etiquetaSemantica: controlador.repetir
+                      ? 'Repetir todas las semanas: sí, '
+                            '${FormatoFecha.cadaSemana(controlador.dia)}'
+                      : 'Repetir todas las semanas: no',
+                  icono: controlador.repetir
+                      ? Icons.check_box_rounded
+                      : Icons.check_box_outline_blank_rounded,
+                  color: ColorPastel.turquesa,
+                  seleccionado: controlador.repetir,
+                  disposicion: DisposicionBoton.horizontal,
+                  alPulsar: controlador.cambiarRepeticion,
+                ),
+              ),
+            ],
           ),
         ),
         const SizedBox(width: Dimensiones.espaciado),
@@ -312,7 +341,9 @@ class _PasoConfirmar extends StatelessWidget {
         ),
         const SizedBox(height: Dimensiones.espaciado),
         Text(
-          FormatoFecha.diaCompleto(controlador.inicio),
+          controlador.repetir
+              ? FormatoFecha.cadaSemana(controlador.inicio)
+              : FormatoFecha.diaCompleto(controlador.inicio),
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.headlineSmall,
         ),

@@ -1,4 +1,8 @@
+import 'package:ava/core/servicios/almacen_simulado.dart';
+import 'package:ava/core/utilidades/controlador_carga.dart';
 import 'package:ava/features/autenticacion/dominio/clave_acceso.dart';
+import 'package:ava/features/autenticacion/dominio/pictograma_clave.dart';
+import 'package:ava/features/aulas/logica/estudiantes_aula_controlador.dart';
 import 'package:ava/features/autenticacion/dominio/cuenta.dart';
 import 'package:ava/features/autenticacion/dominio/repositorio_autenticacion_simulado.dart';
 import 'package:ava/features/autenticacion/dominio/repositorio_cuentas_simulado.dart';
@@ -14,6 +18,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../ayudas_prueba.dart';
 
 void main() {
+  _pruebasDesactivacion();
+
   group('HU-18: login de tutores y administración', () {
     test('entra con credenciales válidas y rechaza las inválidas', () async {
       final login = LoginGestionControlador(
@@ -151,6 +157,116 @@ void main() {
       expect(gestion.validarEmail('', rol: Rol.tutor), isNotNull);
       expect(gestion.validarEmail('', rol: Rol.estudiante), isNull);
       expect(gestion.validarContrasena('corta', obligatoria: true), isNotNull);
+    });
+  });
+}
+
+void _pruebasDesactivacion() {
+  group('HU-13: desactivar una cuenta', () {
+    late GestionCuentasControlador gestion;
+    late RepositorioAutenticacionSimulado autenticacion;
+    late RepositorioEstudiantesSimulado estudiantes;
+    late RepositorioCuentasSimulado cuentas;
+    late AlmacenSimulado almacen;
+
+    setUp(() {
+      almacen = almacenDePrueba();
+      autenticacion = RepositorioAutenticacionSimulado(almacen);
+      estudiantes = RepositorioEstudiantesSimulado(almacen);
+      cuentas = RepositorioCuentasSimulado(almacen);
+      gestion = GestionCuentasControlador(
+        cuentas: cuentas,
+        autenticacion: autenticacion,
+        estudiantes: estudiantes,
+        aulas: RepositorioAulasSimulado(almacen),
+      );
+    });
+
+    test('un tutor desactivado no puede entrar y se le explica', () async {
+      final javier = (await cuentas.obtener('javier'))!;
+      final error = await gestion.cambiarActivacion(
+        javier,
+        activa: false,
+        idCuentaActual: 'admin',
+      );
+      expect(error, isNull);
+      expect((await cuentas.obtener('javier'))!.activa, isFalse);
+      expect((await cuentas.obtener('javier'))!.desactivadaEn, isNotNull);
+
+      final login = LoginGestionControlador(autenticacion);
+      final cuenta = await login.iniciarSesion(
+        usuario: 'javier',
+        contrasena: 'tutor1234',
+      );
+      expect(cuenta, isNull);
+      expect(login.mensajeError, contains('desactivada'));
+    });
+
+    test('al reactivarla vuelve a poder entrar', () async {
+      final javier = (await cuentas.obtener('javier'))!;
+      await gestion.cambiarActivacion(
+        javier,
+        activa: false,
+        idCuentaActual: 'admin',
+      );
+      await gestion.cambiarActivacion(
+        (await cuentas.obtener('javier'))!,
+        activa: true,
+        idCuentaActual: 'admin',
+      );
+      final cuenta = await autenticacion.iniciarSesionGestion(
+        usuario: 'javier',
+        contrasena: 'tutor1234',
+      );
+      expect(cuenta?.activa, isTrue);
+    });
+
+    test('un alumno desactivado no sale en la tableta ni entra, '
+        'pero conserva sus datos', () async {
+      final diego = (await cuentas.obtener('e01'))!;
+      await gestion.cambiarActivacion(
+        diego,
+        activa: false,
+        idCuentaActual: 'admin',
+      );
+
+      final perfil = await estudiantes.obtener('e01');
+      expect(perfil, isNotNull, reason: 'no se borran sus datos');
+      expect(perfil!.activo, isFalse);
+
+      final aula = (await RepositorioAulasSimulado(
+        almacen,
+      ).obtenerAulas()).firstWhere((a) => a.id == perfil.idAula);
+      final tableta = EstudiantesAulaControlador(
+        repositorio: estudiantes,
+        aula: aula,
+      );
+      await tableta.cargar();
+      expect(tableta.datos!.map((e) => e.id), isNot(contains('e01')));
+
+      await expectLater(
+        autenticacion.entrarEstudiante(
+          estudiante: perfil,
+          clave: const ClavePictogramas([
+            PictogramaClave.sol,
+            PictogramaClave.casa,
+            PictogramaClave.perro,
+            PictogramaClave.coche,
+          ]),
+        ),
+        throwsA(isA<ErrorConMensaje>()),
+      );
+    });
+
+    test('la administración no puede desactivar su propia cuenta', () async {
+      final admin = (await cuentas.obtener('admin'))!;
+      final error = await gestion.cambiarActivacion(
+        admin,
+        activa: false,
+        idCuentaActual: 'admin',
+      );
+      expect(error, isNotNull);
+      expect((await cuentas.obtener('admin'))!.activa, isTrue);
     });
   });
 }

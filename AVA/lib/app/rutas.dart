@@ -22,6 +22,11 @@ import '../features/perfil/presentacion/pantalla_ficha_estudiante.dart';
 import '../features/perfil/presentacion/pantalla_lista_alumnos.dart';
 import '../features/perfil/presentacion/pantalla_menu_estudiante.dart';
 import '../features/perfil/presentacion/pantalla_perfil.dart';
+import '../features/comedor/presentacion/pantalla_comedor_estudiante.dart';
+import '../features/comedor/presentacion/pantalla_comedor_tutor.dart';
+import '../features/comedor/presentacion/pantalla_lista_comedor.dart';
+import '../features/seguimiento/presentacion/pantalla_historial.dart';
+import '../features/seguimiento/presentacion/pantalla_seguimiento.dart';
 import '../features/tareas/dominio/tarea_agenda.dart';
 import '../features/tareas/presentacion/pantalla_detalle_tarea.dart';
 import '../features/tareas/presentacion/pantalla_encargos.dart';
@@ -45,6 +50,8 @@ abstract final class Rutas {
   static const siguienteTarea = '/agenda/siguiente';
   static const detalleTarea = '/tarea';
   static const nuevaTareaEstudiante = '/tarea/nueva';
+  static const comedor = '/comedor';
+  static const listaComedor = '/comedor/lista';
 
   // Tutores y administración.
   static const loginGestion = '/gestion/login';
@@ -56,6 +63,9 @@ abstract final class Rutas {
   static const encargos = '/gestion/encargos';
   static const gestionAulas = '/gestion/aulas';
   static const cuentas = '/gestion/cuentas';
+  static const seguimiento = '/gestion/seguimiento';
+  static const historial = '/gestion/historial';
+  static const comedorGestion = '/gestion/comedor';
 
   static Route<Object?> generar(RouteSettings ajustes) {
     final WidgetBuilder constructor = switch ((
@@ -92,6 +102,14 @@ abstract final class Rutas {
       (Rutas.nuevaTareaEstudiante, final Tarea? tarea) => _paraEstudiante(
         (e) => PantallaNuevaTareaEstudiante(estudiante: e, tarea: tarea),
       ),
+      (Rutas.comedor, _) => _paraEstudiante(
+        (e) => PantallaComedorEstudiante(estudiante: e),
+      ),
+      (Rutas.listaComedor, final Aula aula) => _paraEstudiante(
+        (e) => aula.idEncargadoComedor == e.id
+            ? PantallaListaComedor(encargado: e, aula: aula)
+            : PantallaComedorEstudiante(estudiante: e),
+      ),
       (Rutas.loginGestion, _) => (_) => const PantallaLoginGestion(),
       (Rutas.recuperarContrasena, _) =>
         (_) => const PantallaRecuperarContrasena(),
@@ -119,6 +137,18 @@ abstract final class Rutas {
       (Rutas.cuentas, _) => _paraGestion(
         (_) => const PantallaCuentas(),
         permitido: Permisos.puedeGestionarCuentas,
+      ),
+      (Rutas.comedorGestion, _) => _paraGestion(
+        (c) => PantallaComedorTutor(cuenta: c),
+        permitido: Permisos.puedeGestionarComedor,
+      ),
+      (Rutas.seguimiento, _) => _paraGestion(
+        (c) => PantallaSeguimiento(cuenta: c),
+        permitido: Permisos.puedeVerSeguimiento,
+      ),
+      (Rutas.historial, final Estudiante estudiante) => _paraGestion(
+        (_) => PantallaHistorial(estudiante: estudiante),
+        permitido: Permisos.puedeVerSeguimiento,
       ),
       _ => (_) => const PantallaInicio(),
     };

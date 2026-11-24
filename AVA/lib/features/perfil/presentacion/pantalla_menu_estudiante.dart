@@ -55,12 +55,14 @@ class PantallaMenuEstudiante extends StatelessWidget {
           ColorPastel.menta,
           () => Navigator.pushNamed(context, Rutas.nuevaTareaEstudiante),
         ),
+      // Boceto de la pantalla de inicio remodelada (figura 2): acceso al
+      // comedor (HU-23).
       _OpcionMenu(
-        'Salir',
-        Pictogramas.salir,
-        Icons.logout_rounded,
-        ColorPastel.rosa,
-        () => _salir(context),
+        'Comedor',
+        Pictogramas.comer,
+        Icons.restaurant_rounded,
+        ColorPastel.melocoton,
+        () => Navigator.pushNamed(context, Rutas.comedor),
       ),
     ];
 
@@ -70,6 +72,7 @@ class PantallaMenuEstudiante extends StatelessWidget {
       icono: Icons.waving_hand_rounded,
       color: estudiante.color,
       textoVoz: 'Hola, ${estudiante.nombre}. ¿Qué quieres hacer?',
+      alSalir: () => _salir(context),
       cuerpo: CuadriculaAjustada<_OpcionMenu>(
         elementos: opciones,
         maxColumnas: 4,

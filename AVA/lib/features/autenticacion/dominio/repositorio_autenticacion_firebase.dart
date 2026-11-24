@@ -29,6 +29,8 @@ class RepositorioAutenticacionFirebase implements RepositorioAutenticacion {
     rol: usuario.esAdmin ? Rol.administrador : Rol.tutor,
     email: usuario.email,
     esFamiliar: usuario.tipoTutor == bd.TipoTutor.familiar,
+    activa: usuario.activa,
+    desactivadaEn: usuario.desactivadaEn,
   );
 
   /// Lo que hay que pasar a `Autenticacion` según el tipo de clave.

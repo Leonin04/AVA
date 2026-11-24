@@ -81,10 +81,22 @@ abstract final class MedidaTexto {
           altoTarjeta(textos, estilo, tamano, escala, ancho) <= alto;
     });
 
-    var tamano = maximo;
-    while (tamano > minimo && !caben(tamano)) {
-      tamano -= 0.5;
+    // Búsqueda binaria entre el mínimo y el máximo, con precisión de medio
+    // punto: cuanto más grande la letra, menos cabe.
+    var cabe = minimo;
+    var noCabe = maximo;
+    if (caben(maximo)) {
+      cabe = maximo;
+    } else {
+      while (noCabe - cabe > 0.5) {
+        final medio = (cabe + noCabe) / 2;
+        if (caben(medio)) {
+          cabe = medio;
+        } else {
+          noCabe = medio;
+        }
+      }
     }
-    return math.max(tamano, minimo);
+    return cabe;
   }
 }

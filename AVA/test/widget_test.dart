@@ -74,6 +74,19 @@ void main() {
       expect(voz.dichos.last, contains('Hola, Álex'));
     });
 
+    testWidgets('T-81: «Escuchar» en Hoy lee las tareas del día', (
+      tester,
+    ) async {
+      final voz = await arrancarApp(tester) as ServicioVozSilencioso;
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi agenda');
+      await pulsar(tester, 'Hoy');
+
+      await pulsar(tester, 'Escuchar');
+      expect(voz.dichos.last, contains('Tus tareas son'));
+      expect(voz.dichos.last, contains('Asamblea a las 9:00'));
+    });
+
     testWidgets('sin voz activada, Ayuda no habla pero «Escuchar» sí', (
       tester,
     ) async {
@@ -96,7 +109,7 @@ void main() {
       await pulsar(tester, 'Mi perfil');
 
       final antes = Theme.of(tester.element(find.text('Mi perfil'))).brightness;
-      await pulsar(tester, 'Modo oscuro');
+      await pulsarEnPaginas(tester, 'Modo oscuro');
       final despues = Theme.of(
         tester.element(find.text('Mi perfil')),
       ).brightness;
@@ -115,13 +128,13 @@ void main() {
       Color fondo() => Theme.of(
         tester.element(find.text('Mi perfil')),
       ).scaffoldBackgroundColor;
-      await pulsar(tester, 'Color rosa');
+      await pulsarEnPaginas(tester, 'Color rosa');
 
       expect(
         fondo(),
         TemaApp.construir(color: ColorPastel.rosa).scaffoldBackgroundColor,
       );
-      await pulsar(tester, 'Color menta');
+      await pulsarEnPaginas(tester, 'Color menta');
       expect(
         fondo(),
         TemaApp.construir(color: ColorPastel.menta).scaffoldBackgroundColor,
@@ -144,12 +157,12 @@ void main() {
       await pulsar(tester, 'Mi perfil');
       expect(find.text('Escuchar'), findsOneWidget);
 
-      await pulsar(tester, 'Botón Escuchar');
+      await pulsarEnPaginas(tester, 'Botón Escuchar');
       expect(find.text('Escuchar'), findsNothing);
 
       // El botón ignora un segundo toque seguido (evitar dobles toques).
       await tester.runAsync(() => Future.delayed(Dimensiones.esperaDobleToque));
-      await pulsar(tester, 'Botón Escuchar');
+      await pulsarEnPaginas(tester, 'Botón Escuchar');
       expect(find.text('Escuchar'), findsOneWidget);
     });
 
@@ -226,6 +239,62 @@ void main() {
       await pulsar(tester, 'Hoy');
       expect(find.byType(Scrollable), findsNothing);
     });
+
+    testWidgets('la semana enseña los 7 días y 3 tareas de cada uno', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi agenda');
+      await pulsar(tester, 'Semana');
+
+      for (final dia in [
+        'Lunes',
+        'Martes',
+        'Miércoles',
+        'Jueves',
+        'Viernes',
+        'Sábado',
+        'Domingo',
+      ]) {
+        expect(find.text(dia), findsOneWidget, reason: dia);
+      }
+      // Los días de diario tienen 5 tareas: se ven siempre las 3 primeras
+      // (asamblea, taller y recreo) y las últimas quedan para «Ver más».
+      expect(find.text('Asamblea'), findsNWidgets(5));
+      expect(find.text('Recreo'), findsNWidgets(5));
+      expect(find.text('Llevar fotocopias'), findsNothing);
+      expect(find.text('Comida'), findsNothing);
+
+      // «Ver más» del lunes avanza hasta sus últimas tareas y entonces
+      // pasa a «Volver», que regresa a las primeras.
+      while (find.text('Volver').evaluate().isEmpty) {
+        await tester.tap(find.text('Ver más').first);
+        await tester.pumpAndSettle();
+        await tester.runAsync(
+          () => Future.delayed(Dimensiones.esperaDobleToque),
+        );
+      }
+      expect(find.text('Comida'), findsOneWidget);
+      expect(find.text('Asamblea'), findsNWidgets(4));
+
+      await pulsar(tester, 'Volver');
+      expect(find.text('Asamblea'), findsNWidgets(5));
+    });
+
+    testWidgets('el perfil reparte sus opciones en páginas legibles', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      await pulsar(tester, 'Mi perfil');
+
+      expect(find.text('1 de 2'), findsOneWidget);
+      expect(find.text('Anterior'), findsNothing);
+      await pulsarEnPaginas(tester, 'Botones arriba');
+      expect(find.text('2 de 2'), findsOneWidget);
+      expect(find.byType(Scrollable), findsNothing);
+    });
   });
 
   group('Pautas de accesibilidad de Flutter', () {
@@ -272,6 +341,45 @@ void main() {
       await pulsar(tester, 'Mis alumnos');
       expect(find.text('Diego'), findsOneWidget);
       expect(find.text('Iván'), findsNothing); // De 2ºA, de otra tutora.
+    });
+
+    testWidgets('el tutor tiene seguimiento y comedor (iteración 2)', (
+      tester,
+    ) async {
+      await arrancarApp(tester);
+      await entrarComoGestion(tester, 'javier', 'tutor1234');
+      expect(find.text('Seguimiento de hoy'), findsOneWidget);
+      expect(find.text('Comedor'), findsOneWidget);
+
+      await pulsar(tester, 'Seguimiento de hoy');
+      expect(find.text('Diego'), findsOneWidget);
+      final historial = find.text('Historial').first;
+      await tester.ensureVisible(historial);
+      await tester.tap(historial);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Historial de'), findsOneWidget);
+    });
+  });
+
+  group('Comedor del estudiante (HU-23)', () {
+    testWidgets('marca un día desde el menú, sin desplazarse', (tester) async {
+      await arrancarApp(tester);
+      await entrarComoDiego(tester);
+      // «Salir» va en la barra de abajo, como «Ayuda», no entre las opciones.
+      expect(find.text('Salir'), findsOneWidget);
+      expect(find.text('Ayuda'), findsOneWidget);
+      await pulsar(tester, 'Comedor');
+
+      expect(find.byType(Scrollable), findsNothing);
+      expect(find.text('Lunes'), findsOneWidget);
+      expect(find.text('Viernes'), findsOneWidget);
+      expect(find.text('Sábado'), findsNothing);
+      expect(find.text('Toca para elegir'), findsNWidgets(5));
+
+      await pulsar(tester, 'Lunes');
+      expect(find.text('Voy al comedor'), findsOneWidget);
+      // Nunca se ven dietas.
+      expect(find.textContaining('Dieta'), findsNothing);
     });
 
     testWidgets('la administración ve cuentas y aulas', (tester) async {

@@ -30,6 +30,24 @@ class PantallaPanelGestion extends StatelessWidget {
         ColorPastel.cielo,
         Rutas.listaAlumnos,
       ),
+      if (Permisos.puedeVerSeguimiento(cuenta))
+        const _OpcionPanel(
+          'Seguimiento de hoy',
+          'Progreso, retrasos e historial de las tareas',
+          Pictogramas.calendario,
+          Icons.insights_rounded,
+          ColorPastel.melocoton,
+          Rutas.seguimiento,
+        ),
+      if (Permisos.puedeGestionarComedor(cuenta))
+        const _OpcionPanel(
+          'Comedor',
+          'Asistencia, dietas y listado para cocina',
+          Pictogramas.comer,
+          Icons.restaurant_rounded,
+          ColorPastel.rosa,
+          Rutas.comedorGestion,
+        ),
       if (Permisos.puedeCrearEncargos(cuenta))
         const _OpcionPanel(
           'Encargos del colegio',

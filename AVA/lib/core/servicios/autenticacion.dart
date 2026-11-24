@@ -105,14 +105,23 @@ class Autenticacion {
       throw ErrorAcceso(_mensaje(e));
     }
     final s = await quienSoy();
-    if (s.usuario == null) {
+    final usuario = s.usuario;
+    String? rechazo;
+    if (usuario == null) {
+      rechazo = 'Esta cuenta no es de un tutor ni de un administrador.';
+    } else if (!usuario.activa) {
+      rechazo = mensajeCuentaDesactivada; // HU-13
+    }
+    if (rechazo != null) {
       await salir();
-      throw const ErrorAcceso(
-        'Esta cuenta no es de un tutor ni de un administrador.',
-      );
+      throw ErrorAcceso(rechazo);
     }
     return s;
   }
+
+  /// HU-13: lo que ve quien entra con una cuenta desactivada.
+  static const mensajeCuentaDesactivada =
+      'Esta cuenta está desactivada. Habla con la administración del centro.';
 
   /// HU-09: estudiante con su método (PIN, pictogramas o contraseña).
   /// [entrada] es el PIN (String), la lista de palabras de pictogramas
@@ -132,7 +141,14 @@ class Autenticacion {
             : _mensaje(e),
       );
     }
-    return quienSoy();
+    final sesion = await quienSoy();
+    // HU-13: una cuenta desactivada conserva sus datos, pero no entra.
+    if (sesion.estudiante?.activo == false) {
+      await salir();
+      await prepararTableta();
+      throw const ErrorAcceso(mensajeCuentaDesactivada);
+    }
+    return sesion;
   }
 
   /// T-18: quién ha iniciado sesión (admin, tutor o estudiante).

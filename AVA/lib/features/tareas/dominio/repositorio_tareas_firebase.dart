@@ -6,6 +6,7 @@ import '../../../core/servicios/base_datos.dart';
 import '../../agenda/dominio/registro.dart' as bd;
 import '../../perfil/dominio/conversion_firestore.dart';
 import 'paso.dart' as bd;
+import 'evento_historial.dart';
 import 'repositorio_tareas.dart';
 import 'tarea.dart' as bd;
 import 'tarea_agenda.dart';
@@ -37,7 +38,7 @@ class RepositorioTareasFirebase implements RepositorioTareas {
 
   /// Tareas del día ya mostradas, para poder actualizar su estado.
   final Map<String, Tarea> _cache = {};
-  final Map<String, List<String>> _pasos = {};
+  final Map<String, List<PasoTarea>> _pasos = {};
 
   CollectionReference<Map<String, dynamic>> get _tareas =>
       _db.collection('tareas');
@@ -72,7 +73,7 @@ class RepositorioTareasFirebase implements RepositorioTareas {
     ) {
       final registros = {
         for (final r in await _bd.registrosDelDia(idEstudiante, dia).first)
-          r.tareaId: r.estado,
+          r.tareaId: r,
       };
       final delDia = [
         for (final doc in documentos.values)
@@ -80,6 +81,8 @@ class RepositorioTareasFirebase implements RepositorioTareas {
             (doc: doc, base: base),
       ];
       for (final (:doc, :base) in delDia) {
+        final registro = registros[base.id];
+        final datos = doc.data();
         final tarea = Tarea(
           id: '${base.id}$_separador${bd.Tarea.claveFecha(dia)}',
           idEstudiante: idEstudiante,
@@ -88,15 +91,15 @@ class RepositorioTareasFirebase implements RepositorioTareas {
           pasos: await _pasosDe(base.id),
           inicio: _hora(dia, base.horaInicio),
           fin: _fin(dia, base.horaInicio, base.horaFin),
-          tipo: _tipoDesde(doc.data(), base),
-          estado: switch (registros[base.id]) {
-            bd.EstadoTarea.iniciada => EstadoTarea.enCurso,
-            bd.EstadoTarea.terminada => EstadoTarea.completada,
-            _ => EstadoTarea.pendiente,
-          },
+          tipo: _tipoDesde(datos, base),
+          estado: _estadoDesde(registro?.estado),
           pictograma: RecursoVisual.desdeUrl(base.pictogramaUrl),
           creadaPor: base.creadaPor,
           idEncargo: _esEncargo(base) ? base.id : null,
+          diasSemana: base.diasSemana,
+          temporizador: datos['temporizador'] as bool? ?? false,
+          avisoMinutos: (datos['avisoMinutos'] as num?)?.toInt(),
+          pasoActual: registro?.pasoActual ?? 0,
         );
         _cache[tarea.id] = tarea;
         resultado.add(tarea);
@@ -108,12 +111,13 @@ class RepositorioTareasFirebase implements RepositorioTareas {
   @override
   Future<void> guardar(Tarea tarea) async {
     final idBase = _idBase(tarea.id);
+    // Las tareas ya guardadas llegan con el día en su identificador
+    // («id|yyyy-MM-dd»). Una nueva no se lee: las reglas no dejan leer un
+    // documento que todavía no existe.
     bd.Tarea? anterior;
-    try {
+    if (tarea.id.contains(_separador)) {
       final doc = await _tareas.doc(idBase).get();
       if (doc.exists) anterior = bd.Tarea.fromDoc(doc);
-    } catch (_) {
-      anterior = null;
     }
 
     final definicion = bd.Tarea(
@@ -124,8 +128,9 @@ class RepositorioTareasFirebase implements RepositorioTareas {
       tipo: _tipoA(tarea.tipo),
       horaInicio: _textoHora(tarea.inicio),
       horaFin: _textoHora(tarea.fin),
-      // Una tarea que se repite sigue repitiéndose; si no, es de ese día.
-      diasSemana: anterior?.diasSemana ?? const [],
+      // HU-14: los días elegidos. Al cambiarlos se actualizan las próximas
+      // apariciones; los registros y su historial no se tocan.
+      diasSemana: tarea.diasSemana,
       fecha: bd.Tarea.claveFecha(tarea.inicio),
       creadaPor: anterior?.creadaPor ?? tarea.creadaPor ?? '',
       estudiantes: anterior?.estudiantes ?? [tarea.idEstudiante],
@@ -162,22 +167,43 @@ class RepositorioTareasFirebase implements RepositorioTareas {
     Tarea tarea, {
     required bool existe,
   }) async {
-    final pasos = [
-      for (final (i, texto) in tarea.pasos.indexed)
-        bd.Paso(id: '', orden: i + 1, texto: texto),
-    ];
     final foto = ConversionFirestore.fotoIncrustada(tarea.pictograma);
     final sinFoto = foto == null ? definicion : _conPictograma(definicion, '');
 
+    // Los pasos con foto propia se guardan primero sin ella; las fotos se
+    // suben después, cuando ya se conoce el id de la tarea (HU-20).
     final String id;
+    final pasosSinFotos = _pasosA(tarea.pasos, urls: const {});
     if (existe) {
-      await _bd.actualizarTarea(sinFoto, pasos);
+      await _bd.actualizarTarea(sinFoto, pasosSinFotos);
       id = definicion.id;
     } else {
-      id = await _bd.crearTarea(sinFoto, pasos);
+      id = await _bd.crearTarea(sinFoto, pasosSinFotos);
     }
 
-    final extras = <String, Object?>{'categoria': tarea.tipo.name};
+    final urls = <int, String>{};
+    for (final (i, paso) in tarea.pasos.indexed) {
+      final fotoPaso = ConversionFirestore.fotoIncrustada(paso.imagen);
+      if (fotoPaso != null) {
+        urls[i] = await _almacenamiento.subirImagenTarea(
+          '$id-paso-${i + 1}',
+          fotoPaso.bytes,
+          tipo: fotoPaso.tipo,
+        );
+      }
+    }
+    if (urls.isNotEmpty) {
+      await _bd.actualizarTarea(
+        _conId(sinFoto, id),
+        _pasosA(tarea.pasos, urls: urls),
+      );
+    }
+
+    final extras = <String, Object?>{
+      'categoria': tarea.tipo.name,
+      'temporizador': tarea.temporizador,
+      'avisoMinutos': tarea.avisoMinutos,
+    };
     if (foto != null) {
       extras['pictogramaUrl'] = await _almacenamiento.subirImagenTarea(
         id,
@@ -189,6 +215,25 @@ class RepositorioTareasFirebase implements RepositorioTareas {
     _pasos.remove(id);
   }
 
+  /// Pasos para la base de datos. Las fotos incrustadas se sustituyen por
+  /// su dirección en [urls] (por posición) o se dejan sin imagen.
+  static List<bd.Paso> _pasosA(
+    List<PasoTarea> pasos, {
+    required Map<int, String> urls,
+  }) => [
+    for (final (i, paso) in pasos.indexed)
+      bd.Paso(
+        id: '',
+        orden: i + 1,
+        texto: paso.texto,
+        imagenUrl:
+            urls[i] ??
+            (ConversionFirestore.fotoIncrustada(paso.imagen) == null
+                ? paso.imagen?.url ?? ''
+                : ''),
+      ),
+  ];
+
   @override
   Future<void> eliminar(String idTarea) async {
     final idBase = _idBase(idTarea);
@@ -197,35 +242,138 @@ class RepositorioTareasFirebase implements RepositorioTareas {
     _pasos.remove(idBase);
   }
 
-  @override
-  Future<Tarea> actualizarEstado(String idTarea, EstadoTarea estado) async {
+  Tarea _enCache(String idTarea) {
     final tarea = _cache[idTarea];
     if (tarea == null) throw StateError('No se encuentra la tarea $idTarea');
+    return tarea;
+  }
 
-    final dia = DateTime(
-      tarea.inicio.year,
-      tarea.inicio.month,
-      tarea.inicio.day,
+  static DateTime _diaDe(Tarea tarea) =>
+      DateTime(tarea.inicio.year, tarea.inicio.month, tarea.inicio.day);
+
+  @override
+  Future<Tarea> actualizarEstado(
+    String idTarea,
+    EstadoTarea estado, {
+    OrigenCambio origen = OrigenCambio.estudiante,
+    String? idActor,
+  }) async {
+    final tarea = _enCache(idTarea);
+    await _bd.registrarEstado(
+      tarea.idEstudiante,
+      _idBase(idTarea),
+      _diaDe(tarea),
+      estadoNuevo: _estadoA(estado),
+      estadoAnterior: _estadoA(tarea.estado),
+      origen: origen.name,
+      actorUid: idActor,
     );
-    final idBase = _idBase(idTarea);
-    // Volver a «pendiente» no se registra: solo se guardan inicio y fin.
-    if (estado == EstadoTarea.enCurso) {
-      await _bd.marcarInicio(tarea.idEstudiante, idBase, dia);
-    } else if (estado == EstadoTarea.completada) {
-      await _bd.marcarFin(tarea.idEstudiante, idBase, dia);
-    }
     final actualizada = tarea.copyWith(estado: estado);
     _cache[idTarea] = actualizada;
     return actualizada;
   }
 
   @override
+  Future<Tarea> guardarPasoActual(String idTarea, int paso) async {
+    final tarea = _enCache(idTarea);
+    await _bd.guardarPasoActual(
+      tarea.idEstudiante,
+      _idBase(idTarea),
+      _diaDe(tarea),
+      paso,
+    );
+    final actualizada = tarea.copyWith(pasoActual: paso);
+    _cache[idTarea] = actualizada;
+    return actualizada;
+  }
+
+  @override
+  Future<List<EventoHistorial>> historial({
+    required String idEstudiante,
+    required DateTime desde,
+    required DateTime hasta,
+  }) async {
+    final registros = await _bd.historialDe(idEstudiante, desde, hasta);
+    final nombres = <String, String>{};
+    final eventos = <EventoHistorial>[];
+    for (final (registro, cambios) in registros) {
+      final titulo = nombres[registro.tareaId] ??= await _nombreTarea(
+        registro.tareaId,
+      );
+      for (final cambio in cambios) {
+        final momento = (cambio['fechaHora'] as Timestamp?)?.toDate();
+        if (momento != null) {
+          eventos.add(
+            EventoHistorial(
+              idEstudiante: idEstudiante,
+              idTarea: registro.tareaId,
+              tituloTarea: titulo,
+              dia: DateTime.parse(registro.fecha),
+              estadoAnterior: cambio['estadoAnterior'] == null
+                  ? null
+                  : _estadoDesde(
+                      bd.EstadoTarea.values.byName(
+                        cambio['estadoAnterior'] as String,
+                      ),
+                    ),
+              estadoNuevo: _estadoDesde(
+                bd.EstadoTarea.values.byName(
+                  cambio['estadoNuevo'] as String? ?? 'pendiente',
+                ),
+              ),
+              momento: momento,
+              origen: OrigenCambio.desde(cambio['origen']),
+              idActor: cambio['actorUid'] as String?,
+            ),
+          );
+        }
+      }
+    }
+    return eventos..sort((a, b) => a.momento.compareTo(b.momento));
+  }
+
+  /// Nombre de una tarea para el historial. Si se ha borrado, el historial
+  /// se conserva igualmente.
+  Future<String> _nombreTarea(String idBase) async {
+    final doc = await _tareas.doc(idBase).get();
+    return doc.data()?['nombre'] as String? ?? 'Tarea borrada';
+  }
+
+  static EstadoTarea _estadoDesde(bd.EstadoTarea? estado) => switch (estado) {
+    bd.EstadoTarea.iniciada => EstadoTarea.enCurso,
+    bd.EstadoTarea.terminada => EstadoTarea.completada,
+    _ => EstadoTarea.pendiente,
+  };
+
+  static bd.EstadoTarea _estadoA(EstadoTarea estado) => switch (estado) {
+    EstadoTarea.pendiente => bd.EstadoTarea.pendiente,
+    EstadoTarea.enCurso => bd.EstadoTarea.iniciada,
+    EstadoTarea.completada => bd.EstadoTarea.terminada,
+  };
+
+  @override
   String nuevoId(String prefijo) => _bd.nuevoId('tareas');
 
-  Future<List<String>> _pasosDe(String idBase) async => _pasos[idBase] ??= [
+  Future<List<PasoTarea>> _pasosDe(String idBase) async => _pasos[idBase] ??= [
     for (final paso in await _bd.pasosDe(idBase))
-      if (paso.texto.trim().isNotEmpty) paso.texto,
+      if (paso.texto.trim().isNotEmpty)
+        PasoTarea(paso.texto, imagen: RecursoVisual.desdeUrl(paso.imagenUrl)),
   ];
+
+  static bd.Tarea _conId(bd.Tarea t, String id) => bd.Tarea(
+    id: id,
+    nombre: t.nombre,
+    pictogramaUrl: t.pictogramaUrl,
+    descripcion: t.descripcion,
+    tipo: t.tipo,
+    horaInicio: t.horaInicio,
+    horaFin: t.horaFin,
+    diasSemana: t.diasSemana,
+    fecha: t.fecha,
+    creadaPor: t.creadaPor,
+    estudiantes: t.estudiantes,
+    aulaId: t.aulaId,
+  );
 
   static bd.Tarea _conPictograma(bd.Tarea t, String url) => bd.Tarea(
     id: t.id,

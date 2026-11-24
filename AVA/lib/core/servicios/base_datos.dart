@@ -68,6 +68,31 @@ class BaseDatos {
 
   Future<void> eliminarUsuario(String uid) => _usuarios.doc(uid).delete();
 
+  /// HU-13: activa o desactiva una cuenta (solo admin). No borra nada: la
+  /// cuenta conserva sus datos, tareas y registros, pero no puede entrar.
+  /// En un estudiante se marca su ficha y su acceso, para que la tableta
+  /// deje de mostrarlo.
+  Future<void> cambiarEstadoCuenta(
+    String uid, {
+    required bool activa,
+    required bool esEstudiante,
+  }) async {
+    final cambios = {
+      'estado': activa
+          ? EstadoCuenta.activa.name
+          : EstadoCuenta.desactivada.name,
+      'desactivadaEn': activa ? null : FieldValue.serverTimestamp(),
+    };
+    final batch = _db.batch();
+    if (esEstudiante) {
+      batch.update(_estudiantes.doc(uid), cambios);
+      batch.update(_acceso.doc(uid), cambios);
+    } else {
+      batch.update(_usuarios.doc(uid), cambios);
+    }
+    await batch.commit();
+  }
+
   // ===================================================================
   // Estudiantes (HU-01, HU-02, HU-15, HU-16, HU-17, HU-19)
   // ===================================================================
@@ -358,6 +383,82 @@ class BaseDatos {
       'estado': EstadoTarea.terminada.name,
       'fin': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+  /// HU-12, HU-26 y T-124: guarda el estado de una tarea en un día (el
+  /// estudiante o su tutor) y añade el cambio a `registros/{id}/historial`
+  /// sin sobrescribir los anteriores (HU-27). [origen] es `estudiante`,
+  /// `tutor` o `sistema`.
+  Future<void> registrarEstado(
+    String estudianteId,
+    String tareaId,
+    DateTime dia, {
+    required EstadoTarea estadoNuevo,
+    EstadoTarea? estadoAnterior,
+    required String origen,
+    String? actorUid,
+  }) async {
+    final fecha = Tarea.claveFecha(dia);
+    final registro = _registros(
+      estudianteId,
+    ).doc(Registro.idPara(fecha, tareaId));
+    final batch = _db.batch();
+    batch.set(registro, {
+      'tareaId': tareaId,
+      'fecha': fecha,
+      'estado': estadoNuevo.name,
+      if (estadoNuevo == EstadoTarea.iniciada)
+        'inicio': FieldValue.serverTimestamp(),
+      if (estadoNuevo == EstadoTarea.terminada)
+        'fin': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+    batch.set(registro.collection('historial').doc(), {
+      'estadoAnterior': estadoAnterior?.name,
+      'estadoNuevo': estadoNuevo.name,
+      'fechaHora': FieldValue.serverTimestamp(),
+      'actorUid': actorUid,
+      'origen': origen,
+    });
+    await batch.commit();
+  }
+
+  /// HU-21 / T-109: paso por el que va el estudiante en una tarea.
+  Future<void> guardarPasoActual(
+    String estudianteId,
+    String tareaId,
+    DateTime dia,
+    int paso,
+  ) {
+    final fecha = Tarea.claveFecha(dia);
+    return _registros(estudianteId).doc(Registro.idPara(fecha, tareaId)).set({
+      'tareaId': tareaId,
+      'fecha': fecha,
+      'pasoActual': paso,
+    }, SetOptions(merge: true));
+  }
+
+  /// HU-27: registros de un estudiante entre dos fechas («yyyy-MM-dd»,
+  /// [hasta] sin incluir), cada uno con los eventos de su historial.
+  Future<List<(Registro, List<Map<String, dynamic>>)>> historialDe(
+    String estudianteId,
+    DateTime desde,
+    DateTime hasta,
+  ) async {
+    final registros = await _registros(estudianteId)
+        .where('fecha', isGreaterThanOrEqualTo: Tarea.claveFecha(desde))
+        .where('fecha', isLessThan: Tarea.claveFecha(hasta))
+        .get();
+    return [
+      for (final doc in registros.docs)
+        (
+          Registro.fromDoc(doc),
+          [
+            for (final evento
+                in (await doc.reference.collection('historial').get()).docs)
+              evento.data(),
+          ],
+        ),
+    ];
   }
 
   // ===================================================================
