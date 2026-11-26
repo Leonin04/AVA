@@ -16,6 +16,7 @@ import '../dominio/repositorio_tareas.dart';
 import '../dominio/tarea_agenda.dart';
 import '../logica/detalle_tarea_controlador.dart';
 import 'widgets/dialogo_celebracion.dart';
+import 'widgets/temporizador_tarea.dart';
 
 /// Detalle de una tarea (HU-06, HU-07): a la izquierda el pictograma, la
 /// hora y el estado; a la derecha la explicación, de una en una (primero
@@ -80,6 +81,29 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
     if (guardado && mounted) await mostrarCelebracion(context);
   }
 
+  /// HU-21: el estudiante dice que ha terminado el paso actual. Si lo
+  /// confirma, se guarda y se pasa al siguiente; si cancela, se queda en el
+  /// mismo paso. En el último, la tarea queda terminada.
+  Future<void> _terminarPaso() async {
+    final ultimo = _controlador.esUltimoPaso;
+    final paso = _controlador.tarea.pasos[_controlador.pasoActual];
+    final confirmado = await mostrarDialogoConfirmacion(
+      context,
+      titulo: ultimo
+          ? '¿Has terminado el último paso?'
+          : '¿Has terminado este paso?',
+      mensaje: paso.texto,
+      pictograma: paso.imagen ?? Pictogramas.terminar,
+      textoConfirmar: ultimo ? 'Sí, he terminado' : 'Sí, siguiente paso',
+      textoCancelar: 'Todavía no',
+    );
+    // Si cancela, se queda en el mismo paso (HU-21).
+    if (confirmado) {
+      final guardado = await _controlador.confirmarPaso();
+      if (guardado && ultimo && mounted) await mostrarCelebracion(context);
+    }
+  }
+
   Future<void> _borrar() async {
     final confirmado = await mostrarDialogoConfirmacion(
       context,
@@ -119,7 +143,7 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
           textoVoz: [
             tarea.titulo,
             FormatoFecha.intervaloHablado(tarea.inicio, tarea.fin),
-            if (paginas.isNotEmpty) paginas[pagina],
+            if (paginas.isNotEmpty) paginas[pagina].texto,
           ].join('. '),
           cuerpo: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -131,6 +155,12 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    // HU-22: solo si el tutor lo ha activado y mientras se
+                    // hace la tarea.
+                    if (tarea.temporizador && _controlador.puedeTerminar) ...[
+                      TemporizadorTarea(tarea: tarea),
+                      const SizedBox(height: Dimensiones.espaciadoPequeno),
+                    ],
                     Expanded(
                       child: _Explicacion(
                         paginas: paginas,
@@ -224,6 +254,20 @@ class _PantallaDetalleTareaState extends State<PantallaDetalleTarea> {
         color: ColorPastel.cielo,
         disposicion: DisposicionBoton.horizontal,
         alPulsar: ocupado ? null : _empezar,
+      );
+    }
+    if (_controlador.guiando) {
+      final ultimo = _controlador.esUltimoPaso;
+      return BotonAccesible(
+        texto: ultimo ? 'He terminado' : 'He terminado este paso',
+        etiquetaSemantica: ultimo
+            ? 'He terminado el último paso y la tarea'
+            : 'He terminado este paso',
+        pictograma: Pictogramas.terminar,
+        icono: Icons.check_rounded,
+        color: ColorPastel.menta,
+        disposicion: DisposicionBoton.horizontal,
+        alPulsar: ocupado ? null : _terminarPaso,
       );
     }
     if (_controlador.puedeTerminar) {
@@ -327,7 +371,7 @@ class _Explicacion extends StatelessWidget {
     required this.color,
   });
 
-  final List<String> paginas;
+  final List<PaginaExplicacion> paginas;
   final int pagina;
   final ColorPastel color;
 
@@ -335,6 +379,10 @@ class _Explicacion extends StatelessWidget {
   Widget build(BuildContext context) {
     final esquema = Theme.of(context).colorScheme;
     final textos = Theme.of(context).textTheme;
+    final mostrarImagen =
+        AjustesInterfaz.of(context).mostrarPictogramas &&
+        paginas.isNotEmpty &&
+        paginas[pagina].imagen != null;
 
     return Container(
       padding: const EdgeInsets.all(Dimensiones.espaciado),
@@ -364,6 +412,24 @@ class _Explicacion extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: Dimensiones.espaciadoPequeno),
+                  // HU-20: el apoyo del paso (pictograma o foto) encima del
+                  // texto, si el estudiante ve los dibujos.
+                  if (mostrarImagen) ...[
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, restricciones) => Center(
+                          child: Pictograma(
+                            recurso: paginas[pagina].imagen,
+                            tamano: restricciones.biggest.shortestSide.clamp(
+                              48,
+                              260,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: Dimensiones.espaciadoPequeno),
+                  ],
                   Expanded(
                     child: Center(
                       child: FittedBox(
@@ -371,7 +437,7 @@ class _Explicacion extends StatelessWidget {
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 560),
                           child: Text(
-                            paginas[pagina],
+                            paginas[pagina].texto,
                             textAlign: TextAlign.center,
                             style: textos.headlineMedium,
                           ),

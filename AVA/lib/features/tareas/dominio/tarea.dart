@@ -5,9 +5,9 @@ enum TipoTarea { colegio, personal }
 
 extension TipoTareaTexto on TipoTarea {
   String get texto => switch (this) {
-        TipoTarea.colegio => 'Del colegio',
-        TipoTarea.personal => 'Personal',
-      };
+    TipoTarea.colegio => 'Del colegio',
+    TipoTarea.personal => 'Personal',
+  };
 }
 
 /// Documento `tareas/{tareaId}`.
@@ -80,16 +80,16 @@ class Tarea {
   }
 
   Map<String, dynamic> toMap() => {
-        'nombre': nombre,
-        'pictogramaUrl': pictogramaUrl,
-        'descripcion': descripcion,
-        'tipo': tipo.name,
-        'horaInicio': horaInicio,
-        'horaFin': horaFin,
-        'diasSemana': diasSemana,
-        'fecha': seRepite ? null : fecha,
-        'creadaPor': creadaPor,
-        'estudiantes': estudiantes,
-        'aulaId': aulaId,
-      };
+    'nombre': nombre,
+    'pictogramaUrl': pictogramaUrl,
+    'descripcion': descripcion,
+    'tipo': tipo.name,
+    'horaInicio': horaInicio,
+    'horaFin': horaFin,
+    'diasSemana': diasSemana,
+    'fecha': seRepite ? null : fecha,
+    'creadaPor': creadaPor,
+    'estudiantes': estudiantes,
+    'aulaId': aulaId,
+  };
 }

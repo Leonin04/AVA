@@ -51,13 +51,15 @@ class BaseDatos {
   }
 
   /// Todas las cuentas de admin y tutores (solo admin).
-  Stream<List<Usuario>> usuarios() => _usuarios.snapshots().map((s) =>
-      s.docs.map(Usuario.fromDoc).toList()
-        ..sort((a, b) => a.nombre.compareTo(b.nombre)));
+  Stream<List<Usuario>> usuarios() => _usuarios.snapshots().map(
+    (s) =>
+        s.docs.map(Usuario.fromDoc).toList()
+          ..sort((a, b) => a.nombre.compareTo(b.nombre)),
+  );
 
   /// Solo los tutores (solo admin).
-  Stream<List<Usuario>> tutores() => usuarios()
-      .map((l) => l.where((u) => u.rol == Rol.tutor).toList());
+  Stream<List<Usuario>> tutores() =>
+      usuarios().map((l) => l.where((u) => u.rol == Rol.tutor).toList());
 
   /// Crea o actualiza el documento de un admin o tutor (HU-02, HU-03).
   /// La cuenta de Authentication la crea `Autenticacion.crearCuentaPersonal`.
@@ -65,6 +67,31 @@ class BaseDatos {
       _usuarios.doc(u.id).set(u.toMap(), SetOptions(merge: true));
 
   Future<void> eliminarUsuario(String uid) => _usuarios.doc(uid).delete();
+
+  /// HU-13: activa o desactiva una cuenta (solo admin). No borra nada: la
+  /// cuenta conserva sus datos, tareas y registros, pero no puede entrar.
+  /// En un estudiante se marca su ficha y su acceso, para que la tableta
+  /// deje de mostrarlo.
+  Future<void> cambiarEstadoCuenta(
+    String uid, {
+    required bool activa,
+    required bool esEstudiante,
+  }) async {
+    final cambios = {
+      'estado': activa
+          ? EstadoCuenta.activa.name
+          : EstadoCuenta.desactivada.name,
+      'desactivadaEn': activa ? null : FieldValue.serverTimestamp(),
+    };
+    final batch = _db.batch();
+    if (esEstudiante) {
+      batch.update(_estudiantes.doc(uid), cambios);
+      batch.update(_acceso.doc(uid), cambios);
+    } else {
+      batch.update(_usuarios.doc(uid), cambios);
+    }
+    await batch.commit();
+  }
 
   // ===================================================================
   // Estudiantes (HU-01, HU-02, HU-15, HU-16, HU-17, HU-19)
@@ -137,10 +164,12 @@ class BaseDatos {
       });
 
   /// HU-15: el tutor autoriza o no al estudiante a cambiar sus preferencias.
-  Future<void> permitirCambiarPreferencias(String estudianteId, bool permitir) =>
-      _estudiantes
-          .doc(estudianteId)
-          .update({'puedeCambiarPreferencias': permitir});
+  Future<void> permitirCambiarPreferencias(
+    String estudianteId,
+    bool permitir,
+  ) => _estudiantes.doc(estudianteId).update({
+    'puedeCambiarPreferencias': permitir,
+  });
 
   /// T-31: método de acceso del estudiante (admin o tutor).
   /// Ojo: la clave en sí está en Authentication; si cambia el método hay que
@@ -356,13 +385,91 @@ class BaseDatos {
     }, SetOptions(merge: true));
   }
 
+  /// HU-12, HU-26 y T-124: guarda el estado de una tarea en un día (el
+  /// estudiante o su tutor) y añade el cambio a `registros/{id}/historial`
+  /// sin sobrescribir los anteriores (HU-27). [origen] es `estudiante`,
+  /// `tutor` o `sistema`.
+  Future<void> registrarEstado(
+    String estudianteId,
+    String tareaId,
+    DateTime dia, {
+    required EstadoTarea estadoNuevo,
+    EstadoTarea? estadoAnterior,
+    required String origen,
+    String? actorUid,
+  }) async {
+    final fecha = Tarea.claveFecha(dia);
+    final registro = _registros(
+      estudianteId,
+    ).doc(Registro.idPara(fecha, tareaId));
+    final batch = _db.batch();
+    batch.set(registro, {
+      'tareaId': tareaId,
+      'fecha': fecha,
+      'estado': estadoNuevo.name,
+      if (estadoNuevo == EstadoTarea.iniciada)
+        'inicio': FieldValue.serverTimestamp(),
+      if (estadoNuevo == EstadoTarea.terminada)
+        'fin': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+    batch.set(registro.collection('historial').doc(), {
+      'estadoAnterior': estadoAnterior?.name,
+      'estadoNuevo': estadoNuevo.name,
+      'fechaHora': FieldValue.serverTimestamp(),
+      'actorUid': actorUid,
+      'origen': origen,
+    });
+    await batch.commit();
+  }
+
+  /// HU-21 / T-109: paso por el que va el estudiante en una tarea.
+  Future<void> guardarPasoActual(
+    String estudianteId,
+    String tareaId,
+    DateTime dia,
+    int paso,
+  ) {
+    final fecha = Tarea.claveFecha(dia);
+    return _registros(estudianteId).doc(Registro.idPara(fecha, tareaId)).set({
+      'tareaId': tareaId,
+      'fecha': fecha,
+      'pasoActual': paso,
+    }, SetOptions(merge: true));
+  }
+
+  /// HU-27: registros de un estudiante entre dos fechas («yyyy-MM-dd»,
+  /// [hasta] sin incluir), cada uno con los eventos de su historial.
+  Future<List<(Registro, List<Map<String, dynamic>>)>> historialDe(
+    String estudianteId,
+    DateTime desde,
+    DateTime hasta,
+  ) async {
+    final registros = await _registros(estudianteId)
+        .where('fecha', isGreaterThanOrEqualTo: Tarea.claveFecha(desde))
+        .where('fecha', isLessThan: Tarea.claveFecha(hasta))
+        .get();
+    return [
+      for (final doc in registros.docs)
+        (
+          Registro.fromDoc(doc),
+          [
+            for (final evento
+                in (await doc.reference.collection('historial').get()).docs)
+              evento.data(),
+          ],
+        ),
+    ];
+  }
+
   // ===================================================================
   // Utilidades
   // ===================================================================
 
   /// Une dos streams de tareas en uno, sin duplicados y ordenado por hora.
   static Stream<List<Tarea>> _unir(
-      Stream<List<Tarea>> a, Stream<List<Tarea>> b) {
+    Stream<List<Tarea>> a,
+    Stream<List<Tarea>> b,
+  ) {
     late StreamController<List<Tarea>> ctrl;
     StreamSubscription<List<Tarea>>? sa;
     StreamSubscription<List<Tarea>>? sb;
@@ -371,9 +478,13 @@ class BaseDatos {
 
     void emitir() {
       if (ua == null || ub == null) return;
-      final porId = <String, Tarea>{for (final t in [...ua!, ...ub!]) t.id: t};
-      ctrl.add(porId.values.toList()
-        ..sort((x, y) => x.horaInicio.compareTo(y.horaInicio)));
+      final porId = <String, Tarea>{
+        for (final t in [...ua!, ...ub!]) t.id: t,
+      };
+      ctrl.add(
+        porId.values.toList()
+          ..sort((x, y) => x.horaInicio.compareTo(y.horaInicio)),
+      );
     }
 
     ctrl = StreamController<List<Tarea>>(

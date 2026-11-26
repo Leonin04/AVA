@@ -1,11 +1,15 @@
 rules_version = '2';
 
-// Reglas de seguridad de AVA (iteración 1, versión 2)
+// Reglas de seguridad de AVA (iteración 2)
 //
 // Quién es quién:
 //  - admin y tutor: tienen documento en /usuarios/{uid}
 //  - estudiante:    tiene documento en /estudiantes/{uid}
 //  - tableta sin sesión de alumno: sesión ANÓNIMA de Firebase (solo ve /acceso y /aulas)
+//
+// Iteración 2: cuentas desactivadas (HU-13), confirmación de tareas por el
+// tutor (T-124), historial de estados (HU-27), comedor (HU-23 a HU-25) y la
+// matriz de permisos del entregable 2.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -19,53 +23,80 @@ service cloud.firestore {
     function rutaUsuario() {
       return /databases/$(database)/documents/usuarios/$(uid());
     }
-    function esPersonal() {                 // admin o tutor
-      return sesion() && exists(rutaUsuario());
+    function usuario() {
+      return get(rutaUsuario()).data;
+    }
+    // HU-13: una cuenta desactivada conserva sus datos, pero no tiene acceso.
+    function esPersonal() {                 // admin o tutor con la cuenta activa
+      return sesion() && exists(rutaUsuario())
+          && usuario().get('estado', 'activa') != 'desactivada';
     }
     function esAdmin() {
-      return esPersonal() && get(rutaUsuario()).data.rol == 'admin';
+      return esPersonal() && usuario().rol == 'admin';
     }
     function esTutor() {
-      return esPersonal() && get(rutaUsuario()).data.rol == 'tutor';
+      return esPersonal() && usuario().rol == 'tutor';
+    }
+    function esTutorDelCentro() {           // el familiar solo consulta
+      return esTutor() && usuario().get('tipoTutor', 'centro') == 'centro';
     }
     function estudiante(id) {
       return get(/databases/$(database)/documents/estudiantes/$(id)).data;
     }
-    function esEstudiante() {               // el usuario es un estudiante
-      return sesion() && exists(/databases/$(database)/documents/estudiantes/$(uid()));
+    function esEstudiante() {               // estudiante con la cuenta activa
+      return sesion()
+          && exists(/databases/$(database)/documents/estudiantes/$(uid()))
+          && estudiante(uid()).get('estado', 'activa') != 'desactivada';
+    }
+    function esElEstudiante(estId) {
+      return esEstudiante() && uid() == estId;
     }
     function esTutorDe(estId) {             // RF-06 / HU-17
       return esTutor() && uid() in estudiante(estId).tutores;
+    }
+    function esTutorDelCentroDe(estId) {
+      return esTutorDelCentro() && uid() in estudiante(estId).tutores;
+    }
+    function aula(aulaId) {
+      return get(/databases/$(database)/documents/aulas/$(aulaId)).data;
     }
     function soloCambia(campos) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(campos);
     }
 
-    // ---------- usuarios (HU-01, HU-02, HU-03, HU-18) ----------
+    // ---------- usuarios (HU-01, HU-02, HU-03, HU-13, HU-18) ----------
     match /usuarios/{u} {
+      // Cada uno puede leer su propio documento (también si está
+      // desactivado, para que la app le explique por qué no entra).
       allow read: if esAdmin() || (sesion() && uid() == u);
       allow write: if esAdmin();
     }
 
-    // ---------- aulas (HU-16) ----------
+    // ---------- aulas (HU-16, HU-23) ----------
     // La tableta (sesión anónima) las lee para mostrar la pantalla "elige tu aula" (HU-09).
     match /aulas/{aulaId} {
       allow read: if sesion();
       allow write: if esAdmin();
+      // El tutor responsable nombra al encargado del comedor (HU-23).
+      allow update: if esTutorDelCentro()
+                    && resource.data.tutorResponsable == uid()
+                    && soloCambia(['encargadoComedor']);
     }
 
-    // ---------- acceso (HU-09) ----------
+    // ---------- acceso (HU-09, HU-13) ----------
     // Datos mínimos para elegir alumno antes de iniciar sesión:
-    // nombre de pila, avatar, aula, método de acceso y usuario.
+    // nombre de pila, avatar, aula, método de acceso, usuario y estado.
     match /acceso/{estId} {
       allow read: if sesion();
       allow write: if esAdmin() || esTutorDe(estId);
     }
 
-    // ---------- estudiantes (HU-01, HU-02, HU-15, HU-16, HU-17, HU-19) ----------
+    // ---------- estudiantes (HU-01, HU-02, HU-13, HU-15, HU-16, HU-17, HU-19) ----------
     match /estudiantes/{estId} {
       // Un tutor solo lee los estudiantes en los que aparece (consulta con
-      // where('tutores', arrayContains: uid) o Firestore la rechaza).
+      // where('tutores', arrayContains: uid) o Firestore la rechaza). El
+      // propio estudiante puede leer su ficha aunque esté desactivado, para
+      // que la app le explique por qué no entra (HU-13).
       allow read: if esAdmin()
                   || (esTutor() && uid() in resource.data.tutores)
                   || (sesion() && uid() == estId);
@@ -73,30 +104,41 @@ service cloud.firestore {
       allow create, delete: if esAdmin();
 
       allow update: if esAdmin()
-                    // Tutor: perfil y preferencias, pero no tutores ni aula
+                    // Tutor: perfil y preferencias, pero no tutores, aula, usuario ni estado
                     || (esTutor() && uid() in resource.data.tutores
                         && !request.resource.data.diff(resource.data).affectedKeys()
-                              .hasAny(['tutores', 'aulaId', 'usuario']))
+                              .hasAny(['tutores', 'aulaId', 'usuario', 'estado', 'desactivadaEn']))
                     // Estudiante: solo sus preferencias y si su tutor le deja (HU-15)
-                    || (sesion() && uid() == estId
+                    || (esElEstudiante(estId)
                         && resource.data.puedeCambiarPreferencias == true
                         && soloCambia(['preferencias']));
 
-      // ---------- registros de inicio y fin (HU-11, HU-12) ----------
+      // ---------- registros de inicio, fin y paso (HU-12, HU-21, HU-26) ----------
+      // Los escribe el propio estudiante o, para confirmar una tarea, su
+      // tutor del centro (T-124). El tutor familiar solo los lee.
       match /registros/{regId} {
         allow read: if esAdmin() || esTutorDe(estId) || (sesion() && uid() == estId);
-        allow create, update: if sesion() && uid() == estId
+        allow create, update: if (esElEstudiante(estId) || esTutorDelCentroDe(estId) || esAdmin())
                               && request.resource.data.tareaId is string
                               && request.resource.data.fecha is string;
         allow delete: if esAdmin();
+
+        // HU-27: historial de cambios de estado. Solo se añaden eventos:
+        // nunca se cambian ni se borran los anteriores.
+        match /historial/{eventoId} {
+          allow read: if esAdmin() || esTutorDe(estId) || (sesion() && uid() == estId);
+          allow create: if (esElEstudiante(estId) || esTutorDelCentroDe(estId) || esAdmin())
+                        && request.resource.data.origen in ['estudiante', 'tutor', 'sistema'];
+          allow update, delete: if false;
+        }
       }
     }
 
-    // ---------- tareas y pasos (HU-04 a HU-08, HU-10) ----------
+    // ---------- tareas y pasos (HU-04 a HU-08, HU-10, HU-14, HU-20, HU-22, HU-28) ----------
     match /tareas/{tareaId} {
       function puedeVer(t) {
         return esPersonal()
-            || (sesion() && uid() in t.estudiantes)
+            || (esEstudiante() && uid() in t.estudiantes)
             || (esEstudiante() && t.aulaId != null && t.aulaId == estudiante(uid()).aulaId);
       }
 
@@ -119,6 +161,55 @@ service cloud.firestore {
         }
         allow read: if puedeVer(tarea());
         allow write: if esAdmin() || (sesion() && tarea().creadaPor == uid());
+      }
+    }
+
+    // ---------- comedor (HU-23, HU-25) ----------
+    // Un documento por aula y día: comedor/{aulaId}_{yyyy-MM-dd}, con un
+    // campo por estudiante en `asistencia` (come / no come). Nunca contiene
+    // dietas.
+    match /comedor/{diaId} {
+      function datos() {
+        return request.resource.data;
+      }
+      function delAula(aulaId) {
+        return esEstudiante() && estudiante(uid()).aulaId == aulaId;
+      }
+      function esEncargadoDe(aulaId) {
+        return delAula(aulaId) && aula(aulaId).get('encargadoComedor', '') == uid();
+      }
+      function cambiaSoloLoSuyo() {
+        return resource == null
+            ? datos().asistencia.keys().hasOnly([uid()])
+            : datos().asistencia.diff(resource.data.asistencia).affectedKeys().hasOnly([uid()]);
+      }
+
+      // El aula sale del id ({aulaId}_{fecha}), así se puede consultar un
+      // día que todavía no tiene documento.
+      allow read: if esPersonal() || delAula(diaId.split('_')[0]);
+
+      allow create, update: if datos().aulaId is string
+                            && diaId.matches(datos().aulaId + '_.*')
+                            && (esAdmin()
+                                || esTutorDelCentro()
+                                // El encargado pasa la lista de su aula (T-114)
+                                || esEncargadoDe(datos().aulaId)
+                                // Cada estudiante marca solo lo suyo (boceto)
+                                || (delAula(datos().aulaId) && cambiaSoloLoSuyo()));
+      allow delete: if esAdmin();
+    }
+
+    // ---------- dietas (HU-24) ----------
+    // Datos protegidos: solo la administración y los tutores del centro del
+    // estudiante (T-117). Ni el estudiante, ni el encargado, ni el tutor
+    // familiar. Cocina no las lee: recibe el listado diario (HU-25).
+    match /dietas/{estId} {
+      allow read, write: if esAdmin() || esTutorDelCentroDe(estId);
+
+      // T-118: registro de cambios; solo se añaden.
+      match /cambios/{cambioId} {
+        allow read, create: if esAdmin() || esTutorDelCentroDe(estId);
+        allow update, delete: if false;
       }
     }
   }

@@ -10,6 +10,7 @@ import 'package:ava/features/autenticacion/dominio/rol.dart';
 import 'package:ava/features/aulas/dominio/repositorio_aulas_simulado.dart';
 import 'package:ava/features/aulas/logica/gestion_aulas_controlador.dart';
 import 'package:ava/features/autenticacion/dominio/repositorio_cuentas_simulado.dart';
+import 'package:ava/features/perfil/dominio/conversion_firestore.dart';
 import 'package:ava/features/perfil/dominio/perfil_estudiante.dart';
 import 'package:ava/features/perfil/dominio/preferencias_accesibilidad.dart';
 import 'package:ava/features/perfil/dominio/repositorio_estudiantes_simulado.dart';
@@ -95,6 +96,51 @@ void main() {
         expect(copia.puedeGestionarTareas, isTrue);
       },
     );
+  });
+
+  group('T-60: tamaño de letra', () {
+    test('los tres tamaños se conservan al guardarlos en Firebase', () {
+      for (final tamano in TamanoTexto.values) {
+        final mapa = ConversionFirestore.preferenciasA(
+          PreferenciasAccesibilidad(tamanoTexto: tamano),
+        );
+        expect(
+          ConversionFirestore.preferenciasDesde(mapa).tamanoTexto,
+          tamano,
+          reason: tamano.name,
+        );
+      }
+    });
+
+    test('se guarda en el perfil y sigue al volver a entrar', () async {
+      final almacen = almacenDePrueba();
+      final repositorio = RepositorioEstudiantesSimulado(almacen);
+      final controlador = PreferenciasControlador(repositorio)
+        ..aplicarDeEstudiante((await repositorio.obtener('e03'))!);
+
+      await controlador.cambiar(
+        const PreferenciasAccesibilidad(tamanoTexto: TamanoTexto.muyGrande),
+      );
+
+      final guardado = await repositorio.obtener('e03');
+      expect(guardado!.preferencias.tamanoTexto, TamanoTexto.muyGrande);
+    });
+
+    test('si no se puede guardar, el cambio se deshace y se avisa', () async {
+      final almacen = almacenDePrueba();
+      final repositorio = _RepositorioQueFalla(almacen);
+      final controlador = PreferenciasControlador(repositorio)
+        ..aplicarDeEstudiante((await repositorio.obtener('e03'))!);
+      final antes = controlador.preferencias.tamanoTexto;
+
+      await expectLater(
+        controlador.cambiar(
+          const PreferenciasAccesibilidad(tamanoTexto: TamanoTexto.muyGrande),
+        ),
+        throwsA(isA<ErrorConMensaje>()),
+      );
+      expect(controlador.preferencias.tamanoTexto, antes);
+    });
   });
 
   group('HU-15: preferencias de accesibilidad', () {
@@ -190,4 +236,13 @@ void main() {
       expect(gestion.validarNombre('1ºa', idAula: 'nueva'), isNotNull);
     });
   });
+}
+
+/// Repositorio que no puede guardar, como si Firebase rechazara el cambio.
+class _RepositorioQueFalla extends RepositorioEstudiantesSimulado {
+  _RepositorioQueFalla(super.almacen);
+
+  @override
+  Future<void> guardar(Estudiante estudiante) async =>
+      throw Exception('Sin conexión');
 }

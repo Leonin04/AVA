@@ -16,12 +16,26 @@ comprobado con pruebas automáticas (`flutter test`).
 
 ## Decisiones de diseño para el alumnado
 
-- **Todo a la vista, sin desplazamiento ni páginas.** Ninguna pantalla del
-  alumno tiene scroll ni botones de pasar página: todos los elementos se
-  reparten el espacio y, si hay muchos, se hacen más pequeños
-  (`CuadriculaAjustada`). Los botones «Anterior» y «Siguiente» solo
-  aparecen en los pasos de una tarea, para verlos de uno en uno. Hay una
-  prueba que lo comprueba en todo el recorrido, también con letra muy grande.
+- **Todo a la vista, sin desplazamiento.** Ninguna pantalla del alumno
+  tiene scroll: los elementos se reparten el espacio (`CuadriculaAjustada`).
+  Solo hay botones para avanzar en dos sitios donde, si no, se verían
+  demasiado pequeños: la semana y las opciones del perfil. Los botones
+  «Anterior» y «Siguiente» también aparecen en los pasos de una tarea, para
+  verlos de uno en uno. Hay pruebas que lo comprueban en todo el recorrido y
+  con letra muy grande.
+- **Semana con tareas grandes.** Se ven siempre los 7 días, cada uno en su
+  columna, con 3 tareas como mucho para que se lean bien. Si un día tiene
+  más, debajo aparece «Ver más» para pasar a las 3 siguientes; en la última
+  tanda el botón se llama «Volver» y regresa a las primeras. Con letra muy
+  grande, si 3 no caben legibles, se ven menos por tanda.
+- **Perfil por páginas.** Si las opciones de accesibilidad no caben con
+  letra legible, se reparten en páginas con «Anterior», «1 de 2» y
+  «Siguiente» (`BarraPaginas`).
+- **Misma letra en todas las tarjetas.** En la semana y en el perfil se
+  calcula una sola letra, la mayor con la que caben todas, para que las de
+  nombre largo no se vean más pequeñas; el pictograma usa el espacio que
+  sobra (`MedidaTexto`). La letra nunca baja de la mínima legible
+  (16 px multiplicado por el tamaño elegido).
 - **Color elegido visible.** El color que elige el alumno en su perfil tiñe
   el fondo de toda la app, manteniendo el contraste del texto por encima de
   7:1.
@@ -40,7 +54,18 @@ comprobado con pruebas automáticas (`flutter test`).
   levantar la mano, con pictograma y voz.
 - **Ahora / después** (HU-11): formato habitual en agendas visuales, con la
   parte del día en pictograma para quien no lee el reloj (persona Álex).
-- **Pasos de uno en uno** en el detalle de la tarea (persona Diego).
+- **Pasos de uno en uno** en el detalle de la tarea (persona Diego). Mientras
+  se hace, solo se ve el paso actual con su pictograma o foto (HU-20) y se
+  avanza confirmando «He terminado este paso»; «Todavía no» deja el paso como
+  estaba, así un toque accidental no hace avanzar (HU-21).
+- **Temporizador sin presión** (HU-22): una barra que se vacía y el tiempo en
+  palabras («Quedan 15 minutos»); al acabar, lo dice sin alarmas.
+- **Avisos tranquilos** (HU-28): una banda arriba con pictograma, texto y el
+  botón «Vale», leída en voz si el alumno la tiene activada. Nunca ventanas
+  que interrumpan ni sonidos bruscos.
+- **Comedor** (HU-23): los cinco días con su casilla y «Voy al comedor / No
+  voy al comedor», en texto y no solo con el color. El encargado ve a sus
+  compañeros con su foto. Nunca se muestran dietas al alumnado.
 - **Filtro antitemblor** (persona Carlos): ignora pulsaciones repetidas.
 - **Voz** (personas Álex y Samuel): lectura en voz alta de botones y
   pantallas, a ritmo pausado.

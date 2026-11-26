@@ -56,4 +56,25 @@ class DistribucionCuadricula {
     }
     return mejor!;
   }
+
+  /// Cuántas celdas de al menos [anchoMinimo] × [altoMinimo] caben en
+  /// [ancho] × [alto] (como mínimo 1). Si hay más elementos que esta
+  /// cantidad, no se pueden ver todos a la vez sin que queden ilegibles.
+  static int capacidad({
+    required double ancho,
+    required double alto,
+    required double espaciado,
+    required double anchoMinimo,
+    required double altoMinimo,
+    int maxColumnas = 6,
+  }) {
+    final columnas = ((ancho + espaciado) / (anchoMinimo + espaciado))
+        .floor()
+        .clamp(1, maxColumnas);
+    final filas = math.max(
+      1,
+      ((alto + espaciado) / (altoMinimo + espaciado)).floor(),
+    );
+    return columnas * filas;
+  }
 }

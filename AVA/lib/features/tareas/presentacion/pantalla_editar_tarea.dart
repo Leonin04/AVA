@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constantes/dimensiones.dart';
 import '../../../core/modelos/recurso_visual.dart';
 import '../../../core/utilidades/controlador_carga.dart';
+import '../../../core/utilidades/formato_fecha.dart';
 import '../../../core/widgets/pantalla_gestion.dart';
 import '../../../core/widgets/selector_recurso_visual.dart';
 import '../../autenticacion/dominio/cuenta.dart';
@@ -32,8 +33,9 @@ class ArgumentosFormularioTarea {
   final Tarea? tarea;
 }
 
-/// Formulario de tarea del tutor (HU-04 a HU-07): nombre, tipo, pictograma
-/// o foto, descripción breve, horario y pasos.
+/// Formulario de tarea del tutor (HU-04 a HU-07, HU-14, HU-20, HU-22,
+/// HU-28): nombre, tipo, pictograma o foto, descripción breve, horario,
+/// días de repetición, pasos con su apoyo, temporizador y aviso previo.
 class PantallaFormularioTarea extends StatefulWidget {
   const PantallaFormularioTarea({
     super.key,
@@ -60,7 +62,10 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
   );
   late TipoTarea _tipo = _existente?.tipo ?? TipoTarea.escolar;
   late RecursoVisual? _pictograma = _existente?.pictograma;
-  late List<String> _pasos = List.of(_existente?.pasos ?? const []);
+  late List<PasoTarea> _pasos = List.of(_existente?.pasos ?? const []);
+  late final Set<int> _diasSemana = {...?_existente?.diasSemana};
+  late bool _temporizador = _existente?.temporizador ?? false;
+  late int? _avisoMinutos = _existente?.avisoMinutos;
   late DateTime _dia = _existente?.inicio ?? widget.argumentos.dia;
   late TimeOfDay _inicio = _existente == null
       ? const TimeOfDay(hour: 10, minute: 0)
@@ -121,13 +126,20 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
         descripcion: _descripcion.text,
         pasos: _pasos,
         pictograma: _pictograma,
+        diasSemana: _diasSemana.toList(),
+        temporizador: _temporizador,
+        avisoMinutos: _avisoMinutos,
         existente: _existente,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on ErrorConMensaje catch (error) {
       if (mounted) setState(() => _error = error.mensaje);
-    } catch (error) {
-      if (mounted) setState(() => _error = 'Error al guardar: $error');
+    } on Exception {
+      if (mounted) {
+        setState(
+          () => _error = 'No se ha podido guardar la tarea. Prueba otra vez.',
+        );
+      }
     } finally {
       if (mounted) setState(() => _guardando = false);
     }
@@ -202,6 +214,55 @@ class _PantallaFormularioTareaState extends State<PantallaFormularioTarea> {
                 _fin = h;
                 _actualizarHorario();
               },
+            ),
+            TituloSeccion(
+              'Repetir cada semana',
+              descripcion: _diasSemana.isEmpty
+                  ? 'Sin días marcados, la tarea es solo del día elegido.'
+                  : 'Se repite estos días. Los cambios se aplican a las '
+                        'próximas veces; lo ya hecho no cambia (HU-14).',
+            ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var dia = 1; dia <= 7; dia++)
+                  FilterChip(
+                    label: Text(FormatoFecha.nombreDiaSemana(dia)),
+                    selected: _diasSemana.contains(dia),
+                    onSelected: (marcado) => setState(
+                      () => marcado
+                          ? _diasSemana.add(dia)
+                          : _diasSemana.remove(dia),
+                    ),
+                  ),
+              ],
+            ),
+            const TituloSeccion('Mientras la hace'),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              value: _temporizador,
+              onChanged: (valor) => setState(() => _temporizador = valor),
+              title: const Text('Temporizador'),
+              subtitle: const Text(
+                'El alumno ve cuánto tiempo le queda hasta la hora de fin '
+                '(HU-22).',
+              ),
+            ),
+            DropdownButtonFormField<int?>(
+              initialValue: _avisoMinutos,
+              decoration: const InputDecoration(
+                labelText: 'Aviso antes de empezar (HU-28)',
+              ),
+              items: [
+                const DropdownMenuItem(value: null, child: Text('Sin aviso')),
+                for (final minutos in const [5, 10, 15, 30])
+                  DropdownMenuItem(
+                    value: minutos,
+                    child: Text('$minutos minutos antes'),
+                  ),
+              ],
+              onChanged: (valor) => setState(() => _avisoMinutos = valor),
             ),
             const TituloSeccion(
               'Qué hay que hacer',

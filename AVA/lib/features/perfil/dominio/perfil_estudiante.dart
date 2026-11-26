@@ -26,6 +26,7 @@ class Estudiante {
     this.preferencias = const PreferenciasAccesibilidad(),
     this.puedeModificarPreferencias = false,
     this.puedeGestionarTareas = false,
+    this.activo = true,
   });
 
   final String id;
@@ -66,6 +67,10 @@ class Estudiante {
   /// El tutor permite que el estudiante cree y borre sus tareas (HU-04).
   final bool puedeGestionarTareas;
 
+  /// Si su cuenta está activa. Un estudiante desactivado no aparece en la
+  /// tableta ni puede entrar, pero conserva sus datos (HU-13).
+  final bool activo;
+
   Estudiante copyWith({
     String? nombre,
     String? idAula,
@@ -83,6 +88,7 @@ class Estudiante {
     PreferenciasAccesibilidad? preferencias,
     bool? puedeModificarPreferencias,
     bool? puedeGestionarTareas,
+    bool? activo,
   }) {
     return Estudiante(
       id: id,
@@ -102,6 +108,7 @@ class Estudiante {
       puedeModificarPreferencias:
           puedeModificarPreferencias ?? this.puedeModificarPreferencias,
       puedeGestionarTareas: puedeGestionarTareas ?? this.puedeGestionarTareas,
+      activo: activo ?? this.activo,
     );
   }
 
@@ -121,6 +128,7 @@ class Estudiante {
     'preferencias': preferencias.toMap(),
     'puedeModificarPreferencias': puedeModificarPreferencias,
     'puedeGestionarTareas': puedeGestionarTareas,
+    'activo': activo,
   };
 
   factory Estudiante.fromMap(String id, Map<String, Object?> datos) =>
@@ -148,5 +156,6 @@ class Estudiante {
         puedeModificarPreferencias:
             datos['puedeModificarPreferencias'] as bool? ?? false,
         puedeGestionarTareas: datos['puedeGestionarTareas'] as bool? ?? false,
+        activo: datos['activo'] as bool? ?? true,
       );
 }

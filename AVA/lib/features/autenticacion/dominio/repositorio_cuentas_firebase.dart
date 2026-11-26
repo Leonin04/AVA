@@ -36,13 +36,7 @@ class RepositorioCuentasFirebase implements RepositorioCuentas {
     final estudiantes = await _db.collection('estudiantes').get();
     return [
       for (final u in personal) RepositorioAutenticacionFirebase.cuentaDesde(u),
-      for (final doc in estudiantes.docs)
-        Cuenta(
-          id: doc.id,
-          nombre: doc.data()['nombre'] as String? ?? '',
-          rol: Rol.estudiante,
-          usuario: doc.data()['usuario'] as String?,
-        ),
+      for (final doc in estudiantes.docs) _cuentaEstudiante(doc.id, doc.data()),
     ]..sort((a, b) => compararAlfabeticamente(a.nombre, b.nombre));
   }
 
@@ -52,15 +46,9 @@ class RepositorioCuentasFirebase implements RepositorioCuentas {
     if (usuario != null) {
       return RepositorioAutenticacionFirebase.cuentaDesde(usuario);
     }
-    final estudiante = await _bd.obtenerEstudiante(id);
-    return estudiante == null
-        ? null
-        : Cuenta(
-            id: id,
-            nombre: estudiante.nombre,
-            rol: Rol.estudiante,
-            usuario: estudiante.usuario,
-          );
+    final estudiante = await _db.collection('estudiantes').doc(id).get();
+    final datos = estudiante.data();
+    return datos == null ? null : _cuentaEstudiante(id, datos);
   }
 
   @override
@@ -127,4 +115,24 @@ class RepositorioCuentasFirebase implements RepositorioCuentas {
       ),
     );
   }
+
+  @override
+  Future<void> cambiarActivacion(Cuenta cuenta, {required bool activa}) =>
+      _bd.cambiarEstadoCuenta(
+        cuenta.id,
+        activa: activa,
+        esEstudiante: cuenta.rol == Rol.estudiante,
+      );
+
+  /// Cuenta de un estudiante a partir de su documento `estudiantes/{id}`.
+  static Cuenta _cuentaEstudiante(String id, Map<String, dynamic> datos) =>
+      Cuenta(
+        id: id,
+        nombre: datos['nombre'] as String? ?? '',
+        rol: Rol.estudiante,
+        usuario: datos['usuario'] as String?,
+        activa:
+            bd.EstadoCuenta.desde(datos['estado']) == bd.EstadoCuenta.activa,
+        desactivadaEn: (datos['desactivadaEn'] as Timestamp?)?.toDate(),
+      );
 }

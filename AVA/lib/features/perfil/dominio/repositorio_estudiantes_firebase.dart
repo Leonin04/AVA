@@ -59,6 +59,7 @@ class RepositorioEstudiantesFirebase implements RepositorioEstudiantes {
             metodoAcceso: ConversionFirestore.metodoDesde(a.metodoLogin.name),
             avatar: RecursoVisual.desdeUrl(a.fotoUrl),
             color: ColorPastel.paraIndice(i),
+            activo: a.activo,
           ),
       ];
     }

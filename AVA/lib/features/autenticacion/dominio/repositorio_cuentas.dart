@@ -18,6 +18,11 @@ abstract interface class RepositorioCuentas {
 
   /// Cambia nombre, rol y correo.
   Future<void> actualizar(Cuenta cuenta);
+
+  /// Activa o desactiva [cuenta] (HU-13). Desactivar no borra sus datos ni
+  /// su historial: solo impide que entre. Si es de estudiante, deja de
+  /// aparecer en la tableta.
+  Future<void> cambiarActivacion(Cuenta cuenta, {required bool activa});
 }
 
 class CuentaDuplicada implements Exception {

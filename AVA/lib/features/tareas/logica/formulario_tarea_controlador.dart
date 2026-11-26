@@ -9,7 +9,8 @@ import '../dominio/tarea_agenda.dart';
 import 'validacion_tareas.dart';
 
 /// Creación y edición de una tarea por el tutor: nombre, tipo, imagen de
-/// apoyo, descripción, horario y pasos (HU-03 a HU-06).
+/// apoyo, descripción, horario, días de repetición, pasos con su apoyo,
+/// temporizador y aviso previo (HU-04 a HU-07, HU-14, HU-20, HU-22, HU-28).
 ///
 /// Antes de guardar comprueba que el tutor tiene asignado al alumno
 /// (HU-16).
@@ -37,13 +38,17 @@ class FormularioTareaControlador {
     required DateTime inicio,
     required DateTime fin,
     String descripcion = '',
-    List<String> pasos = const [],
+    List<PasoTarea> pasos = const [],
     RecursoVisual? pictograma,
+    List<int> diasSemana = const [],
+    bool temporizador = false,
+    int? avisoMinutos,
     Tarea? existente,
   }) async {
     final error =
         ValidacionTareas.titulo(titulo) ??
-        ValidacionTareas.horario(inicio, fin);
+        ValidacionTareas.horario(inicio, fin) ??
+        ValidacionTareas.diasSemana(diasSemana);
     if (error != null) throw ErrorConMensaje(error);
 
     final estudiante = await _estudiantes.obtener(idEstudiante);
@@ -68,6 +73,10 @@ class FormularioTareaControlador {
       pictograma: pictograma,
       creadaPor: existente?.creadaPor ?? cuenta.id,
       idEncargo: existente?.idEncargo,
+      diasSemana: ValidacionTareas.normalizarDias(diasSemana),
+      temporizador: temporizador,
+      avisoMinutos: avisoMinutos,
+      pasoActual: existente?.pasoActual ?? 0,
     );
     await _tareas.guardar(tarea);
     return tarea;

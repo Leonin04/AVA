@@ -43,18 +43,41 @@ class ServicioArasaac {
     final datos = jsonDecode(respuesta.body) as List<Object?>;
     return [
       for (final elemento in datos.whereType<Map<String, Object?>>())
-        ResultadoArasaac(
-          pictograma: PictogramaArasaac(elemento['_id']! as int),
-          palabra: _primeraPalabra(elemento) ?? termino,
-        ),
+        if (esApropiado(elemento))
+          ResultadoArasaac(
+            pictograma: PictogramaArasaac(elemento['_id']! as int),
+            palabra: _palabras(elemento).firstOrNull ?? termino,
+          ),
     ];
   }
 
-  static String? _primeraPalabra(Map<String, Object?> elemento) {
+  /// Palabras que indican un pictograma explícito aunque ARASAAC no lo
+  /// haya marcado (por ejemplo, el 11234 «desnudo» no lleva la marca).
+  static final _palabrasExplicitas = RegExp(
+    r'desnud|genital|\bpene\b|vulva|vagina|sexual|coito|masturb|erecci|'
+    r'\bsenos\b|testícul',
+    caseSensitive: false,
+  );
+
+  /// `false` si el pictograma es de contenido sexual, desnudos o violencia:
+  /// AVA lo usan niños y adolescentes, y estos pictogramas no deben salir
+  /// en las búsquedas del alumno ni del tutor.
+  static bool esApropiado(Map<String, Object?> elemento) {
+    final marcado = elemento['sex'] == true || elemento['violence'] == true;
+    final explicito = _palabras(
+      elemento,
+    ).any((palabra) => _palabrasExplicitas.hasMatch(palabra));
+    return !marcado && !explicito;
+  }
+
+  static List<String> _palabras(Map<String, Object?> elemento) {
     final palabras = elemento['keywords'];
-    if (palabras is! List || palabras.isEmpty) return null;
-    final primera = palabras.first;
-    return primera is Map ? primera['keyword'] as String? : null;
+    return palabras is List
+        ? [
+            for (final palabra in palabras.whereType<Map<Object?, Object?>>())
+              if (palabra['keyword'] case final String texto) texto,
+          ]
+        : const [];
   }
 }
 

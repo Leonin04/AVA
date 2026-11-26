@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../perfil/dominio/estudiante.dart';
+import 'usuario.dart';
 
 /// Documento `acceso/{estudianteId}` (HU-09).
 ///
@@ -14,6 +15,7 @@ class Acceso {
   final String? aulaId;
   final MetodoLogin metodoLogin;
   final String usuario; // para construir su correo interno
+  final EstadoCuenta estado; // HU-13: los desactivados no salen en la tableta
 
   const Acceso({
     required this.id,
@@ -22,16 +24,19 @@ class Acceso {
     this.aulaId,
     this.metodoLogin = MetodoLogin.pin,
     required this.usuario,
+    this.estado = EstadoCuenta.activa,
   });
 
+  bool get activo => estado == EstadoCuenta.activa;
+
   factory Acceso.deEstudiante(Estudiante e) => Acceso(
-        id: e.id,
-        nombre: e.nombre.split(' ').first,
-        fotoUrl: e.fotoUrl,
-        aulaId: e.aulaId,
-        metodoLogin: e.metodoLogin,
-        usuario: e.usuario,
-      );
+    id: e.id,
+    nombre: e.nombre.split(' ').first,
+    fotoUrl: e.fotoUrl,
+    aulaId: e.aulaId,
+    metodoLogin: e.metodoLogin,
+    usuario: e.usuario,
+  );
 
   factory Acceso.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data() ?? {};
@@ -40,17 +45,19 @@ class Acceso {
       nombre: d['nombre'] as String? ?? '',
       fotoUrl: d['fotoUrl'] as String? ?? '',
       aulaId: d['aulaId'] as String?,
-      metodoLogin:
-          MetodoLogin.values.byName(d['metodoLogin'] as String? ?? 'pin'),
+      metodoLogin: MetodoLogin.values.byName(
+        d['metodoLogin'] as String? ?? 'pin',
+      ),
       usuario: d['usuario'] as String? ?? '',
+      estado: EstadoCuenta.desde(d['estado']),
     );
   }
 
   Map<String, dynamic> toMap() => {
-        'nombre': nombre,
-        'fotoUrl': fotoUrl,
-        'aulaId': aulaId,
-        'metodoLogin': metodoLogin.name,
-        'usuario': usuario,
-      };
+    'nombre': nombre,
+    'fotoUrl': fotoUrl,
+    'aulaId': aulaId,
+    'metodoLogin': metodoLogin.name,
+    'usuario': usuario,
+  };
 }

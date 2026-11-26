@@ -25,6 +25,11 @@ import '../features/perfil/logica/preferencias_controlador.dart';
 import '../features/tareas/dominio/repositorio_tareas.dart';
 import '../features/tareas/dominio/repositorio_tareas_firebase.dart';
 import '../features/tareas/dominio/repositorio_tareas_simulado.dart';
+import '../features/avisos/logica/avisos_estudiante_controlador.dart';
+import '../features/avisos/presentacion/con_aviso_previo.dart';
+import '../features/comedor/dominio/repositorio_comedor.dart';
+import '../features/comedor/dominio/repositorio_comedor_firebase.dart';
+import '../features/comedor/dominio/repositorio_comedor_simulado.dart';
 import 'datos_iniciales.dart';
 import 'rutas.dart';
 
@@ -62,6 +67,12 @@ class AplicacionAva extends StatelessWidget {
           create: (c) =>
               PreferenciasControlador(c.read<RepositorioEstudiantes>()),
         ),
+        ChangeNotifierProvider(
+          create: (c) => AvisosEstudianteControlador(
+            tareas: c.read<RepositorioTareas>(),
+            sesion: c.read<SesionControlador>(),
+          ),
+        ),
       ],
       child: const _AplicacionConTema(),
     );
@@ -79,6 +90,7 @@ class AplicacionAva extends StatelessWidget {
       ),
     ),
     Provider<RepositorioTareas>(create: (_) => RepositorioTareasFirebase()),
+    Provider<RepositorioComedor>(create: (_) => RepositorioComedorFirebase()),
   ];
 
   List<SingleChildWidget> _repositoriosSimulados() => [
@@ -100,6 +112,9 @@ class AplicacionAva extends StatelessWidget {
     ),
     Provider<RepositorioTareas>(
       create: (c) => RepositorioTareasSimulado(c.read<AlmacenSimulado>()),
+    ),
+    Provider<RepositorioComedor>(
+      create: (c) => RepositorioComedorSimulado(c.read<AlmacenSimulado>()),
     ),
   ];
 }
@@ -155,7 +170,7 @@ class _AplicacionConTema extends StatelessWidget {
             altoContraste: preferencias.altoContraste,
             modoOscuro: preferencias.modoOscuro,
             menuArriba: preferencias.menuArriba,
-            child: pantalla ?? const SizedBox.shrink(),
+            child: ConAvisoPrevio(child: pantalla ?? const SizedBox.shrink()),
           ),
         );
       },

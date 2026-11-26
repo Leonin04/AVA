@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constantes/dimensiones.dart';
+import '../../../../core/modelos/recurso_visual.dart';
+import '../../../../core/widgets/pictograma.dart';
+import '../../../../core/widgets/selector_recurso_visual.dart';
+import '../../dominio/tarea_agenda.dart';
 
-/// Lista editable de pasos de una tarea (HU-06): añadir, quitar y
-/// cambiar el orden con botones (sin arrastrar, WCAG 2.5.7).
+/// Lista editable de pasos de una tarea (HU-07, HU-20): añadir, quitar,
+/// cambiar el orden con botones (sin arrastrar, WCAG 2.5.7) y poner a cada
+/// paso un pictograma o una foto de apoyo.
 class EditorPasos extends StatefulWidget {
   const EditorPasos({
     super.key,
@@ -11,45 +16,93 @@ class EditorPasos extends StatefulWidget {
     required this.alCambiar,
   });
 
-  final List<String> pasosIniciales;
-  final ValueChanged<List<String>> alCambiar;
+  final List<PasoTarea> pasosIniciales;
+  final ValueChanged<List<PasoTarea>> alCambiar;
 
   @override
   State<EditorPasos> createState() => _EditorPasosState();
 }
 
 class _EditorPasosState extends State<EditorPasos> {
-  late final List<TextEditingController> _pasos = [
-    for (final paso in widget.pasosIniciales) TextEditingController(text: paso),
+  late final List<TextEditingController> _textos = [
+    for (final paso in widget.pasosIniciales)
+      TextEditingController(text: paso.texto),
+  ];
+  late final List<RecursoVisual?> _imagenes = [
+    for (final paso in widget.pasosIniciales) paso.imagen,
   ];
 
   @override
   void dispose() {
-    for (final paso in _pasos) {
-      paso.dispose();
+    for (final texto in _textos) {
+      texto.dispose();
     }
     super.dispose();
   }
 
-  void _notificar() => widget.alCambiar([for (final p in _pasos) p.text]);
+  void _notificar() => widget.alCambiar([
+    for (var i = 0; i < _textos.length; i++)
+      PasoTarea(_textos[i].text, imagen: _imagenes[i]),
+  ]);
 
   void _anadir() {
-    setState(() => _pasos.add(TextEditingController()));
+    setState(() {
+      _textos.add(TextEditingController());
+      _imagenes.add(null);
+    });
     _notificar();
   }
 
   void _quitar(int i) {
-    setState(() => _pasos.removeAt(i).dispose());
+    setState(() {
+      _textos.removeAt(i).dispose();
+      _imagenes.removeAt(i);
+    });
     _notificar();
   }
 
   void _mover(int i, int destino) {
-    if (destino < 0 || destino >= _pasos.length) return;
-    setState(() {
-      final paso = _pasos.removeAt(i);
-      _pasos.insert(destino, paso);
-    });
-    _notificar();
+    if (destino >= 0 && destino < _textos.length) {
+      setState(() {
+        _textos.insert(destino, _textos.removeAt(i));
+        _imagenes.insert(destino, _imagenes.removeAt(i));
+      });
+      _notificar();
+    }
+  }
+
+  Future<void> _elegirImagen(int i) async {
+    var elegida = _imagenes[i];
+    final aceptada = await showDialog<bool>(
+      context: context,
+      builder: (contexto) => AlertDialog(
+        title: Text('Apoyo del paso ${i + 1}'),
+        content: SizedBox(
+          width: 560,
+          child: StatefulBuilder(
+            builder: (contexto, actualizar) => SelectorRecursoVisual(
+              recurso: elegida,
+              textoBusquedaInicial: _textos[i].text,
+              alCambiar: (recurso) => actualizar(() => elegida = recurso),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(contexto).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(contexto).pop(true),
+            child: const Text('Aceptar'),
+          ),
+        ],
+      ),
+    );
+    if (aceptada == true) {
+      setState(() => _imagenes[i] = elegida);
+      _notificar();
+    }
   }
 
   @override
@@ -57,7 +110,7 @@ class _EditorPasosState extends State<EditorPasos> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var i = 0; i < _pasos.length; i++)
+        for (var i = 0; i < _textos.length; i++)
           Padding(
             padding: const EdgeInsets.only(
               bottom: Dimensiones.espaciadoPequeno,
@@ -68,12 +121,28 @@ class _EditorPasosState extends State<EditorPasos> {
                 const SizedBox(width: Dimensiones.espaciadoPequeno),
                 Expanded(
                   child: TextField(
-                    controller: _pasos[i],
+                    controller: _textos[i],
                     onChanged: (_) => _notificar(),
                     decoration: InputDecoration(
                       labelText: 'Paso ${i + 1}',
                       hintText:
                           'Una frase corta. Por ejemplo: Coge los guantes.',
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: _imagenes[i] == null
+                      ? 'Añadir pictograma o foto al paso ${i + 1}'
+                      : 'Cambiar el apoyo del paso ${i + 1}',
+                  child: InkWell(
+                    onTap: () => _elegirImagen(i),
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox.square(
+                      dimension: 56,
+                      child: _imagenes[i] == null
+                          ? const Icon(Icons.add_photo_alternate_rounded)
+                          : Pictograma(recurso: _imagenes[i], tamano: 52),
                     ),
                   ),
                 ),
@@ -84,7 +153,7 @@ class _EditorPasosState extends State<EditorPasos> {
                 ),
                 IconButton(
                   tooltip: 'Bajar el paso ${i + 1}',
-                  onPressed: i < _pasos.length - 1
+                  onPressed: i < _textos.length - 1
                       ? () => _mover(i, i + 1)
                       : null,
                   icon: const Icon(Icons.arrow_downward_rounded),

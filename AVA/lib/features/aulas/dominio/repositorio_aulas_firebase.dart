@@ -9,9 +9,10 @@ import 'repositorio_aulas.dart';
 
 /// Aulas en Cloud Firestore (`aulas/{id}`).
 ///
-/// Además de `nombre` y `tutorResponsable`, guarda `color` y `pictograma`
-/// para que cada clase se reconozca en la tableta. Si un aula aún no los
-/// tiene, se le asignan por orden.
+/// Además de `nombre` y `tutorResponsable`, guarda `color` y `pictograma`,
+/// para que cada clase se reconozca en la tableta (si un aula aún no los
+/// tiene, se le asignan por orden), y `encargadoComedor`: el alumno que
+/// registra quién come (HU-23).
 class RepositorioAulasFirebase implements RepositorioAulas {
   RepositorioAulasFirebase({BaseDatos? baseDatos, FirebaseFirestore? firestore})
     : _bd = baseDatos ?? BaseDatos(),
@@ -44,6 +45,7 @@ class RepositorioAulasFirebase implements RepositorioAulas {
           RecursoVisual.desdeUrl(d['pictograma'] as String?) ??
           _pictogramasPorDefecto[indice % _pictogramasPorDefecto.length],
       idTutor: tutor == null || tutor.isEmpty ? null : tutor,
+      idEncargadoComedor: d['encargadoComedor'] as String?,
     );
   }
 
@@ -71,6 +73,7 @@ class RepositorioAulasFirebase implements RepositorioAulas {
       'tutorResponsable': aula.idTutor ?? '',
       'color': aula.color.name,
       'pictograma': aula.pictograma?.url,
+      'encargadoComedor': aula.idEncargadoComedor,
       if (!existe) 'creadoEn': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 

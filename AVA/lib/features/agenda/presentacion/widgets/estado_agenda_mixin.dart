@@ -11,6 +11,10 @@ import '../../logica/agenda_controlador.dart';
 /// Comportamiento común a las vistas de la agenda: crear y liberar el
 /// [AgendaControlador] y abrir el detalle de una tarea, recargando la agenda
 /// al volver por si el estudiante la ha empezado o terminado.
+///
+/// La pantalla se vuelve a construir cuando cambian las tareas, para que lo
+/// que se calcula con ellas fuera de la lista (como el texto de «Escuchar»)
+/// no se quede con la agenda vacía de antes de cargar (T-81).
 mixin EstadoAgendaMixin<T extends StatefulWidget> on State<T> {
   late final AgendaControlador agenda;
 
@@ -26,13 +30,19 @@ mixin EstadoAgendaMixin<T extends StatefulWidget> on State<T> {
       repositorio: context.read<RepositorioTareas>(),
       idEstudiante: idEstudiante,
       diaReferencia: diaReferencia,
-    );
+    )..addListener(_alCambiarAgenda);
     unawaited(agenda.cargar());
+  }
+
+  void _alCambiarAgenda() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
-    agenda.dispose();
+    agenda
+      ..removeListener(_alCambiarAgenda)
+      ..dispose();
     super.dispose();
   }
 

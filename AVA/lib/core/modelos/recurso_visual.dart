@@ -22,14 +22,9 @@ sealed class RecursoVisual {
   static RecursoVisual? desdeUrl(String? url) {
     if (url == null || url.isEmpty) return null;
     final arasaac = _urlArasaac.firstMatch(url);
-    if (arasaac != null) {
-      final id = int.parse(arasaac.group(1)!);
-      if (id == 2798) {
-        return const FotoPropia('assets/iconos/sol.png');
-      }
-      return PictogramaArasaac(id);
-    }
-    return FotoPropia(url);
+    return arasaac == null
+        ? FotoPropia(url)
+        : PictogramaArasaac(int.parse(arasaac.group(1)!));
   }
 
   /// Dirección que se guarda en la base de datos.

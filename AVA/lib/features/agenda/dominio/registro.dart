@@ -11,6 +11,7 @@ class Registro {
   final EstadoTarea estado;
   final DateTime? inicio;
   final DateTime? fin;
+  final int pasoActual; // HU-21: paso por el que va
 
   const Registro({
     required this.tareaId,
@@ -18,6 +19,7 @@ class Registro {
     this.estado = EstadoTarea.pendiente,
     this.inicio,
     this.fin,
+    this.pasoActual = 0,
   });
 
   /// Id del documento: un registro por tarea y día.
@@ -33,6 +35,7 @@ class Registro {
       estado: EstadoTarea.values.byName(d['estado'] as String? ?? 'pendiente'),
       inicio: (d['inicio'] as Timestamp?)?.toDate(),
       fin: (d['fin'] as Timestamp?)?.toDate(),
+      pasoActual: (d['pasoActual'] as num?)?.toInt() ?? 0,
     );
   }
 }

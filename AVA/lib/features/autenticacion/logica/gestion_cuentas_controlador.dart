@@ -89,6 +89,30 @@ class GestionCuentasControlador extends ControladorCarga<List<Cuenta>> {
     return null;
   }
 
+  /// Activa o desactiva [cuenta] (HU-13). La administración no puede
+  /// desactivar su propia cuenta ([idCuentaActual]), para no quedarse sin
+  /// acceso. Devuelve un mensaje de error o `null`.
+  Future<String?> cambiarActivacion(
+    Cuenta cuenta, {
+    required bool activa,
+    required String idCuentaActual,
+  }) async {
+    String? error;
+    if (!activa && cuenta.id == idCuentaActual) {
+      error = 'No puedes desactivar tu propia cuenta.';
+    } else {
+      try {
+        await _cuentas.cambiarActivacion(cuenta, activa: activa);
+        await cargar();
+      } on ErrorConMensaje catch (e) {
+        error = e.mensaje;
+      } on Exception {
+        error = 'No se ha podido cambiar la cuenta. Prueba otra vez.';
+      }
+    }
+    return error;
+  }
+
   /// Actualiza nombre, rol y correo. Si [nuevaClave] no es `null`, cambia
   /// también la clave. Devuelve un mensaje de error o `null`.
   Future<String?> actualizar(Cuenta cuenta, {ClaveAcceso? nuevaClave}) async {

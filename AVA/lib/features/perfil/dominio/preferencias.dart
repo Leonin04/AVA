@@ -30,13 +30,13 @@ class PreferenciasComunicacion {
   }
 
   Map<String, dynamic> toMap() => {
-        'pictogramas': pictogramas,
-        'imagenes': imagenes,
-        'texto': texto,
-        'sonido': sonido,
-        'voz': voz,
-        'botonesGrandes': botonesGrandes,
-      };
+    'pictogramas': pictogramas,
+    'imagenes': imagenes,
+    'texto': texto,
+    'sonido': sonido,
+    'voz': voz,
+    'botonesGrandes': botonesGrandes,
+  };
 
   PreferenciasComunicacion copyWith({
     bool? pictogramas,
@@ -45,15 +45,14 @@ class PreferenciasComunicacion {
     bool? sonido,
     bool? voz,
     bool? botonesGrandes,
-  }) =>
-      PreferenciasComunicacion(
-        pictogramas: pictogramas ?? this.pictogramas,
-        imagenes: imagenes ?? this.imagenes,
-        texto: texto ?? this.texto,
-        sonido: sonido ?? this.sonido,
-        voz: voz ?? this.voz,
-        botonesGrandes: botonesGrandes ?? this.botonesGrandes,
-      );
+  }) => PreferenciasComunicacion(
+    pictogramas: pictogramas ?? this.pictogramas,
+    imagenes: imagenes ?? this.imagenes,
+    texto: texto ?? this.texto,
+    sonido: sonido ?? this.sonido,
+    voz: voz ?? this.voz,
+    botonesGrandes: botonesGrandes ?? this.botonesGrandes,
+  );
 }
 
 // Los nombres coinciden con los valores guardados en Firestore.
@@ -97,12 +96,12 @@ class PreferenciasVisual {
   }
 
   Map<String, dynamic> toMap() => {
-        'colores': colores.name,
-        'tipografia': tipografia,
-        'tamanoLetra': tamanoLetra,
-        'posicionMenus': posicionMenus.name,
-        'posicionBotones': posicionBotones.name,
-      };
+    'colores': colores.name,
+    'tipografia': tipografia,
+    'tamanoLetra': tamanoLetra,
+    'posicionMenus': posicionMenus.name,
+    'posicionBotones': posicionBotones.name,
+  };
 
   PreferenciasVisual copyWith({
     EsquemaColores? colores,
@@ -110,14 +109,13 @@ class PreferenciasVisual {
     double? tamanoLetra,
     Posicion? posicionMenus,
     Posicion? posicionBotones,
-  }) =>
-      PreferenciasVisual(
-        colores: colores ?? this.colores,
-        tipografia: tipografia ?? this.tipografia,
-        tamanoLetra: tamanoLetra ?? this.tamanoLetra,
-        posicionMenus: posicionMenus ?? this.posicionMenus,
-        posicionBotones: posicionBotones ?? this.posicionBotones,
-      );
+  }) => PreferenciasVisual(
+    colores: colores ?? this.colores,
+    tipografia: tipografia ?? this.tipografia,
+    tamanoLetra: tamanoLetra ?? this.tamanoLetra,
+    posicionMenus: posicionMenus ?? this.posicionMenus,
+    posicionBotones: posicionBotones ?? this.posicionBotones,
+  );
 }
 
 /// Map `preferencias` dentro del documento del estudiante (entidad Perfil).
@@ -131,23 +129,22 @@ class Preferencias {
   });
 
   factory Preferencias.fromMap(Map<String, dynamic>? m) => Preferencias(
-        comunicacion: PreferenciasComunicacion.fromMap(
-            m?['comunicacion'] as Map<String, dynamic>?),
-        visual:
-            PreferenciasVisual.fromMap(m?['visual'] as Map<String, dynamic>?),
-      );
+    comunicacion: PreferenciasComunicacion.fromMap(
+      m?['comunicacion'] as Map<String, dynamic>?,
+    ),
+    visual: PreferenciasVisual.fromMap(m?['visual'] as Map<String, dynamic>?),
+  );
 
   Map<String, dynamic> toMap() => {
-        'comunicacion': comunicacion.toMap(),
-        'visual': visual.toMap(),
-      };
+    'comunicacion': comunicacion.toMap(),
+    'visual': visual.toMap(),
+  };
 
   Preferencias copyWith({
     PreferenciasComunicacion? comunicacion,
     PreferenciasVisual? visual,
-  }) =>
-      Preferencias(
-        comunicacion: comunicacion ?? this.comunicacion,
-        visual: visual ?? this.visual,
-      );
+  }) => Preferencias(
+    comunicacion: comunicacion ?? this.comunicacion,
+    visual: visual ?? this.visual,
+  );
 }

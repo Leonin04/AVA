@@ -21,6 +21,30 @@ abstract final class Permisos {
   /// Crear encargos del centro (HU-08).
   static bool puedeCrearEncargos(Cuenta? cuenta) => cuenta?.esGestion ?? false;
 
+  static bool _esTutorDelCentro(Cuenta? cuenta) =>
+      cuenta?.rol == Rol.tutor && !cuenta!.esFamiliar;
+
+  /// Consultar el estado, el progreso y el historial de las tareas de sus
+  /// estudiantes (HU-26, HU-27): administración y tutores.
+  static bool puedeVerSeguimiento(Cuenta? cuenta) => cuenta?.esGestion ?? false;
+
+  /// Confirmar que una tarea se ha completado (T-124): administración y
+  /// tutores del centro. El tutor familiar solo consulta (matriz de
+  /// permisos del entregable 2).
+  static bool puedeConfirmarTareas(Cuenta? cuenta) =>
+      esAdministrador(cuenta) || _esTutorDelCentro(cuenta);
+
+  /// Revisar y corregir la asistencia al comedor (HU-23, T-115) y generar el
+  /// listado para cocina (HU-25): administración y tutores del centro.
+  static bool puedeGestionarComedor(Cuenta? cuenta) =>
+      esAdministrador(cuenta) || _esTutorDelCentro(cuenta);
+
+  /// Ver y cambiar la información de dietas (HU-24, T-116, T-117): solo
+  /// administración y tutores del centro. Nunca el estudiante, ni el
+  /// encargado del comedor, ni el tutor familiar.
+  static bool puedeGestionarDietas(Cuenta? cuenta) =>
+      esAdministrador(cuenta) || _esTutorDelCentro(cuenta);
+
   /// Si [cuenta] puede ver y gestionar el perfil y las tareas de
   /// [estudiante] (HU-17).
   static bool puedeGestionarEstudiante(

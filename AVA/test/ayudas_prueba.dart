@@ -46,6 +46,16 @@ Future<void> pulsar(WidgetTester tester, String texto) async {
   await tester.pumpAndSettle();
 }
 
+/// Como [pulsar], pero si [texto] no está en la página actual pasa con
+/// «Siguiente» hasta encontrarlo (pantallas repartidas en páginas).
+Future<void> pulsarEnPaginas(WidgetTester tester, String texto) async {
+  while (find.text(texto).evaluate().isEmpty &&
+      find.text('Siguiente').evaluate().isNotEmpty) {
+    await pulsar(tester, 'Siguiente');
+  }
+  await pulsar(tester, texto);
+}
+
 /// Entra como el alumno [nombre] del [aula] con su clave de [pictogramas].
 Future<void> entrarConPictogramas(
   WidgetTester tester,

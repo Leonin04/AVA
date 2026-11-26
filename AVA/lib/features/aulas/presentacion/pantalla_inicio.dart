@@ -149,16 +149,17 @@ class _Logotipo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // La etiqueta la da Semantics; la imagen no se anuncia otra vez.
     return Semantics(
       header: true,
       label: 'AVA, Agenda Virtual Accesible',
+      excludeSemantics: true,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(Dimensiones.radioBorde),
         child: Image.asset(
           'assets/iconos/logo_AVA.jpg',
           height: Dimensiones.altoBarraNavegacion,
           fit: BoxFit.contain,
-          semanticLabel: 'AVA, Agenda Virtual Accesible',
         ),
       ),
     );
@@ -184,11 +185,7 @@ class _HuecoBoton extends StatelessWidget {
           return Align(
             alignment: alineacion,
             child: boton != null
-                ? SizedBox(
-                    width: ancho,
-                    height: double.infinity,
-                    child: boton,
-                  )
+                ? SizedBox(width: ancho, height: double.infinity, child: boton)
                 : const SizedBox.shrink(),
           );
         },

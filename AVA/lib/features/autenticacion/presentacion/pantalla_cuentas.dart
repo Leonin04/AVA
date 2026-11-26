@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constantes/dimensiones.dart';
+import '../../../core/widgets/dialogo_confirmacion.dart';
 import '../../../core/widgets/pantalla_gestion.dart';
 import '../../../core/widgets/vista_carga.dart';
 import '../../aulas/dominio/ficha_aula.dart';
@@ -15,6 +16,7 @@ import '../dominio/repositorio_autenticacion.dart';
 import '../dominio/repositorio_cuentas.dart';
 import '../dominio/rol.dart';
 import '../logica/gestion_cuentas_controlador.dart';
+import '../logica/sesion_controlador.dart';
 import 'widgets/aviso_error.dart';
 import 'widgets/editor_clave.dart';
 
@@ -98,17 +100,36 @@ class _PantallaCuentasState extends State<PantallaCuentas> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
                 subtitle: Text(
-                  cuenta.email ?? 'Usuario: ${cuenta.usuario ?? cuenta.id}',
+                  [
+                    cuenta.email ?? 'Usuario: ${cuenta.usuario ?? cuenta.id}',
+                    if (!cuenta.activa) _textoDesactivada(cuenta),
+                  ].join('\n'),
                 ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Chip(label: Text(cuenta.rol.nombre)),
+                    if (!cuenta.activa) ...[
+                      const SizedBox(width: 8),
+                      const Chip(
+                        avatar: Icon(Icons.block_rounded),
+                        label: Text('Desactivada'),
+                      ),
+                    ],
                     const SizedBox(width: 8),
                     IconButton(
                       tooltip: 'Editar ${cuenta.nombre}',
                       onPressed: () => _abrirFormulario(cuenta),
                       icon: const Icon(Icons.edit_rounded),
+                    ),
+                    TextButton.icon(
+                      onPressed: () => _cambiarActivacion(cuenta),
+                      icon: Icon(
+                        cuenta.activa
+                            ? Icons.person_off_rounded
+                            : Icons.person_rounded,
+                      ),
+                      label: Text(cuenta.activa ? 'Desactivar' : 'Reactivar'),
                     ),
                   ],
                 ),
@@ -118,6 +139,46 @@ class _PantallaCuentasState extends State<PantallaCuentas> {
         ),
       ),
     );
+  }
+
+  /// Desactiva o reactiva una cuenta tras confirmarlo (HU-13).
+  Future<void> _cambiarActivacion(Cuenta cuenta) async {
+    final activar = !cuenta.activa;
+    final avisos = ScaffoldMessenger.of(context);
+    final idCuentaActual = context.read<SesionControlador>().cuenta?.id ?? '';
+    final confirmado = await mostrarDialogoConfirmacion(
+      context,
+      titulo: activar
+          ? '¿Reactivar la cuenta de ${cuenta.nombre}?'
+          : '¿Desactivar la cuenta de ${cuenta.nombre}?',
+      mensaje: activar
+          ? 'Podrá volver a entrar en AVA.'
+          : 'No podrá entrar en AVA. Sus datos, tareas e historial se '
+                'conservan y se puede reactivar cuando quieras.',
+      textoConfirmar: activar ? 'Reactivar' : 'Desactivar',
+      textoCancelar: 'Cancelar',
+    );
+    if (confirmado && mounted) {
+      final error = await _controlador.cambiarActivacion(
+        cuenta,
+        activa: activar,
+        idCuentaActual: idCuentaActual,
+      );
+      avisos.showSnackBar(
+        SnackBar(
+          content: Text(
+            error ?? (activar ? 'Cuenta reactivada.' : 'Cuenta desactivada.'),
+          ),
+        ),
+      );
+    }
+  }
+
+  static String _textoDesactivada(Cuenta cuenta) {
+    final fecha = cuenta.desactivadaEn;
+    return fecha == null
+        ? 'Desactivada'
+        : 'Desactivada el ${fecha.day}/${fecha.month}/${fecha.year}';
   }
 
   static IconData _icono(Rol rol) => switch (rol) {

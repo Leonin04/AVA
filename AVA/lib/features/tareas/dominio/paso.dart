@@ -25,8 +25,8 @@ class Paso {
   }
 
   Map<String, dynamic> toMap() => {
-        'orden': orden,
-        'texto': texto,
-        'imagenUrl': imagenUrl,
-      };
+    'orden': orden,
+    'texto': texto,
+    'imagenUrl': imagenUrl,
+  };
 }

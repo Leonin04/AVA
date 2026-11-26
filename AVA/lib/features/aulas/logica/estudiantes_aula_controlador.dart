@@ -3,7 +3,8 @@ import '../../perfil/dominio/perfil_estudiante.dart';
 import '../../perfil/dominio/repositorio_estudiantes.dart';
 import '../dominio/ficha_aula.dart';
 
-/// Carga los estudiantes de un aula.
+/// Carga los estudiantes de un aula para la tableta. Los que tienen la
+/// cuenta desactivada no aparecen (HU-13).
 class EstudiantesAulaControlador extends ControladorCarga<List<Estudiante>> {
   EstudiantesAulaControlador({
     required RepositorioEstudiantes repositorio,
@@ -14,8 +15,10 @@ class EstudiantesAulaControlador extends ControladorCarga<List<Estudiante>> {
   final Aula aula;
 
   @override
-  Future<List<Estudiante>> obtenerDatos() =>
-      _repositorio.listar(idAula: aula.id);
+  Future<List<Estudiante>> obtenerDatos() async => [
+    for (final estudiante in await _repositorio.listar(idAula: aula.id))
+      if (estudiante.activo) estudiante,
+  ];
 
   @override
   String get mensajeErrorCarga => 'No se han podido cargar los alumnos.';
