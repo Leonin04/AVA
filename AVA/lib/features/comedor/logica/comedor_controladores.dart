@@ -51,17 +51,34 @@ class ComedorEstudianteControlador extends ControladorCarga<List<DiaComedor>> {
   String get mensajeErrorCarga => 'No se ha podido abrir el comedor.';
 
   /// Cambia la respuesta de [dia]: si iba, ya no va, y al revés.
+  /// Al marcar cualquier día de la semana, el resto de días aún sin responder
+  /// se guardan como «no come» para que no figuren como pendientes.
   Future<void> cambiar(DiaComedor dia) async {
-    await _comedor.registrarAsistencia(
-      idAula: estudiante.idAula!,
-      fecha: dia.dia,
-      asistencia: AsistenciaComedor(
-        idEstudiante: estudiante.id,
-        come: !(dia.come ?? false),
-        origen: OrigenAsistencia.estudiante,
-        idActor: estudiante.id,
+    final idAula = estudiante.idAula!;
+    await Future.wait([
+      _comedor.registrarAsistencia(
+        idAula: idAula,
+        fecha: dia.dia,
+        asistencia: AsistenciaComedor(
+          idEstudiante: estudiante.id,
+          come: !(dia.come ?? false),
+          origen: OrigenAsistencia.estudiante,
+          idActor: estudiante.id,
+        ),
       ),
-    );
+      for (final otro in datos ?? const <DiaComedor>[])
+        if (otro.dia != dia.dia && otro.come == null)
+          _comedor.registrarAsistencia(
+            idAula: idAula,
+            fecha: otro.dia,
+            asistencia: AsistenciaComedor(
+              idEstudiante: estudiante.id,
+              come: false,
+              origen: OrigenAsistencia.estudiante,
+              idActor: estudiante.id,
+            ),
+          ),
+    ]);
     await cargar();
   }
 }
@@ -210,7 +227,11 @@ class ComedorTutorControlador extends ControladorCarga<List<Aula>> {
   @override
   Future<List<Aula>> obtenerDatos() async {
     final aulas = Permisos.aulasVisibles(cuenta, await _aulas.obtenerAulas());
-    aula ??= aulas.firstOrNull;
+    final actual = aula;
+    aula = actual == null
+        ? aulas.firstOrNull
+        : aulas.where((a) => a.id == actual.id).firstOrNull ??
+              aulas.firstOrNull;
     return aulas;
   }
 

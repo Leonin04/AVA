@@ -196,30 +196,51 @@ class _BarraNavegacion extends StatelessWidget {
   final bool esInicio;
   final VoidCallback? alSalir;
 
+  static const _estiloSalir = EstiloTarjeta(
+    fondo: Color(0xFFFFA8A8),
+    borde: Color(0xFFB71C1C),
+    texto: Paleta.tinta,
+    acento: Color(0xFFB71C1C),
+  );
+
   @override
   Widget build(BuildContext context) {
     final salir = alSalir;
-    final Widget primero;
+    final botonAyuda = BotonAccesible(
+      texto: 'Ayuda',
+      etiquetaSemantica: 'Pedir ayuda',
+      pictograma: Pictogramas.ayuda,
+      icono: Icons.pan_tool_rounded,
+      color: ColorPastel.rosa,
+      disposicion: DisposicionBoton.horizontal,
+      alPulsar: () => mostrarAyuda(context),
+    );
+
+    final Widget izquierda;
+    final Widget derecha;
     if (salir != null) {
-      primero = BotonAccesible(
+      izquierda = botonAyuda;
+      derecha = BotonAccesible(
         texto: 'Salir',
         etiquetaSemantica: 'Salir de mi sesión',
         pictograma: Pictogramas.salir,
         icono: Icons.logout_rounded,
-        color: ColorPastel.melocoton,
+        color: ColorPastel.rosa,
+        estiloPersonalizado: _estiloSalir,
         disposicion: DisposicionBoton.horizontal,
         alPulsar: salir,
       );
-    } else if (puedeVolver) {
-      primero = BotonAccesible(
-        texto: 'Atrás',
-        icono: Icons.arrow_back_rounded,
-        color: ColorPastel.lavanda,
-        disposicion: DisposicionBoton.horizontal,
-        alPulsar: () => Navigator.of(context).maybePop(),
-      );
     } else {
-      primero = const SizedBox.shrink();
+      izquierda = puedeVolver
+          ? BotonAccesible(
+              texto: 'Atrás',
+              icono: Icons.arrow_back_rounded,
+              color: ColorPastel.lavanda,
+              disposicion: DisposicionBoton.horizontal,
+              alPulsar: () => Navigator.of(context).maybePop(),
+            )
+          : const SizedBox.shrink();
+      derecha = botonAyuda;
     }
 
     // Los tres huecos se mantienen aunque un botón no aparezca, para que
@@ -228,7 +249,7 @@ class _BarraNavegacion extends StatelessWidget {
       height: Dimensiones.altoBarraNavegacion,
       child: Row(
         children: [
-          Expanded(child: primero),
+          Expanded(child: izquierda),
           const SizedBox(width: Dimensiones.espaciado),
           Expanded(
             child: esInicio
@@ -243,17 +264,7 @@ class _BarraNavegacion extends StatelessWidget {
                   ),
           ),
           const SizedBox(width: Dimensiones.espaciado),
-          Expanded(
-            child: BotonAccesible(
-              texto: 'Ayuda',
-              etiquetaSemantica: 'Pedir ayuda',
-              pictograma: Pictogramas.ayuda,
-              icono: Icons.pan_tool_rounded,
-              color: ColorPastel.rosa,
-              disposicion: DisposicionBoton.horizontal,
-              alPulsar: () => mostrarAyuda(context),
-            ),
-          ),
+          Expanded(child: derecha),
         ],
       ),
     );

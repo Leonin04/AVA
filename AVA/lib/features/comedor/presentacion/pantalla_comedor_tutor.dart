@@ -131,16 +131,24 @@ class _PantallaComedorTutorState extends State<PantallaComedorTutor> {
               runSpacing: Dimensiones.espaciadoPequeno,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                DropdownButton<Aula>(
-                  value: _panel.aula,
+                DropdownButton<String>(
+                  value: aulas.any((a) => a.id == _panel.aula?.id)
+                      ? _panel.aula?.id
+                      : null,
                   hint: const Text('Elige un aula'),
                   items: [
                     for (final aula in aulas)
-                      DropdownMenuItem(value: aula, child: Text(aula.nombre)),
+                      DropdownMenuItem(
+                        value: aula.id,
+                        child: Text(aula.nombre),
+                      ),
                   ],
-                  onChanged: (aula) {
-                    _panel.elegir(aula: aula);
-                    _crearLista();
+                  onChanged: (id) {
+                    final elegida = aulas.where((a) => a.id == id).firstOrNull;
+                    if (elegida != null) {
+                      _panel.elegir(aula: elegida);
+                      _crearLista();
+                    }
                   },
                 ),
                 OutlinedButton.icon(
@@ -195,7 +203,12 @@ class _ListaTutor extends StatelessWidget {
                 'El alumno que pasa la lista de su clase desde la tableta.',
           ),
           DropdownButton<String?>(
-            value: panel.aula?.idEncargadoComedor,
+            value:
+                filas.any(
+                  (f) => f.estudiante.id == panel.aula?.idEncargadoComedor,
+                )
+                ? panel.aula?.idEncargadoComedor
+                : null,
             isExpanded: true,
             items: [
               const DropdownMenuItem(value: null, child: Text('Nadie')),

@@ -38,6 +38,7 @@ class BotonAccesible extends StatefulWidget {
     this.icono,
     this.imagen,
     this.color = ColorPastel.cielo,
+    this.estiloPersonalizado,
     this.disposicion = DisposicionBoton.vertical,
     this.seleccionado = false,
     this.etiqueta,
@@ -62,6 +63,10 @@ class BotonAccesible extends StatefulWidget {
   /// para identificar.
   final Widget Function(double lado)? imagen;
   final ColorPastel color;
+
+  /// Estilo de color opcional para casos concretos (por ejemplo, rojo para
+  /// «Salir»). En modo alto contraste se sigue usando el tema de contraste.
+  final EstiloTarjeta? estiloPersonalizado;
   final DisposicionBoton disposicion;
   final bool seleccionado;
 
@@ -145,7 +150,9 @@ class _BotonAccesibleState extends State<BotonAccesible> {
   @override
   Widget build(BuildContext context) {
     final ajustes = AjustesInterfaz.of(context);
-    final estilo = ajustes.estiloDe(widget.color);
+    final estilo = ajustes.altoContraste
+        ? ajustes.estiloDe(widget.color)
+        : (widget.estiloPersonalizado ?? ajustes.estiloDe(widget.color));
     final habilitado = widget.alPulsar != null;
     final resaltado = widget.seleccionado || _conFoco;
     final radio = BorderRadius.circular(Dimensiones.radioBorde);

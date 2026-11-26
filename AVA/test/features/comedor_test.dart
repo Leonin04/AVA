@@ -48,6 +48,7 @@ void main() {
 
       await propio.cambiar(propio.datos!.first);
       expect(propio.datos!.first.come, isTrue);
+      expect(propio.datos!.skip(1).every((d) => d.come == false), isTrue);
       await propio.cambiar(propio.datos!.first);
       expect(propio.datos!.first.come, isFalse);
     });
